@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans transition-colors duration-200;
+  }
+
+  /* Dark mode root styles */
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
+}
+
+/* Tabular figures for numbers, currency, and IDs */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom Low-Profile Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
+}
+
+/* Design Tokens & Surfaces */
+@layer components {
+  .card-surface {
+    @apply bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-xs transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-soft hover:-translate-y-0.5 transition-all duration-200;
+  }
+
+  .glass-panel {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60;
+  }
+}
+
+/* Print Optimization for ID Cards, Fee Challans & Reports */
+@media print {
+  /* Hide application shell elements */
+  aside,
+  header,
+  nav,
+  button,
+  .no-print,
+  #command-palette,
+  [role="dialog"] > div:first-child /* backdrop */ {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Force background colors and images for cards and barcodes */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .page-break-after {
+    page-break-after: always !important;
+  }
+
+  /* Ensure modal content expands cleanly during print */
+  .print-container {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
