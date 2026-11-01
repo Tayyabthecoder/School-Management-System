@@ -40,3 +40,8 @@ backend/.wwebjs_cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+
+#AI Folder and docs files
+.agents/
+docs/
