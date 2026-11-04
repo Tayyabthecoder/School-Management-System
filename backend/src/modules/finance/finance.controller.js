@@ -12,13 +12,46 @@ const { getPagination, formatPaginatedResponse } = require('../../utils/paginati
 const { logAudit } = require('../../utils/audit-log.util')
 const { ApiError } = require('../../middleware/error.middleware')
 const { validateObjectId } = require('../../utils/validation.util')
+const { escapeRegex } = require('../../utils/regex.util')
 const { invalidateCache, getOrSet } = require('../../utils/cache.util')
 const { broadcast } = require('../reports/sse.controller')
 const {
   generateMonthlyFeeChallans,
   getMonthlyChallansStatus,
 } = require('../../services/monthly-challan.service')
-const { validatePayment, applyDiscountToFeeRecord } = require('./finance.service')
+const { validatePayment, applyDiscountToFeeRecord, calculateNetFee } = require('./finance.service')
+
+const withOptionalTransaction = async (workFn) => {
+  if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+    return workFn(null)
+  }
+  let session = null
+  try {
+    if (mongoose && typeof mongoose.startSession === 'function') {
+      session = await mongoose.startSession().catch(() => null)
+    }
+    if (session) {
+      session.startTransaction()
+    }
+    const result = await workFn(session)
+    if (session && typeof session.inTransaction === 'function' && session.inTransaction()) {
+      await session.commitTransaction().catch(() => {})
+    }
+    return result
+  } catch (err) {
+    if (session && typeof session.inTransaction === 'function' && session.inTransaction()) {
+      await session.abortTransaction().catch(() => {})
+    }
+    if (err.message && (err.message.includes('replica set') || err.message.includes('Transactions are not supported'))) {
+      return await workFn(null)
+    }
+    throw err
+  } finally {
+    if (session && typeof session.endSession === 'function') {
+      session.endSession().catch(() => {})
+    }
+  }
+}
 
 const getFeeStructures = async (req, res, next) => {
   try {
@@ -106,7 +139,7 @@ const getStudentFees = async (req, res, next) => {
       }
       if (req.query.search && req.query.search.trim()) {
         const queryTerm = req.query.search.trim()
-        const searchRegex = new RegExp(queryTerm, 'i')
+        const searchRegex = new RegExp(escapeRegex(queryTerm), 'i')
 
         const studentMatches = await Student.find({
           $or: [
@@ -118,7 +151,7 @@ const getStudentFees = async (req, res, next) => {
         }).select('_id')
         const matchedStudentIds = studentMatches.map(s => s._id)
 
-        const cleanSuffix = queryTerm.replace(/^CHL(-\d{4})?-/i, '')
+        const cleanSuffix = escapeRegex(queryTerm.replace(/^CHL(-\d{4})?-/i, ''))
         const searchConditions = []
 
         if (matchedStudentIds.length > 0) {
@@ -185,29 +218,34 @@ const recordPayment = async (req, res, next) => {
     const paymentYear = new Date().getFullYear()
     const receiptNo = `REC-${paymentYear}-${String(seq).padStart(5, '0')}`
 
-    // Atomic conditional decrement prevents race conditions and overpayment
-    const updatedFee = await StudentFee.findOneAndUpdate(
-      { _id: studentFeeId, outstandingAmount: { $gte: amountPaid } },
-      { $inc: { amountPaid: amountPaid, outstandingAmount: -amountPaid } },
-      { new: true }
-    )
+    // Atomic conditional decrement within optional transaction
+    const { payment, updatedFee } = await withOptionalTransaction(async (session) => {
+      const opts = session ? { session } : {}
+      const updated = await StudentFee.findOneAndUpdate(
+        { _id: studentFeeId, outstandingAmount: { $gte: amountPaid } },
+        { $inc: { amountPaid: amountPaid, outstandingAmount: -amountPaid } },
+        { new: true, ...opts }
+      )
 
-    if (!updatedFee) {
-      throw new ApiError(400, 'Payment exceeds outstanding balance or was modified concurrently')
-    }
+      if (!updated) {
+        throw new ApiError(400, 'Payment exceeds outstanding balance or was modified concurrently')
+      }
 
-    updatedFee.status = updatedFee.outstandingAmount <= 0 ? 'Paid' : 'Partial'
-    await updatedFee.save()
+      updated.status = updated.outstandingAmount <= 0 ? 'Paid' : 'Partial'
+      await updated.save(opts)
 
-    const payment = await Payment.create({
-      receiptNo,
-      studentFeeId,
-      studentId: feeRecord.studentId._id,
-      amountPaid,
-      paymentMode: paymentMode || 'Cash',
-      referenceNo: referenceNo || '',
-      remarks: remarks || '',
-      recordedBy: req.user._id,
+      const pmt = await Payment.create({
+        receiptNo,
+        studentFeeId,
+        studentId: feeRecord.studentId._id,
+        amountPaid,
+        paymentMode: paymentMode || 'Cash',
+        referenceNo: referenceNo || '',
+        remarks: remarks || '',
+        recordedBy: req.user._id,
+      })
+
+      return { payment: Array.isArray(pmt) ? pmt[0] : pmt, updatedFee: updated }
     })
 
     await logAudit({
@@ -479,7 +517,7 @@ const assignFeeToStudent = async (req, res, next) => {
       throw new ApiError(400, `Discount (PKR ${numDiscount}) cannot exceed fee amount (PKR ${amountDue})`)
     }
 
-    const netAmount = Math.max(0, amountDue - numDiscount)
+    const { netAmount } = calculateNetFee(amountDue, numDiscount)
     const effectiveDueDate = dueDate || structure.dueDate
 
     const studentFee = await StudentFee.create({

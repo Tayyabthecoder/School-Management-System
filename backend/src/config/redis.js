@@ -1,10 +1,11 @@
 const Redis = require('ioredis')
+const env = require('./env')
 
 let redisClient = null
 let isRedisAvailable = false
 
 try {
-  const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+  const redisUrl = env.REDIS_URL
   redisClient = new Redis(redisUrl, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
@@ -42,7 +43,7 @@ const checkRedisAvailable = () => isRedisAvailable
  */
 const createRedisClient = (role = 'Client') => {
   try {
-    const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+    const redisUrl = env.REDIS_URL
     const client = new Redis(redisUrl, {
       maxRetriesPerRequest: null,
       enableReadyCheck: false,

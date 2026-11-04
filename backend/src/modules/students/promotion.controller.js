@@ -105,6 +105,18 @@ const previewPromotion = async (req, res, next) => {
         termName: config.finalExamTermName || 'Final Term',
       }).populate('subjectId')
 
+      const studentIds = students.map(s => s._id)
+      const examIds = exams.map(e => e._id)
+      const allClassGrades = (studentIds.length > 0 && examIds.length > 0)
+        ? await Grade.find({ studentId: { $in: studentIds }, examId: { $in: examIds } }).lean()
+        : []
+      const gradeMap = new Map()
+      allClassGrades.forEach(g => {
+        const sId = (g.studentId?._id || g.studentId || '').toString()
+        const eId = (g.examId?._id || g.examId || '').toString()
+        gradeMap.set(sId + '_' + eId, g)
+      })
+
       for (const student of students) {
         if (exams.length === 0) {
           unresolved.push({
@@ -121,17 +133,14 @@ const previewPromotion = async (req, res, next) => {
           continue
         }
 
-        const grades = await Grade.find({
-          studentId: student._id,
-          examId: { $in: exams.map(e => e._id) },
-        })
-
         let hasMissingGrade = false
         let hasFailedExam = false
         const examDetails = []
 
         for (const exam of exams) {
-          const grade = grades.find(g => g.examId.toString() === exam._id.toString())
+          const sId = student._id.toString()
+          const eId = exam._id.toString()
+          const grade = gradeMap.get(sId + '_' + eId)
           if (!grade) {
             hasMissingGrade = true
             examDetails.push({ subject: exam.subjectId?.name || 'Subject', status: 'Missing Grade' })
@@ -284,6 +293,18 @@ const previewPromotionInternal = async (config) => {
       termName: config.finalExamTermName || 'Final Term',
     }).populate('subjectId')
 
+    const studentIds = students.map(s => s._id)
+    const examIds = exams.map(e => e._id)
+    const allClassGrades = (studentIds.length > 0 && examIds.length > 0)
+      ? await Grade.find({ studentId: { $in: studentIds }, examId: { $in: examIds } }).lean()
+      : []
+    const gradeMap = new Map()
+    allClassGrades.forEach(g => {
+      const sId = (g.studentId?._id || g.studentId || '').toString()
+      const eId = (g.examId?._id || g.examId || '').toString()
+      gradeMap.set(sId + '_' + eId, g)
+    })
+
     for (const student of students) {
       if (exams.length === 0) {
         unresolved.push({
@@ -297,16 +318,13 @@ const previewPromotionInternal = async (config) => {
         continue
       }
 
-      const grades = await Grade.find({
-        studentId: student._id,
-        examId: { $in: exams.map(e => e._id) },
-      })
-
       let hasMissing = false
       let hasFailed = false
 
       for (const exam of exams) {
-        const grade = grades.find(g => g.examId.toString() === exam._id.toString())
+        const sId = student._id.toString()
+        const eId = exam._id.toString()
+        const grade = gradeMap.get(sId + '_' + eId)
         if (!grade) {
           hasMissing = true
         } else if (grade.marksObtained < (exam.passMarks || 40)) {

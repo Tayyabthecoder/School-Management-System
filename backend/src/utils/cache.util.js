@@ -1,17 +1,7 @@
 const { redisClient, checkRedisAvailable } = require('../config/redis')
 
 const MAX_MEMORY_ITEMS = 500
-// In-memory fallback cache Map
 const memoryCache = new Map()
-
-const cleanExpiredMemoryCache = () => {
-  const now = Date.now()
-  for (const [k, v] of memoryCache.entries()) {
-    if (v.expiry <= now) {
-      memoryCache.delete(k)
-    }
-  }
-}
 
 const getOrSet = async (key, ttlSeconds = 300, fetcherFn) => {
   // 1. Try Redis cache
@@ -21,14 +11,17 @@ const getOrSet = async (key, ttlSeconds = 300, fetcherFn) => {
       if (cached) {
         return JSON.parse(cached)
       }
-    } catch (err) {
+    } catch (_) {
       // Redis error, proceed to fetcher
     }
   } else {
-    // Check in-memory fallback
+    // Check in-memory fallback (passive TTL eviction)
     const mem = memoryCache.get(key)
-    if (mem && mem.expiry > Date.now()) {
-      return mem.data
+    if (mem) {
+      if (mem.expiry > Date.now()) {
+        return mem.data
+      }
+      memoryCache.delete(key)
     }
   }
 
@@ -39,16 +32,13 @@ const getOrSet = async (key, ttlSeconds = 300, fetcherFn) => {
   if (redisClient && checkRedisAvailable()) {
     try {
       await redisClient.setex(key, ttlSeconds, JSON.stringify(freshData))
-    } catch (err) {
+    } catch (_) {
       // Redis set failed
     }
   } else {
     if (memoryCache.size >= MAX_MEMORY_ITEMS) {
-      cleanExpiredMemoryCache()
-      if (memoryCache.size >= MAX_MEMORY_ITEMS) {
-        const oldestKey = memoryCache.keys().next().value
-        if (oldestKey) memoryCache.delete(oldestKey)
-      }
+      const oldestKey = memoryCache.keys().next().value
+      if (oldestKey) memoryCache.delete(oldestKey)
     }
     memoryCache.set(key, {
       data: freshData,
@@ -63,7 +53,7 @@ const invalidateCache = async (key) => {
   if (redisClient && checkRedisAvailable()) {
     try {
       await redisClient.del(key)
-    } catch (err) {}
+    } catch (_) {}
   }
   memoryCache.delete(key)
 }

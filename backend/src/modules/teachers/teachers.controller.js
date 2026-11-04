@@ -43,45 +43,56 @@ const getTeachers = async (req, res, next) => {
     }
     const teachers = await staffQuery
 
-    const enriched = await Promise.all(
-      teachers.map(async (t) => {
-        const entries = await TimetableEntry.find({ teacherId: t._id })
+    const teacherIds = teachers.map(t => t._id)
+    const allEntries = teacherIds.length > 0
+      ? await TimetableEntry.find({ teacherId: { $in: teacherIds } })
           .populate('classId', 'name level')
           .populate('subjectId', 'name code')
+      : []
 
-        const uniqueClasses = []
-        const classIdsSeen = new Set()
-        const uniqueSubjects = []
-        const subjectIdsSeen = new Set()
+    const entriesByTeacher = new Map()
+    allEntries.forEach(e => {
+      const tId = (e.teacherId?._id || e.teacherId || '').toString()
+      if (!entriesByTeacher.has(tId)) {
+        entriesByTeacher.set(tId, [])
+      }
+      entriesByTeacher.get(tId).push(e)
+    })
 
-        entries.forEach((e) => {
-          if (e.classId && !classIdsSeen.has(String(e.classId._id))) {
-            classIdsSeen.add(String(e.classId._id))
-            uniqueClasses.push({
-              _id: e.classId._id,
-              name: e.classId.name,
-              section: e.sectionId,
-            })
-          }
-          if (e.subjectId && !subjectIdsSeen.has(String(e.subjectId._id))) {
-            subjectIdsSeen.add(String(e.subjectId._id))
-            uniqueSubjects.push({
-              _id: e.subjectId._id,
-              name: e.subjectId.name,
-              code: e.subjectId.code,
-            })
-          }
-        })
+    const enriched = teachers.map((t) => {
+      const entries = entriesByTeacher.get(t._id.toString()) || []
+      const uniqueClasses = []
+      const classIdsSeen = new Set()
+      const uniqueSubjects = []
+      const subjectIdsSeen = new Set()
 
-        return {
-          ...t.toObject(),
-          weeklyPeriodsCount: entries.length,
-          assignedClasses: uniqueClasses,
-          assignedSubjects: uniqueSubjects,
-          isAcademicFaculty: (t.department || '').toLowerCase().includes('academic') || (t.designation || '').toLowerCase().includes('teacher'),
+      entries.forEach((e) => {
+        if (e.classId && !classIdsSeen.has(String(e.classId._id))) {
+          classIdsSeen.add(String(e.classId._id))
+          uniqueClasses.push({
+            _id: e.classId._id,
+            name: e.classId.name,
+            section: e.sectionId,
+          })
+        }
+        if (e.subjectId && !subjectIdsSeen.has(String(e.subjectId._id))) {
+          subjectIdsSeen.add(String(e.subjectId._id))
+          uniqueSubjects.push({
+            _id: e.subjectId._id,
+            name: e.subjectId.name,
+            code: e.subjectId.code,
+          })
         }
       })
-    )
+
+      return {
+        ...t.toObject(),
+        weeklyPeriodsCount: entries.length,
+        assignedClasses: uniqueClasses,
+        assignedSubjects: uniqueSubjects,
+        isAcademicFaculty: (t.department || '').toLowerCase().includes('academic') || (t.designation || '').toLowerCase().includes('teacher'),
+      }
+    })
 
     res.json({ success: true, count: enriched.length, data: enriched })
   } catch (error) {

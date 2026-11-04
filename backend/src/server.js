@@ -7,6 +7,8 @@ const startServer = async () => {
   const PORT = env.PORT || 5000
 
   // Start background queue workers & cron schedules
+  const { initQueues } = require('./jobs/queues')
+  initQueues()
   require('./jobs/fee-overdue.worker')
   const { initMonthlyChallanCron } = require('./jobs/monthly-challan.cron')
   initMonthlyChallanCron()

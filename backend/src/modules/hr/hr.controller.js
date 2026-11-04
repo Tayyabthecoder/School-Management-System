@@ -14,7 +14,7 @@ const { ApiError } = require('../../middleware/error.middleware')
 const { escapeRegex } = require('../../utils/regex.util')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 const { getOrSet } = require('../../utils/cache.util')
-const { computeNetSalary } = require('./hr.service')
+const { computeNetSalary, calculateAbsentDeductions } = require('./hr.service')
 
 const getStaffList = async (req, res, next) => {
   try {
@@ -203,6 +203,31 @@ const runPayroll = async (req, res, next) => {
     const { month, year, applyIncomeTax, applyEobi, applySessi } = req.body
     const activeStaff = await Staff.find({ isActive: true, deletedAt: null })
 
+    const startDate = new Date(year, month - 1, 1)
+    const endDate = new Date(year, month, 0)
+    endDate.setHours(23, 59, 59, 999)
+
+    const staffIds = activeStaff.map(s => s._id)
+    const absenceAgg = (staffIds.length > 0)
+      ? await StaffAttendance.aggregate([
+          {
+            $match: {
+              staffId: { $in: staffIds },
+              status: 'Absent',
+              date: { $gte: startDate, $lte: endDate },
+            },
+          },
+          {
+            $group: {
+              _id: '$staffId',
+              count: { $sum: 1 },
+            },
+          },
+        ])
+      : []
+    const absenceMap = new Map()
+    absenceAgg.forEach(a => absenceMap.set((a._id || '').toString(), a.count))
+
     const records = []
     for (const staff of activeStaff) {
       const existing = await PayrollRecord.findOne({ staffId: staff._id, month, year })
@@ -211,19 +236,8 @@ const runPayroll = async (req, res, next) => {
         continue
       }
 
-      // Calculate absent days from StaffAttendance
-      const startDate = new Date(year, month - 1, 1)
-      const endDate = new Date(year, month, 0)
-      endDate.setHours(23, 59, 59, 999)
-
-      const absentCount = await StaffAttendance.countDocuments({
-        staffId: staff._id,
-        status: 'Absent',
-        date: { $gte: startDate, $lte: endDate },
-      })
-
-      const perDaySalary = Math.round(staff.salary / 30)
-      const absentDeduction = absentCount * perDaySalary
+      const absentCount = absenceMap.get(staff._id.toString()) || 0
+      const absentDeduction = calculateAbsentDeductions(staff.salary, absentCount)
       const salaryDetails = computeNetSalary({
         basicPay: staff.salary,
         allowances: staff.allowances || 0,

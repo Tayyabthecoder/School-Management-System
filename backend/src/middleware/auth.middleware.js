@@ -79,9 +79,9 @@ const verifyToken = async (req, res, next) => {
     }
 
     // Enforce password change for accounts flagged with mustChangePassword
-    mustChangePasswordGuard(req, res, () => {})
+    return mustChangePasswordGuard(req, res, next)
 
-    next()
+
   } catch (error) {
     next(error)
   }

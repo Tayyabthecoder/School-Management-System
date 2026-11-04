@@ -1,6 +1,7 @@
 /**
  * Server-Sent Events (SSE) Controller for Real-Time Dashboard Updates (Gap 1)
  */
+const crypto = require('crypto')
 
 const clients = new Set()
 
@@ -12,7 +13,7 @@ const subscribe = (req, res) => {
     'X-Accel-Buffering': 'no', // Disable buffering in Nginx reverse proxies
   })
 
-  const clientId = Date.now() + Math.random().toString(36).substring(2, 7)
+  const clientId = crypto.randomUUID()
   const client = { id: clientId, res }
   clients.add(client)
 

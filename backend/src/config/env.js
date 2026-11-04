@@ -40,6 +40,7 @@ const env = {
   CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',
   UPLOAD_DIR: process.env.UPLOAD_DIR || './uploads',
   MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB || '10', 10),
+  REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
 }
 
 module.exports = env

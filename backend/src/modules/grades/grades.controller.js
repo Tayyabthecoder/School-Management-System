@@ -7,7 +7,7 @@ const { generatePDFBuffer, buildReportCardPDF } = require('../../utils/pdf.util'
 const { ApiError } = require('../../middleware/error.middleware')
 const { validateObjectId } = require('../../utils/validation.util')
 const { getOrSet } = require('../../utils/cache.util')
-const { calculateGradeLetter } = require('./grades.service')
+const { calculateGradeLetter, calculatePercentage } = require('./grades.service')
 
 const getExams = async (req, res, next) => {
   try {
@@ -59,7 +59,7 @@ const saveGrades = async (req, res, next) => {
         throw new ApiError(400, `Marks obtained cannot exceed maximum marks (${exam.maxMarks})`)
       }
 
-      const percentage = Math.round((item.marksObtained / exam.maxMarks) * 100)
+      const percentage = calculatePercentage(item.marksObtained, exam.maxMarks)
       const gradeLetter = calculateGradeLetter(percentage, gradingScale)
 
       const doc = await Grade.findOneAndUpdate(

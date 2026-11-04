@@ -1,11 +1,16 @@
-const morgan = require('morgan')
 const logger = require('../utils/logger')
 
-const morganFormat = ':method :url :status :res[content-length] - :response-time ms'
-
-const loggerMiddleware = morgan(morganFormat, {
-  stream: logger.stream,
-  skip: () => process.env.NODE_ENV === 'test',
-})
+const loggerMiddleware = (req, res, next) => {
+  if (process.env.NODE_ENV === 'test') {
+    return next()
+  }
+  const start = Date.now()
+  res.on('finish', () => {
+    const elapsed = Date.now() - start
+    const len = res.getHeader('content-length') || '-'
+    logger.http(`${req.method} ${req.originalUrl || req.url} ${res.statusCode} ${len} - ${elapsed} ms`)
+  })
+  next()
+}
 
 module.exports = loggerMiddleware

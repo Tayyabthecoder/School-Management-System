@@ -36,6 +36,23 @@ export default function Modal({
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && closeOnEscape) {
         onClose?.()
+        return
+      }
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+        if (focusable.length > 0) {
+          const first = focusable[0]
+          const last = focusable[focusable.length - 1]
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault()
+            last.focus()
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault()
+            first.focus()
+          }
+        }
       }
     }
 
@@ -44,8 +61,17 @@ export default function Modal({
     document.body.style.overflow = 'hidden'
 
     window.addEventListener('keydown', handleKeyDown)
+    const timer = setTimeout(() => {
+      if (modalRef.current) {
+        const firstFocusable = modalRef.current.querySelector(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+        if (firstFocusable) firstFocusable.focus()
+      }
+    }, 50)
 
     return () => {
+      clearTimeout(timer)
       document.body.style.overflow = originalOverflow
       window.removeEventListener('keydown', handleKeyDown)
     }

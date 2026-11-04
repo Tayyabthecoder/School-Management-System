@@ -2,6 +2,7 @@ const Student = require('../../models/Student.model')
 const Exam = require('../../models/Exam.model')
 const Grade = require('../../models/Grade.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
+const AcademicYear = require('../../models/AcademicYear.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF, buildTranscriptPDF } = require('../../utils/pdf.util')
 const { ApiError } = require('../../middleware/error.middleware')
@@ -70,10 +71,29 @@ const compileStudentReportData = async (studentId, termName = 'Final Term', acad
     }
   })
 
-  // Calculate student attendance %
-  const attRecords = await StudentAttendance.find({
-    'records.studentId': student._id,
-  })
+  // Calculate student attendance % scoped to the active academic session or term
+  let attDateFilter = null
+  let yearDoc = null
+  if (academicYearId) {
+    yearDoc = await AcademicYear.findById(academicYearId)
+  }
+  if (!yearDoc) {
+    yearDoc = await AcademicYear.findOne({ isActive: true })
+  }
+  if (yearDoc) {
+    const matchedTerm = (yearDoc.terms || []).find(t => t.name === termName)
+    if (matchedTerm && matchedTerm.startDate && matchedTerm.endDate) {
+      attDateFilter = { $gte: matchedTerm.startDate, $lte: matchedTerm.endDate }
+    } else if (yearDoc.startDate && yearDoc.endDate) {
+      attDateFilter = { $gte: yearDoc.startDate, $lte: yearDoc.endDate }
+    }
+  }
+
+  const attQuery = { 'records.studentId': student._id }
+  if (attDateFilter) {
+    attQuery.date = attDateFilter
+  }
+  const attRecords = await StudentAttendance.find(attQuery)
   let totalDays = 0
   let presentDays = 0
   attRecords.forEach((att) => {
