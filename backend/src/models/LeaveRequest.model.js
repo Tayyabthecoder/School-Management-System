@@ -11,4 +11,7 @@ const leaveRequestSchema = new mongoose.Schema({
   reviewRemarks: { type: String, default: '' },
 }, { timestamps: true })
 
+leaveRequestSchema.index({ status: 1 })
+leaveRequestSchema.index({ staffId: 1, fromDate: -1 })
+
 module.exports = mongoose.model('LeaveRequest', leaveRequestSchema)

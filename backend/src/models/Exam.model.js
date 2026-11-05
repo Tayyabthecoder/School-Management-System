@@ -12,4 +12,8 @@ const examSchema = new mongoose.Schema({
   isPublished: { type: Boolean, default: false },
 }, { timestamps: true })
 
+examSchema.index({ classId: 1, academicYearId: 1, termName: 1 })
+examSchema.index({ subjectId: 1 })
+examSchema.index({ academicYearId: 1 })
+
 module.exports = mongoose.model('Exam', examSchema)

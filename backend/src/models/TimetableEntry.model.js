@@ -14,5 +14,6 @@ const timetableEntrySchema = new mongoose.Schema({
 }, { timestamps: true })
 
 timetableEntrySchema.index({ classId: 1, sectionId: 1, dayOfWeek: 1, periodNumber: 1 }, { unique: true })
+timetableEntrySchema.index({ teacherId: 1, dayOfWeek: 1, periodNumber: 1 })
 
 module.exports = mongoose.model('TimetableEntry', timetableEntrySchema)

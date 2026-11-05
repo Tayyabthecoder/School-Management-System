@@ -26,6 +26,8 @@ export default function AttendancePage() {
   const [activeMainTab, setActiveMainTab] = useState('attendance') // 'attendance' | 'leaves'
   const [classes, setClasses] = useState([])
   const [students, setStudents] = useState([])
+  const [sectionRoster, setSectionRoster] = useState([])
+  const [rosterLoading, setRosterLoading] = useState(false)
   const [loading, setLoading] = useState(true)
 
   const [navLevel, setNavLevel] = useState('grades')
@@ -47,7 +49,7 @@ export default function AttendancePage() {
       try {
         const [clsRes, stuRes] = await Promise.all([
           api.get('/classes'),
-          api.get('/students', { params: { limit: 100 } }),
+          api.get('/students', { params: { limit: 1000 } }),
         ])
         if (clsRes.data?.success && clsRes.data.data.length > 0) {
           setClasses(clsRes.data.data)
@@ -110,27 +112,47 @@ export default function AttendancePage() {
   const handleSelectGrade = (cls) => {
     setSelectedGrade(cls)
     setSelectedSection(null)
+    setSectionRoster([])
     setNavLevel('sections')
   }
 
   const loadExistingAttendance = useCallback(async (grade, section, date) => {
     if (!grade || !section) return
-    const secStudents = students.filter(
-      s => s.classId && (s.classId._id === grade._id || s.classId === grade._id || s.classId?.name === grade.name) && s.sectionId === section
-    )
-    const initial = {}
-    secStudents.forEach(s => { initial[s._id] = 'Present' })
+    setRosterLoading(true)
 
     try {
-      const res = await api.get('/attendance/student', {
-        params: {
-          classId: grade._id,
-          sectionId: section,
-          date,
-        },
-      })
-      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-        const attDoc = res.data.data[0]
+      // Dynamic section roster fetch ensures full class list even in large institutions (2,000+ students)
+      const [stuRes, attRes] = await Promise.all([
+        api.get('/students', {
+          params: {
+            classId: grade._id,
+            sectionId: section,
+            limit: 1000,
+            status: 'Active',
+          },
+        }).catch(() => null),
+        api.get('/attendance/student', {
+          params: {
+            classId: grade._id,
+            sectionId: section,
+            date,
+          },
+        }).catch(() => null),
+      ])
+
+      const fetchedStudents = stuRes?.data?.success && Array.isArray(stuRes.data.data) && stuRes.data.data.length > 0
+        ? stuRes.data.data
+        : students.filter(
+            s => s.classId && (s.classId._id === grade._id || s.classId === grade._id || s.classId?.name === grade.name) && s.sectionId === section
+          )
+
+      setSectionRoster(fetchedStudents)
+
+      const initial = {}
+      fetchedStudents.forEach(s => { initial[s._id] = 'Present' })
+
+      if (attRes?.data?.success && Array.isArray(attRes.data.data) && attRes.data.data.length > 0) {
+        const attDoc = attRes.data.data[0]
         if (Array.isArray(attDoc.records)) {
           attDoc.records.forEach((r) => {
             const sid = r.studentId?._id || r.studentId
@@ -140,10 +162,12 @@ export default function AttendancePage() {
           })
         }
       }
+      setAttendance(initial)
     } catch (err) {
-      console.warn('Could not fetch existing attendance, using defaults', err)
+      console.warn('Could not fetch existing attendance or roster, using defaults', err)
+    } finally {
+      setRosterLoading(false)
     }
-    setAttendance(initial)
   }, [students])
 
   const handleSelectSection = (sec) => {
@@ -209,9 +233,11 @@ export default function AttendancePage() {
     }
   }
 
-  const activeRoster = students.filter(
-    s => selectedGrade && selectedSection && s.classId && (s.classId._id === selectedGrade._id || s.classId === selectedGrade._id || s.classId?.name === selectedGrade.name) && s.sectionId === selectedSection
-  )
+  const activeRoster = sectionRoster.length > 0
+    ? sectionRoster
+    : students.filter(
+        s => selectedGrade && selectedSection && s.classId && (s.classId._id === selectedGrade._id || s.classId === selectedGrade._id || s.classId?.name === selectedGrade.name) && s.sectionId === selectedSection
+      )
 
   const statusCounts = useMemo(() => {
     const counts = { Present: 0, Absent: 0, Late: 0, Excused: 0 }

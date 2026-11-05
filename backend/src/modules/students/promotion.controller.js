@@ -223,30 +223,26 @@ const executePromotion = async (req, res, next) => {
     let promotedCount = 0
     let retainedCount = 0
 
+    const bulkOps = []
     for (const item of allStudents) {
       const studentId = item.studentId.toString()
       const finalDecision = overrideMap.get(studentId) || item.decision
 
       if (finalDecision === 'promote') {
-        const student = await Student.findById(item.studentId)
-        if (student) {
-          const oldClass = student.classId
-          student.classId = item.toClassId
-          await student.save()
-
-          await logAudit({
-            req,
-            action: 'PROMOTE_STUDENT',
-            module: 'students',
-            documentId: student._id,
-            oldValues: { classId: oldClass },
-            newValues: { classId: item.toClassId },
-          })
-          promotedCount++
-        }
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: item.studentId },
+            update: { $set: { classId: item.toClassId } },
+          },
+        })
+        promotedCount++
       } else {
         retainedCount++
       }
+    }
+
+    if (bulkOps.length > 0) {
+      await Student.bulkWrite(bulkOps)
     }
 
     config.isExecuted = true

@@ -69,15 +69,37 @@ export default function StudentListPage() {
 
   const displayClasses = classes && classes.length > 0 ? classes : FALLBACK_GRADES
 
-  const handleSelectGrade = (cls) => {
+  const handleSelectGrade = async (cls) => {
     setSelectedGrade(cls)
     setSelectedSection(null)
     setNavLevel('sections')
+    try {
+      const res = await api.get('/students', { params: { classId: cls._id, limit: 1000 } })
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        setStudents((prev) => {
+          const map = new Map(prev.map(s => [s._id, s]))
+          res.data.data.forEach(s => map.set(s._id, s))
+          return Array.from(map.values())
+        })
+      }
+    } catch (_) {}
   }
 
-  const handleSelectSection = (sectionId) => {
+  const handleSelectSection = async (sectionId) => {
     setSelectedSection(sectionId)
     setNavLevel('students')
+    if (selectedGrade?._id) {
+      try {
+        const res = await api.get('/students', { params: { classId: selectedGrade._id, sectionId, limit: 1000 } })
+        if (res.data?.success && Array.isArray(res.data.data)) {
+          setStudents((prev) => {
+            const map = new Map(prev.map(s => [s._id, s]))
+            res.data.data.forEach(s => map.set(s._id, s))
+            return Array.from(map.values())
+          })
+        }
+      } catch (_) {}
+    }
   }
 
   const handleResetToGrades = () => {

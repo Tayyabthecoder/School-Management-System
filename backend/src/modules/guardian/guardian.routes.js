@@ -7,6 +7,7 @@ const { checkPermission } = require('../../middleware/rbac.middleware')
 router.use(verifyToken)
 
 router.get('/my-child', checkPermission(['guardian', 'super_admin', 'student']), guardianController.getMyChild)
+router.get('/my-children', checkPermission(['guardian', 'super_admin', 'student']), guardianController.getMyChildren)
 router.get('/attendance', checkPermission(['guardian', 'super_admin', 'student']), guardianController.getChildAttendance)
 router.get('/grades', checkPermission(['guardian', 'super_admin', 'student']), guardianController.getChildGrades)
 router.get('/fees', checkPermission(['guardian', 'super_admin', 'student']), guardianController.getChildFees)

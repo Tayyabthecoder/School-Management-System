@@ -31,6 +31,10 @@ const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) +
 
 const seedComprehensiveDatabase = async () => {
   try {
+    if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PRODUCTION_SEED !== 'true') {
+      console.error('❌ [FATAL ABORT]: Database seeding is strictly forbidden in production mode to prevent catastrophic data loss.')
+      process.exit(1)
+    }
     await connectDB()
     console.log('[Seed Engine] Cleaning existing database collections...')
     await Promise.all([

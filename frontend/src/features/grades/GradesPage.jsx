@@ -410,7 +410,7 @@ export default function GradesPage() {
   useEffect(() => {
     Promise.all([
       api.get('/classes').catch(() => ({ data: { data: [] } })),
-      api.get('/students?limit=500').catch(() => ({ data: { data: [] } })),
+      api.get('/students?limit=1000').catch(() => ({ data: { data: [] } })),
     ]).then(([gRes, sRes]) => {
       const loaded = gRes.data?.data?.length > 0 ? gRes.data.data : FALLBACK_GRADES
       setGrades(loaded)
@@ -437,14 +437,33 @@ export default function GradesPage() {
     setView('sections')
   }
 
-  const handleSelectSection = (section) => {
+  const handleSelectSection = async (section) => {
     setSelectedSection(section)
-    const sectionStudents = allStudents.filter(
+
+    // Immediate local in-memory fallback
+    const localSectionStudents = allStudents.filter(
       (s) =>
         (s.classId?._id || s.classId) === selectedGrade._id &&
         s.sectionId === section
     )
-    setStudents(sectionStudents)
+    setStudents(localSectionStudents)
+
+    // Dynamic section-scoped fetch guarantees all students loaded regardless of school population
+    try {
+      const stuRes = await api.get('/students', {
+        params: {
+          classId: selectedGrade._id,
+          sectionId: section,
+          limit: 1000,
+          status: 'Active',
+        },
+      })
+      if (stuRes.data?.success && Array.isArray(stuRes.data.data) && stuRes.data.data.length > 0) {
+        setStudents(stuRes.data.data)
+      }
+    } catch {
+      // Keep localSectionStudents fallback
+    }
 
     // Fetch exams for this class
     api.get(`/grades/exams?classId=${selectedGrade._id}`)

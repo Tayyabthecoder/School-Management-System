@@ -126,9 +126,31 @@ export default function FinancePage() {
     setNavLevel('sections')
   }
 
-  const handleSelectSection = (sec) => {
+  const handleSelectSection = async (sec) => {
     setSelectedSection(sec)
     setNavLevel('fees')
+    if (selectedGrade?._id) {
+      try {
+        const [feesRes, stuRes] = await Promise.all([
+          api.get('/finance/student-fees', { params: { classId: selectedGrade._id, sectionId: sec, limit: 1000 } }).catch(() => null),
+          api.get('/students', { params: { classId: selectedGrade._id, sectionId: sec, limit: 1000 } }).catch(() => null),
+        ])
+        if (feesRes?.data?.success && Array.isArray(feesRes.data.data)) {
+          setStudentFees((prev) => {
+            const map = new Map(prev.map(f => [f._id, f]))
+            feesRes.data.data.forEach(f => map.set(f._id, f))
+            return Array.from(map.values())
+          })
+        }
+        if (stuRes?.data?.success && Array.isArray(stuRes.data.data)) {
+          setStudents((prev) => {
+            const map = new Map(prev.map(s => [s._id, s]))
+            stuRes.data.data.forEach(s => map.set(s._id, s))
+            return Array.from(map.values())
+          })
+        }
+      } catch (_) {}
+    }
   }
 
   // Payment Modal Triggers
@@ -1041,7 +1063,7 @@ export default function FinancePage() {
               const secs = getSectionsForGrade(g)
               setSelectedSection(secs.includes(selectedSection) ? selectedSection : (secs[0] || 'A'))
             }}
-            onSelectSection={(sec) => setSelectedSection(sec)}
+            onSelectSection={(sec) => handleSelectSection(sec)}
             students={students}
             rightSlot={
               <div className="flex items-center gap-2">

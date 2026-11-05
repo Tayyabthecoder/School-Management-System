@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', default: null },
+  studentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
   staffId: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff', default: null },
   mustChangePassword: { type: Boolean, default: true },
   tokenVersion: { type: Number, default: 0 },
