@@ -82,7 +82,9 @@ export default function StudentListPage() {
           return Array.from(map.values())
         })
       }
-    } catch (_) {}
+    } catch (_) {
+      // ignore fetch error
+    }
   }
 
   const handleSelectSection = async (sectionId) => {
@@ -98,7 +100,9 @@ export default function StudentListPage() {
             return Array.from(map.values())
           })
         }
-      } catch (_) {}
+      } catch (_) {
+      // ignore fetch error
+    }
     }
   }
 

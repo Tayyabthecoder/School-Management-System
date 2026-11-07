@@ -122,7 +122,11 @@ const getStudentAttendance = async (req, res, next) => {
     if (studentId) {
       records = records.map(r => ({
         ...r.toObject(),
-        records: r.records.filter(rec => rec.studentId && rec.studentId._id.toString() === studentId),
+        records: r.records.filter(rec => {
+          if (!rec.studentId) return false
+          const sid = rec.studentId._id ? rec.studentId._id.toString() : rec.studentId.toString()
+          return sid === studentId
+        }),
       }))
     }
 

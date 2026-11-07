@@ -9,6 +9,7 @@ const SchoolSettings = require('../../models/SchoolSettings.model')
 const Counter = require('../../models/Counter.model')
 const { generatePDFBuffer, buildPaymentReceiptPDF, buildFeeChallanPDF, DEFAULT_CHALLAN_SETTINGS } = require('../../utils/pdf.util')
 const { getPagination, formatPaginatedResponse } = require('../../utils/pagination.util')
+const { getGuardianStudentIds } = require('../../utils/guardian-auth.util')
 const { logAudit } = require('../../utils/audit-log.util')
 const { ApiError } = require('../../middleware/error.middleware')
 const { validateObjectId } = require('../../utils/validation.util')
@@ -121,8 +122,19 @@ const getStudentFees = async (req, res, next) => {
       if (!req.user.studentId) throw new ApiError(403, 'No linked student record found')
       filter.studentId = req.user.studentId
     } else if (req.user.roleName === 'guardian') {
-      if (!req.user.studentId) throw new ApiError(403, 'No linked student record found')
-      filter.studentId = req.user.studentId
+      const allowedChildIds = getGuardianStudentIds(req.user)
+      if (allowedChildIds.length === 0) {
+        throw new ApiError(403, 'No linked student record found')
+      }
+      if (req.query.studentId) {
+        const requested = req.query.studentId.toString()
+        if (!allowedChildIds.includes(requested)) {
+          throw new ApiError(403, 'Forbidden: You can only view fee records for your own children')
+        }
+        filter.studentId = requested
+      } else {
+        filter.studentId = { $in: allowedChildIds }
+      }
     } else if (adminRoles.includes(req.user.roleName)) {
       if (req.query.studentId) filter.studentId = req.query.studentId
       if (req.query.classId || req.query.sectionId) {

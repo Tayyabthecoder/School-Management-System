@@ -156,7 +156,7 @@ export default function AttendancePage() {
         if (Array.isArray(attDoc.records)) {
           attDoc.records.forEach((r) => {
             const sid = r.studentId?._id || r.studentId
-            if (sid && initial.hasOwnProperty(sid)) {
+            if (sid && Object.prototype.hasOwnProperty.call(initial, sid)) {
               initial[sid] = r.status
             }
           })

@@ -115,6 +115,7 @@ app.use('/api/v1/students/import-excel', heavyLimiter)
 app.use('/api/v1/students/bulk-import', heavyLimiter)
 app.use('/api/v1/reports/custom/export', heavyLimiter)
 app.use('/api/v1/reports/export', heavyLimiter)
+app.use('/api/v1/report-cards/class', heavyLimiter)
 
 // Welcome & API Information (sanitized, no internal env leaks)
 app.get(['/', '/api', '/api/v1'], (req, res) => {

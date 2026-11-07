@@ -14,6 +14,7 @@ const bcrypt = require('bcryptjs')
 const { getPagination, formatPaginatedResponse } = require('../../utils/pagination.util')
 const { logAudit } = require('../../utils/audit-log.util')
 const { ApiError } = require('../../middleware/error.middleware')
+const { assertStudentAccess } = require('../../utils/guardian-auth.util')
 const { escapeRegex } = require('../../utils/regex.util')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 const { invalidateCache } = require('../../utils/cache.util')
@@ -57,17 +58,7 @@ const getStudents = async (req, res, next) => {
 
 const getStudentById = async (req, res, next) => {
   try {
-    if (['student', 'guardian'].includes(req.user.roleName)) {
-      const userStudentId = req.user.studentId ? req.user.studentId.toString() : null
-      if (!userStudentId || userStudentId !== req.params.id.toString()) {
-        throw new ApiError(
-          403,
-          req.user.roleName === 'student'
-            ? 'Forbidden: You can only view your own student profile'
-            : 'Forbidden: You can only view student profiles for your own children'
-        )
-      }
-    }
+    assertStudentAccess(req.user, req.params.id, 'student profile')
     const student = await Student.findOne({ _id: req.params.id, deletedAt: null }).populate({
       path: 'classId',
       populate: { path: 'subjects' },
@@ -218,7 +209,8 @@ const createStudent = async (req, res, next) => {
         }
 
         const netAmount = Math.max(0, structure.amount - discount)
-        const isPaidUpfront = feeSetup.initialPaymentStatus === 'Paid'
+        const isFree = netAmount === 0
+        const isPaidUpfront = feeSetup.initialPaymentStatus === 'Paid' || isFree
         const amountPaid = isPaidUpfront ? netAmount : 0
         const outstandingAmount = isPaidUpfront ? 0 : netAmount
         const status = isPaidUpfront ? 'Paid' : 'Pending'
@@ -228,8 +220,8 @@ const createStudent = async (req, res, next) => {
           feeStructureId: structure._id,
           amountDue: structure.amount,
           discount,
-          concessionType: feeSetup.concessionType || (discount > 0 ? 'Special Management Discount' : 'None'),
-          concessionReason: feeSetup.concessionReason || '',
+          concessionType: discount === 0 ? 'None' : (feeSetup.concessionType || 'Special Management Discount'),
+          concessionReason: discount === 0 ? '' : (feeSetup.concessionReason || ''),
           netAmount,
           amountPaid,
           outstandingAmount,

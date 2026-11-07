@@ -1,10 +1,11 @@
 import React from 'react'
-import { Shield, Phone, Mail, MapPin, CreditCard, Briefcase, AlertCircle, Copy } from 'lucide-react'
+import { Shield, Phone, Mail, MapPin, CreditCard, Briefcase, AlertCircle, Copy, CheckCircle2 } from 'lucide-react'
 
 export default function StepFatherGuardian({
   newStudent,
   setNewStudent,
   formErrors,
+  clearFieldError,
   copyFatherToGuardian,
 }) {
   return (

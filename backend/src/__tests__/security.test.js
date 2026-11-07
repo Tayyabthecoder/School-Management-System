@@ -152,6 +152,18 @@ describe('Security Controls Unit Tests', () => {
       expect(() => verifyStudentAccess(guardianUser, studentDoc)).not.toThrow()
     })
 
+    test('verifyStudentAccess permits multi-child guardian viewing any child in studentIds', () => {
+      const guardianUser = { roleName: 'guardian', studentIds: ['student-child-1', 'student-child-2'] }
+      const child2Doc = { _id: 'student-child-2' }
+      expect(() => verifyStudentAccess(guardianUser, child2Doc)).not.toThrow()
+    })
+
+    test('verifyStudentAccess forbids multi-child guardian viewing an unrelated student', () => {
+      const guardianUser = { roleName: 'guardian', studentIds: ['student-child-1', 'student-child-2'] }
+      const strangerDoc = { _id: 'student-child-999' }
+      expect(() => verifyStudentAccess(guardianUser, strangerDoc)).toThrow(/Forbidden/)
+    })
+
     test('verifyStudentAccess forbids guardian viewing another student', () => {
       const guardianUser = { roleName: 'guardian', studentId: 'student-id-123' }
       const otherStudent = { _id: 'student-id-456' }

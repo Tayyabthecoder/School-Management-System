@@ -4,31 +4,14 @@ const Grade = require('../../models/Grade.model')
 const StudentFee = require('../../models/StudentFee.model')
 const StudentLeaveRequest = require('../../models/StudentLeaveRequest.model')
 const { ApiError } = require('../../middleware/error.middleware')
+const { getGuardianStudentIds, resolveGuardianStudentId } = require('../../utils/guardian-auth.util')
 const { logAudit } = require('../../utils/audit-log.util')
 
-const resolveGuardianStudentId = (req) => {
-  if (req.query.studentId) {
-    const requestedId = req.query.studentId.toString()
-    if (req.user.roleName === 'super_admin') return requestedId
-    if (req.user.studentId && req.user.studentId.toString() === requestedId) return requestedId
-    if (Array.isArray(req.user.studentIds) && req.user.studentIds.some(id => id.toString() === requestedId)) {
-      return requestedId
-    }
-  }
-  return req.user.studentId || (Array.isArray(req.user.studentIds) && req.user.studentIds[0]) || null
-}
+// resolveGuardianStudentId is imported from shared utils/guardian-auth.util
 
 const getMyChildren = async (req, res, next) => {
   try {
-    const studentIds = []
-    if (req.user.studentId) studentIds.push(req.user.studentId)
-    if (Array.isArray(req.user.studentIds)) {
-      req.user.studentIds.forEach(id => {
-        if (!studentIds.some(existing => existing.toString() === id.toString())) {
-          studentIds.push(id)
-        }
-      })
-    }
+    const studentIds = getGuardianStudentIds(req.user)
     if (studentIds.length === 0) {
       return res.json({ success: true, data: [] })
     }
@@ -179,7 +162,7 @@ const submitLeaveRequest = async (req, res, next) => {
  */
 const getGuardianLeaveRequests = async (req, res, next) => {
   try {
-    const studentId = req.user.studentId
+    const studentId = resolveGuardianStudentId(req)
     if (!studentId) throw new ApiError(400, 'No linked student record found')
 
     const requests = await StudentLeaveRequest.find({

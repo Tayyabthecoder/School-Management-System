@@ -1,12 +1,14 @@
 import React from 'react'
-import { CircleDollarSign, CheckCircle2, Wallet, CreditCard, Percent, Tag, AlertCircle } from 'lucide-react'
-import { formatPKR } from '../../../../lib/formatters'
+import { CircleDollarSign, CheckCircle2, Wallet, CreditCard, Percent, Tag, AlertCircle, Check, Receipt } from 'lucide-react'
+import { formatPKR, formatDate } from '../../../../lib/formatters'
 import Badge from '../../../../components/ui/Badge'
 
 export default function StepFeeConcession({
   newStudent,
   setNewStudent,
   formErrors,
+  clearFieldError,
+  currentModalClass,
   classFeeStructures,
   loadingFeeStructures,
   selectedFeeStructures,

@@ -36,9 +36,32 @@ export const formatGradeName = (level) => {
   return `Grade ${level}`
 }
 
+/**
+ * Normalizes an array of academic classes/grades, falling back to FALLBACK_GRADES if empty.
+ * @param {Array} classes
+ * @returns {Array}
+ */
+export const resolveDisplayClasses = (classes) => {
+  return Array.isArray(classes) && classes.length > 0 ? classes : FALLBACK_GRADES
+}
+
+/**
+ * Extracts normalized string section names from a class object.
+ * @param {object} classObj
+ * @returns {string[]}
+ */
+export const extractSectionNames = (classObj) => {
+  if (!classObj || !Array.isArray(classObj.sections) || classObj.sections.length === 0) {
+    return ['A', 'B']
+  }
+  return classObj.sections.map((s) => (typeof s === 'object' && s !== null ? s.name || 'A' : s))
+}
+
 export default {
   GRADE_THEMES,
   FALLBACK_GRADES,
   getGradeTheme,
   formatGradeName,
+  resolveDisplayClasses,
+  extractSectionNames,
 }

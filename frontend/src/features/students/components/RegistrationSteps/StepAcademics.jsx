@@ -4,7 +4,8 @@ import { BookOpen, GraduationCap, Bus, Calendar, AlertCircle } from 'lucide-reac
 export default function StepAcademics({
   newStudent,
   setNewStudent,
-  formErrors,
+  _formErrors,
+  clearFieldError,
   displayClasses,
   modalClassSections,
   fetchFeeStructuresForClass,

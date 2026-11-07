@@ -18,6 +18,8 @@ import {
   PhoneCall,
   DollarSign,
   AlertTriangle,
+  Layers,
+  Users,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -711,9 +713,6 @@ export default function AnalyticsIntelligenceTab() {
               </div>
             </>
           )}
-        </div>
-      )}
-
       {/* Flagged Scholarship Review Candidates Modal */}
       {isReviewDrawerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
@@ -783,5 +782,7 @@ export default function AnalyticsIntelligenceTab() {
             </div>
           </div>
         </div>
+      )}
+    </div>
   )
 }

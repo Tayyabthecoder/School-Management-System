@@ -6,30 +6,12 @@ const AcademicYear = require('../../models/AcademicYear.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF, buildTranscriptPDF } = require('../../utils/pdf.util')
 const { ApiError } = require('../../middleware/error.middleware')
+const { assertStudentAccess } = require('../../utils/guardian-auth.util')
 const { getOrSet } = require('../../utils/cache.util')
 const { calculateGradeLetter } = require('../grades/grades.service')
 
 const verifyStudentAccess = (user, student) => {
-  const roleName = user.roleName || (typeof user.role === 'object' ? user.role?.name : user.role)
-
-  if (['super_admin', 'teacher'].includes(roleName)) {
-    return
-  }
-
-  if (['student', 'guardian'].includes(roleName)) {
-    const linkedStudentId = user.studentId ? user.studentId.toString() : null
-    if (!linkedStudentId || linkedStudentId !== student._id.toString()) {
-      throw new ApiError(
-        403,
-        roleName === 'student'
-          ? 'Forbidden: You can only view your own academic records'
-          : 'Forbidden: You can only view academic records for your own children'
-      )
-    }
-    return
-  }
-
-  throw new ApiError(403, 'Forbidden: Insufficient permissions to view report cards')
+  assertStudentAccess(user, student, 'academic records')
 }
 
 const compileStudentReportData = async (studentId, termName = 'Final Term', academicYearId = null) => {

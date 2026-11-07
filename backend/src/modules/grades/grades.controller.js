@@ -5,6 +5,7 @@ const StudentAttendance = require('../../models/StudentAttendance.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF } = require('../../utils/pdf.util')
 const { ApiError } = require('../../middleware/error.middleware')
+const { assertStudentAccess } = require('../../utils/guardian-auth.util')
 const { validateObjectId } = require('../../utils/validation.util')
 const { getOrSet } = require('../../utils/cache.util')
 const { calculateGradeLetter, calculatePercentage } = require('./grades.service')
@@ -100,15 +101,9 @@ const generateReportCard = async (req, res, next) => {
     const student = await Student.findById(studentId).populate('classId')
     if (!student) throw new ApiError(404, 'Student not found')
 
+    assertStudentAccess(req.user, studentId, 'report card')
     const userRole = req.user?.roleName || req.user?.role?.name
     const isPrivileged = ['super_admin', 'teacher'].includes(userRole)
-
-    if (!isPrivileged) {
-      const allowedStudentId = req.user?.studentId?.toString()
-      if (!allowedStudentId || allowedStudentId !== studentId?.toString()) {
-        throw new ApiError(403, 'Forbidden: You can only view your own report card')
-      }
-    }
 
     const grades = await Grade.find({ studentId })
       .populate({ path: 'examId', populate: { path: 'subjectId' } })

@@ -149,7 +149,9 @@ export default function FinancePage() {
             return Array.from(map.values())
           })
         }
-      } catch (_) {}
+      } catch (_) {
+      // ignore fetch error
+    }
     }
   }
 

@@ -203,7 +203,9 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
           const text = await err.response.data.text()
           const parsed = JSON.parse(text)
           if (parsed?.error?.message) msg = parsed.error.message
-        } catch (_) {}
+        } catch (_) {
+      // ignore error
+    }
       } else if (err.response?.data?.error?.message) {
         msg = err.response.data.error.message
       }

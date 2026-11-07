@@ -15,6 +15,8 @@ import api from '../../../lib/axios'
 import { useToastStore } from '../../../store/toastStore'
 import { formatPKR } from '../../../lib/formatters'
 import Badge from '../../../components/ui/Badge'
+import { FALLBACK_GRADES } from '../../../constants/grades'
+import { downloadBlobResponse } from '../../../lib/download'
 import StepBasicInfo from './RegistrationSteps/StepBasicInfo'
 import StepFatherGuardian from './RegistrationSteps/StepFatherGuardian'
 import StepAcademics from './RegistrationSteps/StepAcademics'
@@ -178,14 +180,7 @@ export default function StudentRegistrationModal({
     try {
       toast.info('Preparing document for download…')
       const res = await api.get(url, { responseType: 'blob' })
-      const blob = new Blob([res.data], { type: 'application/pdf' })
-      const link = document.createElement('a')
-      link.href = window.URL.createObjectURL(blob)
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(link.href)
+      downloadBlobResponse(res, filename)
       toast.success('Document downloaded successfully')
     } catch (err) {
       console.error(err)
@@ -216,6 +211,18 @@ export default function StudentRegistrationModal({
         return copy
       })
     }
+  }
+
+  const copyFatherToGuardian = () => {
+    setNewStudent(prev => ({
+      ...prev,
+      guardianName: prev.fatherName || '',
+      guardianRelationship: 'Father',
+      guardianPhone: prev.fatherPhone || '',
+      guardianEmail: prev.fatherEmail || '',
+      guardianCnic: prev.fatherCnic || '',
+      guardianOccupation: prev.fatherOccupation || '',
+    }))
   }
 
   const validateStep = (step) => {
@@ -454,10 +461,8 @@ export default function StudentRegistrationModal({
                   newStudent={newStudent}
                   setNewStudent={setNewStudent}
                   formErrors={formErrors}
-                  photoPreview={photoPreview}
-                  photoUploading={photoUploading}
+                  clearFieldError={clearFieldError}
                   handlePhotoUpload={handlePhotoUpload}
-                  fileInputRef={fileInputRef}
                 />
               )}
 
@@ -466,6 +471,7 @@ export default function StudentRegistrationModal({
                   newStudent={newStudent}
                   setNewStudent={setNewStudent}
                   formErrors={formErrors}
+                  clearFieldError={clearFieldError}
                   copyFatherToGuardian={copyFatherToGuardian}
                 />
               )}
@@ -475,6 +481,7 @@ export default function StudentRegistrationModal({
                   newStudent={newStudent}
                   setNewStudent={setNewStudent}
                   formErrors={formErrors}
+                  clearFieldError={clearFieldError}
                   displayClasses={displayClasses}
                   modalClassSections={modalClassSections}
                   fetchFeeStructuresForClass={fetchFeeStructuresForClass}
@@ -486,6 +493,8 @@ export default function StudentRegistrationModal({
                   newStudent={newStudent}
                   setNewStudent={setNewStudent}
                   formErrors={formErrors}
+                  clearFieldError={clearFieldError}
+                  currentModalClass={currentModalClass}
                   classFeeStructures={classFeeStructures}
                   loadingFeeStructures={loadingFeeStructures}
                   selectedFeeStructures={selectedFeeStructures}

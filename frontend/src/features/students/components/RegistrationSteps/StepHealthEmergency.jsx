@@ -6,7 +6,7 @@ import Badge from '../../../../components/ui/Badge'
 export default function StepHealthEmergency({
   newStudent,
   setNewStudent,
-  formErrors,
+  _formErrors,
   currentModalClass,
   netPayableTotal,
 }) {

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { GraduationCap, ChevronDown, Users } from 'lucide-react'
-import { getGradeTheme } from '../../constants/grades'
+import { getGradeTheme, extractSectionNames } from '../../constants/grades'
 
 export default function GradeSectionNavigator({
   grades = [],
@@ -20,11 +20,7 @@ export default function GradeSectionNavigator({
   }, [grades, selectedGrade])
 
   const sections = useMemo(() => {
-    if (!currentGrade) return ['A', 'B']
-    if (Array.isArray(currentGrade.sections) && currentGrade.sections.length > 0) {
-      return currentGrade.sections.map((s) => (typeof s === 'object' ? s.name : s))
-    }
-    return ['A', 'B']
+    return extractSectionNames(currentGrade)
   }, [currentGrade])
 
   // Count students in selected grade & section if students array provided

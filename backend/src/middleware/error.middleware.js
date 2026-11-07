@@ -34,7 +34,8 @@ const errorHandler = (err, req, res, next) => {
   // Handle Mongoose Duplicate Key Error
   if (err.code === 11000) {
     statusCode = 409
-    const field = Object.keys(err.keyValue)[0]
+    const keySource = err.keyValue || err.keyPattern || {}
+    const field = Object.keys(keySource)[0] || 'record'
     message = `Duplicate entry for field: ${field}`
     details = [{ field, message: `${field} already exists` }]
   }

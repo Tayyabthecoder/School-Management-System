@@ -14,7 +14,9 @@ const getStoredUser = () => {
 // Remove legacy stored tokens if any exist
 try {
   localStorage.removeItem('sms_token')
-} catch (e) {}
+} catch (e) {
+  // ignore storage errors
+}
 
 export const useAuthStore = create((set) => ({
   user: getStoredUser(),

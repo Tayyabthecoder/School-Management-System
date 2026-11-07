@@ -17,6 +17,26 @@ describe('Utility Unit Tests', () => {
       expect(skip).toBe(0)
     })
 
+    it('should safely handle NaN, negative values, and non-object inputs', () => {
+      const fromNaN = getPagination({ page: 'invalid', limit: 'abc' })
+      expect(fromNaN.page).toBe(1)
+      expect(fromNaN.limit).toBe(25)
+      expect(fromNaN.skip).toBe(0)
+
+      const fromNeg = getPagination({ page: -5, limit: -10 })
+      expect(fromNeg.page).toBe(1)
+      expect(fromNeg.limit).toBe(25)
+      expect(fromNeg.skip).toBe(0)
+
+      const fromNull = getPagination(null)
+      expect(fromNull.page).toBe(1)
+      expect(fromNull.limit).toBe(25)
+
+      const fromUndef = getPagination()
+      expect(fromUndef.page).toBe(1)
+      expect(fromUndef.limit).toBe(25)
+    })
+
     it('should format paginated response correctly', () => {
       const res = formatPaginatedResponse([{ id: 1 }], 50, 1, 25)
       expect(res.success).toBe(true)

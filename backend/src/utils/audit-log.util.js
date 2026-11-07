@@ -1,4 +1,5 @@
 const AuditLog = require('../models/AuditLog.model')
+const logger = require('./logger')
 
 /**
  * Universal Audit Logging helper supporting both object and positional parameter signatures:
@@ -33,7 +34,7 @@ const logAudit = async (...args) => {
 
     const userId = req && req.user ? (req.user._id || req.user.id || null) : null
     const username = req && req.user ? (req.user.username || 'System') : 'System'
-    const ipAddress = req ? (req.ip || req.socket?.remoteAddress || '') : ''
+    const ipAddress = req ? (req.ip || req.socket?.remoteAddress || req.headers?.['x-forwarded-for'] || '') : ''
 
     await AuditLog.create({
       userId,
@@ -46,7 +47,9 @@ const logAudit = async (...args) => {
       ipAddress,
     })
   } catch (err) {
-    console.error(`[AuditLog Error]: ${err.message}`)
+    if (process.env.NODE_ENV !== 'test') {
+      logger.error(`[AuditLog Error]: ${err.message}`)
+    }
   }
 }
 

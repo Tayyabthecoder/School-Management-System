@@ -1,6 +1,13 @@
 import { test, describe } from 'node:test'
 import assert from 'node:assert/strict'
-import { GRADE_THEMES, FALLBACK_GRADES, getGradeTheme, formatGradeName } from '../src/constants/grades.js'
+import {
+  GRADE_THEMES,
+  FALLBACK_GRADES,
+  getGradeTheme,
+  formatGradeName,
+  resolveDisplayClasses,
+  extractSectionNames,
+} from '../src/constants/grades.js'
 
 describe('Frontend Grades & Themes Constant Test Suite', () => {
   test('GRADE_THEMES contains 12 thematic color palettes', () => {
@@ -27,5 +34,20 @@ describe('Frontend Grades & Themes Constant Test Suite', () => {
   test('formatGradeName formats levels properly', () => {
     assert.equal(formatGradeName(10), 'Grade 10')
     assert.equal(formatGradeName(0), 'Grade')
+  })
+
+  test('resolveDisplayClasses returns classes if non-empty array, or FALLBACK_GRADES if empty or invalid', () => {
+    const custom = [{ _id: '1', name: 'Custom Grade' }]
+    assert.deepEqual(resolveDisplayClasses(custom), custom)
+    assert.deepEqual(resolveDisplayClasses([]), FALLBACK_GRADES)
+    assert.deepEqual(resolveDisplayClasses(null), FALLBACK_GRADES)
+    assert.deepEqual(resolveDisplayClasses(undefined), FALLBACK_GRADES)
+  })
+
+  test('extractSectionNames returns string names or defaults to A, B', () => {
+    assert.deepEqual(extractSectionNames({ sections: ['Alpha', 'Beta'] }), ['Alpha', 'Beta'])
+    assert.deepEqual(extractSectionNames({ sections: [{ name: 'S1' }, { name: 'S2' }] }), ['S1', 'S2'])
+    assert.deepEqual(extractSectionNames({ sections: [] }), ['A', 'B'])
+    assert.deepEqual(extractSectionNames(null), ['A', 'B'])
   })
 })

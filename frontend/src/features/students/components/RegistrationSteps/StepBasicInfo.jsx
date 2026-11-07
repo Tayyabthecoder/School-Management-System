@@ -5,10 +5,8 @@ export default function StepBasicInfo({
   newStudent,
   setNewStudent,
   formErrors,
-  photoPreview,
-  photoUploading,
+  clearFieldError,
   handlePhotoUpload,
-  fileInputRef,
 }) {
   return (
                 <div className="space-y-5 animate-in fade-in duration-200">
