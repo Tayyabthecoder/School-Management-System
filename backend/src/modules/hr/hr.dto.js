@@ -16,7 +16,8 @@ const createStaffSchema = z.object({
 const submitLeaveRequestSchema = z.object({
   body: z.object({
     staffId: z.string().min(1, 'Staff ID is required'),
-    leaveType: z.enum(['Casual', 'Medical', 'Annual', 'Unpaid', 'Maternity', 'Paternity']),
+    // Kept in sync with LeaveRequest.leaveType (the model also accepts 'Sick').
+    leaveType: z.enum(['Annual', 'Sick', 'Casual', 'Unpaid', 'Medical', 'Maternity', 'Paternity']),
     fromDate: z.string().or(z.date()),
     toDate: z.string().or(z.date()),
     reason: z.string().min(3, 'Reason is required'),

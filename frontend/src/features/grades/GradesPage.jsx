@@ -3,7 +3,7 @@ import { Award, ChevronRight, Download, Save, Search, BookOpen, FileText } from 
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonGradeCards } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
 
 const LETTER_COLORS = {
@@ -26,7 +26,7 @@ function calcGradeLetter(pct) {
 
 // ─── Exam Create Modal ────────────────────────────────────────────────────────
 function ExamModal({ open, onClose, grades, onCreated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     title: '',
     classId: '',
@@ -187,7 +187,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
 
 // ─── Grade Entry Table ────────────────────────────────────────────────────────
 function GradeEntryTable({ students, exam }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [marks, setMarks] = useState({})
   const [existing, setExisting] = useState({})
   const [saving, setSaving] = useState(false)
@@ -392,7 +392,7 @@ function GradeEntryTable({ students, exam }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function GradesPage() {
-  const toast = useToastStore()
+  const toast = useToast()
 
   // View state: 'grades' | 'sections' | 'entry'
   const [view, setView] = useState('grades')

@@ -5,7 +5,8 @@ const staffSchema = new mongoose.Schema({
   fullName: { type: String, required: true, trim: true },
   cnic: { type: String, required: true, trim: true },
   phone: { type: String, required: true, trim: true },
-  email: { type: String, required: true, trim: true },
+  // Optional (createStaffSchema allows ''), so it must not be `required` here.
+  email: { type: String, default: '', trim: true },
   designation: { type: String, required: true },
   department: { type: String, required: true },
   joiningDate: { type: Date, required: true },

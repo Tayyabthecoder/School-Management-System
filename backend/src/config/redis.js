@@ -4,35 +4,44 @@ const env = require('./env')
 let redisClient = null
 let isRedisAvailable = false
 
-try {
-  const redisUrl = env.REDIS_URL
-  redisClient = new Redis(redisUrl, {
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-    retryStrategy: (times) => {
-      if (times > 2) {
-        isRedisAvailable = false
-        return null // Stop retrying after 2 attempts
-      }
-      return Math.min(times * 100, 500)
-    },
-    lazyConnect: true,
-  })
+// Tests run without a Redis server: skip the live connection so ioredis reconnect
+// timers don't keep the Jest worker alive (cache and rate limiting fall back to memory).
+const IS_TEST_ENV = env.NODE_ENV === 'test'
 
-  redisClient.on('connect', () => {
-    isRedisAvailable = true
-    console.log('[Redis]: Connected successfully')
-  })
+const connectSharedClient = () => {
+  try {
+    redisClient = new Redis(env.REDIS_URL, {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      retryStrategy: (times) => {
+        if (times > 2) {
+          isRedisAvailable = false
+          return null // Stop retrying after 2 attempts
+        }
+        return Math.min(times * 100, 500)
+      },
+      lazyConnect: true,
+    })
 
-  redisClient.on('error', () => {
+    redisClient.on('connect', () => {
+      isRedisAvailable = true
+      console.log('[Redis]: Connected successfully')
+    })
+
+    redisClient.on('error', () => {
+      isRedisAvailable = false
+    })
+
+    redisClient.connect().catch(() => {
+      isRedisAvailable = false
+    })
+  } catch (err) {
     isRedisAvailable = false
-  })
+  }
+}
 
-  redisClient.connect().catch(() => {
-    isRedisAvailable = false
-  })
-} catch (err) {
-  isRedisAvailable = false
+if (!IS_TEST_ENV) {
+  connectSharedClient()
 }
 
 const getRedisClient = () => redisClient
@@ -42,6 +51,7 @@ const checkRedisAvailable = () => isRedisAvailable
  * Factory for dedicated isolated Redis connection instances (e.g. for BullMQ Queues and Workers)
  */
 const createRedisClient = (role = 'Client') => {
+  if (IS_TEST_ENV) return null
   try {
     const redisUrl = env.REDIS_URL
     const client = new Redis(redisUrl, {

@@ -1,10 +1,15 @@
 const Student = require('../../models/Student.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
 const Grade = require('../../models/Grade.model')
+const Exam = require('../../models/Exam.model')
 const StudentFee = require('../../models/StudentFee.model')
 const StudentLeaveRequest = require('../../models/StudentLeaveRequest.model')
 const { ApiError } = require('../../middleware/error.middleware')
-const { getGuardianStudentIds, resolveGuardianStudentId } = require('../../utils/guardian-auth.util')
+const {
+  getGuardianStudentIds,
+  resolveGuardianStudentId,
+  isStudentAccessibleByGuardian,
+} = require('../../utils/guardian-auth.util')
 const { logAudit } = require('../../utils/audit-log.util')
 
 // resolveGuardianStudentId is imported from shared utils/guardian-auth.util
@@ -84,7 +89,14 @@ const getChildGrades = async (req, res, next) => {
     const studentId = resolveGuardianStudentId(req)
     if (!studentId) throw new ApiError(400, 'No linked student record found')
 
-    const grades = await Grade.find({ studentId })
+    // Families must only see marks of exams the school has published.
+    const gradeFilter = { studentId }
+    if (req.user.roleName !== 'super_admin') {
+      const publishedExamIds = await Exam.find({ isPublished: true }).distinct('_id')
+      gradeFilter.examId = { $in: publishedExamIds }
+    }
+
+    const grades = await Grade.find(gradeFilter)
       .populate({
         path: 'examId',
         populate: [{ path: 'subjectId' }, { path: 'classId' }],
@@ -117,15 +129,28 @@ const getChildFees = async (req, res, next) => {
  */
 const submitLeaveRequest = async (req, res, next) => {
   try {
-    const studentId = req.body.studentId || resolveGuardianStudentId(req)
+    const studentId = req.body.studentId ? String(req.body.studentId) : resolveGuardianStudentId(req)
     if (!studentId) throw new ApiError(400, 'No linked student record found for this guardian')
+
+    // A guardian may only file leave for their own linked children (body ids are untrusted).
+    if (req.user.roleName !== 'super_admin' && !isStudentAccessibleByGuardian(req.user, studentId)) {
+      throw new ApiError(403, 'Forbidden: You can only submit leave requests for your own children')
+    }
 
     const { startDate, endDate, category, reason } = req.body
     if (!startDate || !endDate || !reason) {
       throw new ApiError(400, 'Start date, end date, and reason are required')
     }
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new ApiError(400, 'Start date and end date must be valid dates')
+    }
+    if (end < start) {
+      throw new ApiError(400, 'End date cannot be before start date')
+    }
 
-    const student = await Student.findById(studentId)
+    const student = await Student.findOne({ _id: studentId, deletedAt: null })
     if (!student) throw new ApiError(404, 'Student profile not found')
 
     const leave = await StudentLeaveRequest.create({
@@ -133,8 +158,8 @@ const submitLeaveRequest = async (req, res, next) => {
       guardianId: req.user._id,
       classId: student.classId,
       sectionId: student.sectionId || 'A',
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: start,
+      endDate: end,
       category: category || 'Sick',
       reason,
       status: 'Pending',

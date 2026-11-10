@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
 import { useToastStore } from '../store/toastStore'
+import { createSingleFlight } from './singleFlight'
 
 const api = axios.create({
   baseURL: '/api/v1',
@@ -16,19 +17,18 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-let isRefreshing = false
-let failedQueue = []
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error)
-    } else {
-      prom.resolve(token)
-    }
-  })
-  failedQueue = []
-}
+/**
+ * Exchanges the refresh-token cookie for a new access token. Concurrent callers share
+ * one request: refresh tokens rotate server-side, so a second parallel call would
+ * present the already-revoked token, get 401 and log the user out.
+ */
+export const refreshAccessToken = createSingleFlight(async () => {
+  const res = await axios.post('/api/v1/auth/refresh', {}, { withCredentials: true })
+  const newToken = res.data?.success ? res.data?.data?.accessToken : null
+  if (!newToken) throw new Error('Refresh response missing access token')
+  useAuthStore.getState().setAccessToken(newToken)
+  return newToken
+})
 
 // Handle 401 & Concurrent Token Refresh Queue
 api.interceptors.response.use(
@@ -49,39 +49,21 @@ api.interceptors.response.use(
       !originalRequest.url?.includes('/auth/login') &&
       !originalRequest.url?.includes('/auth/refresh')
     ) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
-            return api(originalRequest)
-          })
-          .catch((err) => Promise.reject(err))
-      }
-
       originalRequest._retry = true
-      isRefreshing = true
 
       try {
-        const res = await axios.post('/api/v1/auth/refresh', {}, { withCredentials: true })
-        if (res.data?.success && res.data?.data?.accessToken) {
-          const newToken = res.data.data.accessToken
-          useAuthStore.getState().setAccessToken(newToken)
-          processQueue(null, newToken)
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-          return api(originalRequest)
-        }
-        throw new Error('Refresh response missing access token')
+        const newToken = await refreshAccessToken()
+        originalRequest.headers.Authorization = `Bearer ${newToken}`
+        return api(originalRequest)
       } catch (refreshErr) {
-        processQueue(refreshErr, null)
-        useAuthStore.getState().logout()
+        // Every request waiting on the failed refresh lands here; log out only once.
+        if (useAuthStore.getState().isAuthenticated || useAuthStore.getState().user) {
+          useAuthStore.getState().logout()
+        }
         if (window.location.pathname !== '/login') {
           window.location.href = '/login'
         }
         return Promise.reject(refreshErr)
-      } finally {
-        isRefreshing = false
       }
     }
 

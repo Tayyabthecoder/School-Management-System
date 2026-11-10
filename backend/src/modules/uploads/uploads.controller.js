@@ -1,7 +1,24 @@
 const path = require('path')
+const fs = require('fs')
 const Student = require('../../models/Student.model')
-const Staff = require('../../models/Staff.model')
 const { ApiError } = require('../../middleware/error.middleware')
+const { UPLOADS_DIR } = require('../../middleware/upload.middleware')
+
+/**
+ * Builds the authenticated serving URL (/uploads/<subfolder>/<file>) for a stored file.
+ * Computed relative to the configured UPLOADS_DIR so it stays correct when UPLOAD_DIR
+ * points outside the backend folder (e.g. a mounted Docker volume).
+ */
+const buildFileUrl = (filePath) => {
+  const relativePath = path.relative(UPLOADS_DIR, filePath).split(path.sep).join('/')
+  return `/uploads/${relativePath}`
+}
+
+/** Removes a file multer already wrote to disk when the request ultimately fails. */
+const discardUploadedFile = (file) => {
+  if (!file?.path) return
+  fs.promises.unlink(file.path).catch(() => {})
+}
 
 /**
  * Handle single generic file upload
@@ -12,15 +29,11 @@ const uploadSingleFile = async (req, res, next) => {
       throw new ApiError(400, 'No file was uploaded')
     }
 
-    // Determine public URL relative to uploads directory
-    const relativePath = path.relative(path.join(__dirname, '../../../backend'), req.file.path).replace(/\\/g, '/')
-    const fileUrl = `/${relativePath}`
-
     res.status(201).json({
       success: true,
       message: 'File uploaded successfully',
       data: {
-        fileUrl,
+        fileUrl: buildFileUrl(req.file.path),
         filename: req.file.filename,
         originalName: req.file.originalname,
         size: req.file.size,
@@ -49,12 +62,9 @@ const uploadStudentDocument = async (req, res, next) => {
       throw new ApiError(404, 'Student not found')
     }
 
-    const relativePath = path.relative(path.join(__dirname, '../../../backend'), req.file.path).replace(/\\/g, '/')
-    const fileUrl = `/${relativePath}`
-
     student.documents.push({
       name: documentName,
-      url: fileUrl,
+      url: buildFileUrl(req.file.path),
       uploadedAt: new Date(),
     })
     await student.save()
@@ -65,6 +75,7 @@ const uploadStudentDocument = async (req, res, next) => {
       data: student.documents,
     })
   } catch (error) {
+    discardUploadedFile(req.file)
     next(error)
   }
 }
@@ -80,12 +91,9 @@ const uploadStudentPhoto = async (req, res, next) => {
       throw new ApiError(400, 'No image was uploaded')
     }
 
-    const relativePath = path.relative(path.join(__dirname, '../../../backend'), req.file.path).replace(/\\/g, '/')
-    const photoUrl = `/${relativePath}`
-
     const student = await Student.findOneAndUpdate(
       { _id: studentId, deletedAt: null },
-      { photoUrl },
+      { photoUrl: buildFileUrl(req.file.path) },
       { new: true }
     )
 
@@ -99,6 +107,7 @@ const uploadStudentPhoto = async (req, res, next) => {
       data: { photoUrl: student.photoUrl },
     })
   } catch (error) {
+    discardUploadedFile(req.file)
     next(error)
   }
 }
@@ -107,4 +116,5 @@ module.exports = {
   uploadSingleFile,
   uploadStudentDocument,
   uploadStudentPhoto,
+  buildFileUrl,
 }

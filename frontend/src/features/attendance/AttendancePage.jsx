@@ -17,12 +17,12 @@ import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import GradeSectionNavigator from '../../components/ui/GradeSectionNavigator'
 import api from '../../lib/axios'
-import { formatDate } from '../../lib/formatters'
-import { useToastStore } from '../../store/toastStore'
+import { formatDate, toLocalDateInput } from '../../lib/formatters'
+import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
 
 export default function AttendancePage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [activeMainTab, setActiveMainTab] = useState('attendance') // 'attendance' | 'leaves'
   const [classes, setClasses] = useState([])
   const [students, setStudents] = useState([])
@@ -34,7 +34,7 @@ export default function AttendancePage() {
   const [selectedGrade, setSelectedGrade] = useState(null)
   const [selectedSection, setSelectedSection] = useState(null)
 
-  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0])
+  const [attendanceDate, setAttendanceDate] = useState(() => toLocalDateInput())
   const [attendance, setAttendance] = useState({})
   const [submitting, setSubmitting] = useState(false)
 

@@ -58,7 +58,11 @@ const getStudents = async (req, res, next) => {
 
 const getStudentById = async (req, res, next) => {
   try {
-    assertStudentAccess(req.user, req.params.id, 'student profile')
+    // Staff roles (accountant, hr_manager) are already scoped by the route's RBAC and open
+    // profiles from the student directory; only self-service roles are limited to own records.
+    if (['student', 'guardian'].includes(req.user?.roleName)) {
+      assertStudentAccess(req.user, req.params.id, 'student profile')
+    }
     const student = await Student.findOne({ _id: req.params.id, deletedAt: null }).populate({
       path: 'classId',
       populate: { path: 'subjects' },
@@ -242,7 +246,7 @@ const createStudent = async (req, res, next) => {
             amountPaid: netAmount,
             paymentMode: feeSetup.paymentMode || 'Cash',
             referenceNo: feeSetup.referenceNo || '',
-            remarks: feeSetup.paymentRemarks || `Upfront admission fee payment (${structure.name})`,
+            remarks: feeSetup.paymentRemarks || `Upfront admission fee payment (${structure.title})`,
             recordedBy: req.user?._id || studentRole?._id,
           })
           createdPayments.push(payment)
@@ -286,14 +290,21 @@ const updateStudent = async (req, res, next) => {
 
     if (sanitized.sectionId) {
       sanitized.sectionId = sanitized.sectionId.trim().toUpperCase()
-      const current = await Student.findOne({ _id: req.params.id, deletedAt: null }).populate('classId')
-      if (current && current.classId && Array.isArray(current.classId.sections)) {
-        if (!current.classId.sections.includes(sanitized.sectionId)) {
-          throw new ApiError(
-            400,
-            `Section "${sanitized.sectionId}" does not exist in class "${current.classId.name}". Available sections: ${current.classId.sections.join(', ')}`
-          )
-        }
+      // Validate against the class the student will belong to after this update; when the
+      // class changes in the same request, the old class's sections are irrelevant.
+      let targetClass = null
+      if (sanitized.classId) {
+        targetClass = await Class.findById(sanitized.classId)
+        if (!targetClass) throw new ApiError(400, 'Selected class does not exist')
+      } else {
+        const current = await Student.findOne({ _id: req.params.id, deletedAt: null }).populate('classId')
+        targetClass = current?.classId || null
+      }
+      if (targetClass && Array.isArray(targetClass.sections) && !targetClass.sections.includes(sanitized.sectionId)) {
+        throw new ApiError(
+          400,
+          `Section "${sanitized.sectionId}" does not exist in class "${targetClass.name}". Available sections: ${targetClass.sections.join(', ')}`
+        )
       }
     }
 
@@ -458,8 +469,9 @@ const getStudentPortalData = async (req, res, next) => {
     const attendanceRate = totalDays > 0 ? Math.round(((presentDays + lateDays) / totalDays) * 100) : 100
 
     // 3. Exam Grades (published only unless admin)
-    const examFilter = { deletedAt: null }
-    if (req.user.roleName === 'student') {
+    // Only administrators may preview unpublished results; students and guardians must not.
+    const examFilter = {}
+    if (req.user.roleName !== 'super_admin') {
       examFilter.isPublished = true
     }
     const publishedExams = await Exam.find(examFilter).select('_id')

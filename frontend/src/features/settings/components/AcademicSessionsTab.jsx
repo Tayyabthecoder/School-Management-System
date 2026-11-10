@@ -11,7 +11,7 @@ import Button from '../../../components/ui/Button'
 import { SkeletonTable } from '../../../components/ui/Skeleton'
 import { formatDate } from '../../../lib/formatters'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -32,7 +32,7 @@ export default function AcademicSessionsTab({
   onSaveAcademicConfig,
   savingAcademic,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [allowedDays, setAllowedDays] = useState([
     'Monday',
     'Tuesday',

@@ -1,5 +1,6 @@
 const authService = require('./auth.service')
 const { logAudit } = require('../../utils/audit-log.util')
+const User = require('../../models/User.model')
 
 const login = async (req, res, next) => {
   try {
@@ -62,18 +63,22 @@ const refreshToken = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
+    // Logout must work without a valid access token (expired session, day-restricted
+    // access, etc.); the refresh-token cookie alone identifies the session to revoke.
     const token = req.cookies?.refreshToken
-    if (token) {
-      await authService.revokeRefreshToken(token)
-    }
+    const revokedUserId = token ? await authService.revokeRefreshToken(token) : null
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/api/v1/auth',
     })
-    if (req.user) {
-      await logAudit({ req, action: 'USER_LOGOUT', module: 'auth' })
+    if (revokedUserId) {
+      const user = await User.findById(revokedUserId).select('username').lean()
+      if (user) {
+        const auditReq = { ip: req.ip, socket: req.socket, headers: req.headers, user }
+        await logAudit({ req: auditReq, action: 'USER_LOGOUT', module: 'auth' })
+      }
     }
     res.json({ success: true, message: 'Logged out successfully' })
   } catch (error) {

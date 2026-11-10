@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Modal from '../../../../components/ui/Modal'
 import Button from '../../../../components/ui/Button'
 import api from '../../../../lib/axios'
-import { useToastStore } from '../../../../store/toastStore'
+import { useToast } from '../../../../store/toastStore'
 
 export default function StudentStatusModal({ open, student, onClose, onUpdated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [status, setStatus] = useState(student?.status || 'Active')
   const [transferReason, setTransferReason] = useState(student?.transferReason || '')
   const [saving, setSaving] = useState(false)

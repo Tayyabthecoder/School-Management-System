@@ -21,6 +21,13 @@ const login = async (username, password) => {
     throw new ApiError(403, 'Account locked due to consecutive failed attempts. Try again in 15 minutes.')
   }
 
+  // An expired lock starts a fresh attempt window; otherwise the stale counter would
+  // re-lock the account on the very first wrong password after the lockout ends.
+  if (user.lockUntil) {
+    user.failedLoginAttempts = 0
+    user.lockUntil = null
+  }
+
   if (!user.isActive) {
     throw new ApiError(403, 'Account is deactivated. Contact Administrator.')
   }
@@ -165,8 +172,12 @@ const invalidateUserSessions = async (userId) => {
   }
 }
 
+/**
+ * Revokes a refresh token server-side. Returns the owning user id when the token
+ * signature is valid (even if expired) so the logout can still be attributed.
+ */
 const revokeRefreshToken = async (token) => {
-  if (!token) return
+  if (!token) return null
   try {
     const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET, { ignoreExpiration: true })
     if (decoded && decoded.jti) {
@@ -178,8 +189,10 @@ const revokeRefreshToken = async (token) => {
         }
       }
     }
+    return decoded?.id || null
   } catch (err) {
     // Ignore invalid tokens on revocation
+    return null
   }
 }
 

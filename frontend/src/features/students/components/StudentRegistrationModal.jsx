@@ -12,8 +12,8 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
-import { formatPKR } from '../../../lib/formatters'
+import { useToast } from '../../../store/toastStore'
+import { formatPKR, toLocalDateInput } from '../../../lib/formatters'
 import Badge from '../../../components/ui/Badge'
 import { FALLBACK_GRADES } from '../../../constants/grades'
 import { downloadBlobResponse } from '../../../lib/download'
@@ -53,7 +53,7 @@ const INITIAL_STUDENT_STATE = {
   // Step 3: Academic
   classId: '',
   sectionId: 'A',
-  joiningDate: new Date().toISOString().split('T')[0],
+  joiningDate: toLocalDateInput(),
   previousSchool: '',
 
   // Step 4: Fee & Concession Setup
@@ -90,7 +90,7 @@ export default function StudentRegistrationModal({
   classes = [],
   onSuccess,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [currentStep, setCurrentStep] = useState(1)
   const [newStudent, setNewStudent] = useState(INITIAL_STUDENT_STATE)
   const [formErrors, setFormErrors] = useState({})

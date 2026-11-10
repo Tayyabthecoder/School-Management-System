@@ -14,13 +14,18 @@ const verifyStudentAccess = (user, student) => {
   assertStudentAccess(user, student, 'academic records')
 }
 
-const compileStudentReportData = async (studentId, termName = 'Final Term', academicYearId = null) => {
+// Students and guardians must only see results of exams the school has published;
+// staff (admin/teacher) may preview drafts.
+const canSeeUnpublishedResults = (user) => ['super_admin', 'teacher'].includes(user?.roleName || user?.role?.name)
+
+const compileStudentReportData = async (studentId, termName = 'Final Term', academicYearId = null, { publishedOnly = false } = {}) => {
   const student = await Student.findOne({ _id: studentId, deletedAt: null }).populate('classId')
   if (!student) throw new ApiError(404, 'Student not found')
 
   const examFilter = { classId: student.classId?._id }
   if (termName) examFilter.termName = termName
   if (academicYearId) examFilter.academicYearId = academicYearId
+  if (publishedOnly) examFilter.isPublished = true
 
   const exams = await Exam.find(examFilter).populate('subjectId')
   const examIds = exams.map(e => e._id)
@@ -125,7 +130,9 @@ const getReportCard = async (req, res, next) => {
     verifyStudentAccess(req.user, student)
 
     const { termName, academicYearId } = req.query
-    const reportData = await compileStudentReportData(studentId, termName, academicYearId)
+    const reportData = await compileStudentReportData(studentId, termName, academicYearId, {
+      publishedOnly: !canSeeUnpublishedResults(req.user),
+    })
     res.json({ success: true, data: reportData })
   } catch (error) {
     next(error)
@@ -140,7 +147,9 @@ const downloadReportCardPDF = async (req, res, next) => {
     verifyStudentAccess(req.user, student)
 
     const { termName, academicYearId } = req.query
-    const reportData = await compileStudentReportData(studentId, termName, academicYearId)
+    const reportData = await compileStudentReportData(studentId, termName, academicYearId, {
+      publishedOnly: !canSeeUnpublishedResults(req.user),
+    })
 
     const settings = await getOrSet('ref:school-settings', 300, async () => {
       return SchoolSettings.findOne({ isActive: true }).lean()
@@ -202,7 +211,7 @@ const bulkDownloadClassReportCards = async (req, res, next) => {
 /**
  * Compile Multi-Year Cumulative Transcript Data (FR-RC-03)
  */
-const compileStudentTranscriptData = async (studentId) => {
+const compileStudentTranscriptData = async (studentId, { publishedOnly = false } = {}) => {
   const student = await Student.findOne({ _id: studentId, deletedAt: null }).populate('classId')
   if (!student) throw new ApiError(404, 'Student not found')
 
@@ -225,6 +234,7 @@ const compileStudentTranscriptData = async (studentId) => {
   const termGroups = {}
   grades.forEach((g) => {
     if (!g.examId) return
+    if (publishedOnly && !g.examId.isPublished) return
     const year = g.examId.academicYearId?.year || 'Current'
     const term = g.examId.termName || 'General Term'
     const key = `${year}___${term}`
@@ -302,7 +312,9 @@ const getStudentTranscript = async (req, res, next) => {
     if (!student) throw new ApiError(404, 'Student not found')
     verifyStudentAccess(req.user, student)
 
-    const transcriptData = await compileStudentTranscriptData(studentId)
+    const transcriptData = await compileStudentTranscriptData(studentId, {
+      publishedOnly: !canSeeUnpublishedResults(req.user),
+    })
     res.json({ success: true, data: transcriptData })
   } catch (error) {
     next(error)
@@ -316,7 +328,9 @@ const downloadTranscriptPDF = async (req, res, next) => {
     if (!student) throw new ApiError(404, 'Student not found')
     verifyStudentAccess(req.user, student)
 
-    const transcriptData = await compileStudentTranscriptData(studentId)
+    const transcriptData = await compileStudentTranscriptData(studentId, {
+      publishedOnly: !canSeeUnpublishedResults(req.user),
+    })
 
     const settings = await getOrSet('ref:school-settings', 300, async () => {
       return SchoolSettings.findOne({ isActive: true }).lean()

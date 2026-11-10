@@ -36,6 +36,11 @@ const getExams = async (req, res, next) => {
 
 const createExam = async (req, res, next) => {
   try {
+    const maxMarks = req.body.maxMarks ?? 100
+    const passMarks = req.body.passMarks ?? 40
+    if (passMarks > maxMarks) {
+      throw new ApiError(400, `Pass marks (${passMarks}) cannot exceed maximum marks (${maxMarks})`)
+    }
     const exam = await Exam.create(req.body)
     res.status(201).json({ success: true, data: exam })
   } catch (error) {
@@ -54,12 +59,13 @@ const saveGrades = async (req, res, next) => {
     })
     const gradingScale = settings?.gradingScale || null
 
+    // Validate the whole batch before writing so one bad row can't leave a half-saved exam.
+    if (grades.some(item => item.marksObtained > exam.maxMarks)) {
+      throw new ApiError(400, `Marks obtained cannot exceed maximum marks (${exam.maxMarks})`)
+    }
+
     const saved = []
     for (const item of grades) {
-      if (item.marksObtained > exam.maxMarks) {
-        throw new ApiError(400, `Marks obtained cannot exceed maximum marks (${exam.maxMarks})`)
-      }
-
       const percentage = calculatePercentage(item.marksObtained, exam.maxMarks)
       const gradeLetter = calculateGradeLetter(percentage, gradingScale)
 
@@ -170,12 +176,8 @@ const getGradesByStudent = async (req, res, next) => {
     const userRole = req.user?.roleName || req.user?.role?.name
     const isPrivileged = ['super_admin', 'teacher'].includes(userRole)
 
-    if (!isPrivileged) {
-      const allowedStudentId = req.user?.studentId?.toString()
-      if (!allowedStudentId || allowedStudentId !== req.params.studentId?.toString()) {
-        throw new ApiError(403, 'Forbidden: You can only view your own grades')
-      }
-    }
+    // Students see only themselves; guardians see any linked child (studentId + studentIds).
+    assertStudentAccess(req.user, req.params.studentId, 'grades')
 
     let examFilter = {}
     if (!isPrivileged) {

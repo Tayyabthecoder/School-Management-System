@@ -6,6 +6,7 @@ const { ApiError } = require('../../middleware/error.middleware')
 const { escapeRegex } = require('../../utils/regex.util')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 const { invalidateUserSessions } = require('../auth/auth.service')
+const { logAudit } = require('../../utils/audit-log.util')
 
 const getUsers = async (req, res, next) => {
   try {
@@ -40,6 +41,14 @@ const createUser = async (req, res, next) => {
       passwordHash,
       role: role._id,
       roleName,
+    })
+
+    await logAudit({
+      req,
+      action: 'USER_CREATED',
+      module: 'users',
+      documentId: user._id,
+      newValues: { username: user.username, roleName },
     })
 
     res.status(201).json({
@@ -77,6 +86,14 @@ const resetPassword = async (req, res, next) => {
     }
 
     await invalidateUserSessions(req.params.id)
+
+    await logAudit({
+      req,
+      action: 'USER_PASSWORD_RESET',
+      module: 'users',
+      documentId: user._id,
+      newValues: { username: user.username },
+    })
 
     res.json({ success: true, message: 'Password reset successfully' })
   } catch (error) {

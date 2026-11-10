@@ -20,7 +20,7 @@ import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
 import Badge from '../../components/ui/Badge'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 
 const TABS = [
   { id: 'child', label: 'My Child', icon: User },
@@ -30,7 +30,7 @@ const TABS = [
 ]
 
 export default function GuardianPortalPage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [activeTab, setActiveTab] = useState('child')
   const [loading, setLoading] = useState(true)
   const [child, setChild] = useState(null)

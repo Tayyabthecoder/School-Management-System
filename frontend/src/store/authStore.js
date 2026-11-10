@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { create } from 'zustand'
 
 const getStoredUser = () => {
@@ -46,6 +47,10 @@ export const useAuthStore = create((set) => ({
   },
 
   logout: () => {
+    // Revoke the httpOnly refresh-token cookie server-side; without this call the
+    // session stays refreshable for 7 days after the user "logs out" in the browser.
+    // Plain axios (not lib/axios) avoids the 401 refresh interceptor and a circular import.
+    axios.post('/api/v1/auth/logout', {}, { withCredentials: true }).catch(() => {})
     localStorage.removeItem('sms_user')
     localStorage.removeItem('sms_token')
     set({ user: null, accessToken: null, isAuthenticated: false, isInitializing: false })

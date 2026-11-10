@@ -8,14 +8,14 @@ import DataTable from '../../components/ui/DataTable'
 import Badge from '../../components/ui/Badge'
 import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
 import ChangeSectionModal from './components/ChangeSectionModal'
 import ImportStudentsModal from './components/ImportStudentsModal'
 import StudentRegistrationModal from './components/StudentRegistrationModal'
 
 export default function StudentListPage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [students, setStudents] = useState([])
   const [classes, setClasses] = useState([])
   const [loading, setLoading] = useState(true)

@@ -7,7 +7,7 @@ import {
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -23,7 +23,7 @@ const PERIOD_TIMES = [
 ]
 
 export default function TimetablePage() {
-  const toast = useToastStore()
+  const toast = useToast()
 
   const [classes, setClasses] = useState([])
   const [selectedClassId, setSelectedClassId] = useState('')

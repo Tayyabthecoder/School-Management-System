@@ -27,8 +27,23 @@ export const formatPercentage = (value, fallback = '0%') => {
   return `${Math.round(num)}%`
 }
 
+/**
+ * Returns the user's *local* calendar date as YYYY-MM-DD for <input type="date">.
+ * `toISOString().split('T')[0]` returns the UTC date, which in Pakistan (UTC+5)
+ * is still "yesterday" between midnight and 05:00.
+ */
+export const toLocalDateInput = (date = new Date()) => {
+  const d = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(d.getTime())) return ''
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
 export default {
   formatPKR,
   formatDate,
   formatPercentage,
+  toLocalDateInput,
 }

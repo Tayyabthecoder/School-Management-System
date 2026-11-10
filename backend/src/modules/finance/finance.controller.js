@@ -9,7 +9,7 @@ const SchoolSettings = require('../../models/SchoolSettings.model')
 const Counter = require('../../models/Counter.model')
 const { generatePDFBuffer, buildPaymentReceiptPDF, buildFeeChallanPDF, DEFAULT_CHALLAN_SETTINGS } = require('../../utils/pdf.util')
 const { getPagination, formatPaginatedResponse } = require('../../utils/pagination.util')
-const { getGuardianStudentIds } = require('../../utils/guardian-auth.util')
+const { getGuardianStudentIds, isStudentAccessibleByGuardian } = require('../../utils/guardian-auth.util')
 const { logAudit } = require('../../utils/audit-log.util')
 const { ApiError } = require('../../middleware/error.middleware')
 const { validateObjectId } = require('../../utils/validation.util')
@@ -51,6 +51,27 @@ const withOptionalTransaction = async (workFn) => {
     if (session && typeof session.endSession === 'function') {
       session.endSession().catch(() => {})
     }
+  }
+}
+
+/**
+ * Students may only open their own fee documents; guardians may open those of any
+ * linked child (user.studentId and user.studentIds). Staff roles are already scoped by RBAC.
+ */
+const assertOwnFeeDocument = (user, studentRef, label) => {
+  if (!['student', 'guardian'].includes(user.roleName)) return
+  const ownerId = studentRef?._id || studentRef
+  if (!ownerId) {
+    throw new ApiError(403, `Forbidden: You can only view your own ${label}`)
+  }
+  if (user.roleName === 'student') {
+    if (!user.studentId || user.studentId.toString() !== ownerId.toString()) {
+      throw new ApiError(403, `Forbidden: You can only view your own ${label}`)
+    }
+    return
+  }
+  if (!isStudentAccessibleByGuardian(user, ownerId)) {
+    throw new ApiError(403, `Forbidden: You can only view the ${label} of your own children`)
   }
 }
 
@@ -246,7 +267,7 @@ const recordPayment = async (req, res, next) => {
       updated.status = updated.outstandingAmount <= 0 ? 'Paid' : 'Partial'
       await updated.save(opts)
 
-      const pmt = await Payment.create({
+      const paymentDoc = {
         receiptNo,
         studentFeeId,
         studentId: feeRecord.studentId._id,
@@ -255,7 +276,12 @@ const recordPayment = async (req, res, next) => {
         referenceNo: referenceNo || '',
         remarks: remarks || '',
         recordedBy: req.user._id,
-      })
+      }
+      // The receipt must join the same transaction as the balance decrement; Model.create
+      // only accepts a session via the array form, so a bare object would commit outside it.
+      const pmt = session
+        ? await Payment.create([paymentDoc], opts)
+        : await Payment.create(paymentDoc)
 
       return { payment: Array.isArray(pmt) ? pmt[0] : pmt, updatedFee: updated }
     })
@@ -295,12 +321,7 @@ const downloadReceiptPDF = async (req, res, next) => {
 
     if (!payment) throw new ApiError(404, 'Payment receipt not found')
 
-    // Students and Guardians can only view their own payment receipt
-    if (['student', 'guardian'].includes(req.user.roleName)) {
-      if (!req.user.studentId || payment.studentId?._id?.toString() !== req.user.studentId.toString()) {
-        throw new ApiError(403, 'Forbidden: You can only view your own payment receipt')
-      }
-    }
+    assertOwnFeeDocument(req.user, payment.studentId, 'payment receipt')
 
     const settings = await getOrSet('ref:school-settings', 300, async () => {
       return SchoolSettings.findOne({ isActive: true }).lean()
@@ -339,12 +360,7 @@ const downloadChallanPDF = async (req, res, next) => {
 
     if (!feeRecord) throw new ApiError(404, 'Student fee record not found')
 
-    // Students and Guardians can only view their own fee challan
-    if (['student', 'guardian'].includes(req.user.roleName)) {
-      if (!req.user.studentId || feeRecord.studentId?._id?.toString() !== req.user.studentId.toString()) {
-        throw new ApiError(403, 'Forbidden: You can only view your own fee challan')
-      }
-    }
+    assertOwnFeeDocument(req.user, feeRecord.studentId, 'fee challan')
 
     // Dynamic Due Date: Falls exactly 10 days after the fee challan is downloaded
     const downloadDate = new Date()
@@ -576,7 +592,8 @@ const triggerMonthlyChallansManually = async (req, res, next) => {
     const result = await generateMonthlyFeeChallans({
       targetDate: targetDate || new Date(),
       academicYearId,
-      executedBy: req.user ? `${req.user.fullName || req.user.email} (${req.user.roleName || 'admin'})` : 'MANUAL_ADMIN',
+      // User documents carry `username` (no fullName/email), which previously logged "undefined (...)".
+      executedBy: req.user ? `${req.user.username || 'unknown'} (${req.user.roleName || 'admin'})` : 'MANUAL_ADMIN',
       force: Boolean(force),
     })
 

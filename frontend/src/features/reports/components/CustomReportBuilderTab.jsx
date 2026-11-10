@@ -11,7 +11,7 @@ import {
   FileText,
 } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 import { downloadBlobResponse } from './downloadHelper'
 
 const REPORT_ENTITIES = [
@@ -98,7 +98,7 @@ const REPORT_ENTITIES = [
 ]
 
 export default function CustomReportBuilderTab({ classesList = [] }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [customEntity, setCustomEntity] = useState('students')
   const [selectedFields, setSelectedFields] = useState(REPORT_ENTITIES[0].fields.map(f => f.id))
   const [customFrom, setCustomFrom] = useState('')

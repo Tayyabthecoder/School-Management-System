@@ -5,12 +5,20 @@ const SchoolSettings = require('../../models/SchoolSettings.model')
 const { getOrSet, invalidateCache } = require('../../utils/cache.util')
 const { logAudit } = require('../../utils/audit-log.util')
 const { broadcast } = require('../reports/sse.controller')
+const { ApiError } = require('../../middleware/error.middleware')
+const { toStartOfLocalDay } = require('../../utils/date.util')
+const { validateObjectId } = require('../../utils/validation.util')
+
+const requireDay = (value) => {
+  const day = toStartOfLocalDay(value)
+  if (!day) throw new ApiError(400, 'Invalid attendance date')
+  return day
+}
 
 const markStudentAttendance = async (req, res, next) => {
   try {
     const { classId, sectionId, date, periodNumber, records } = req.body
-    const attendanceDate = new Date(date || Date.now())
-    attendanceDate.setHours(0, 0, 0, 0)
+    const attendanceDate = requireDay(date)
 
     const existing = await StudentAttendance.findOne({
       classId,
@@ -109,9 +117,12 @@ const getStudentAttendance = async (req, res, next) => {
     if (classId) filter.classId = classId
     if (sectionId) filter.sectionId = sectionId
     if (date) {
-      const d = new Date(date)
-      d.setHours(0, 0, 0, 0)
-      filter.date = d
+      filter.date = requireDay(date)
+    }
+    if (studentId) {
+      validateObjectId(studentId, 'studentId')
+      // Only fetch registers that include this student instead of every class's history.
+      filter['records.studentId'] = studentId
     }
 
     let records = await StudentAttendance.find(filter)
@@ -139,8 +150,7 @@ const getStudentAttendance = async (req, res, next) => {
 const markStaffAttendance = async (req, res, next) => {
   try {
     const { staffId, date, status, remarks } = req.body
-    const attendanceDate = new Date(date || Date.now())
-    attendanceDate.setHours(0, 0, 0, 0)
+    const attendanceDate = requireDay(date)
 
     const doc = await StaffAttendance.findOneAndUpdate(
       { staffId, date: attendanceDate },
@@ -159,9 +169,7 @@ const getStaffAttendance = async (req, res, next) => {
     const filter = {}
     if (req.query.staffId) filter.staffId = req.query.staffId
     if (req.query.date) {
-      const d = new Date(req.query.date)
-      d.setHours(0, 0, 0, 0)
-      filter.date = d
+      filter.date = requireDay(req.query.date)
     }
 
     const records = await StaffAttendance.find(filter).populate('staffId').sort({ date: -1 })

@@ -1,52 +1,105 @@
 /**
- * Server-Sent Events (SSE) Client for Real-Time Dashboard Updates (Gap 1)
+ * Server-Sent Events client for real-time dashboard updates.
+ *
+ * The API authenticates with a Bearer access token, which the native EventSource
+ * cannot send (it only carries cookies), so every EventSource connection was rejected
+ * with 401 and retried forever. This client streams the same endpoint through fetch
+ * with an Authorization header and parses the event-stream itself.
  */
+import { useAuthStore } from '../store/authStore'
+import { parseSSEBuffer } from './sseParser'
 
-let eventSource = null
+const SSE_URL = '/api/v1/reports/dashboard/live'
+const TRACKED_EVENTS = new Set(['attendance:updated', 'fee:paid', 'challans:generated', 'dashboard:refresh'])
+const RETRY_BASE_MS = 5000
+const RETRY_MAX_MS = 60000
+
+let isActive = false
+let abortController = null
 let reconnectTimer = null
+let failedAttempts = 0
 
-export const connectSSE = (onEvent) => {
-  if (eventSource) return
+const scheduleReconnect = (onEvent) => {
+  if (!isActive || reconnectTimer) return
+  // Exponential back-off so an unauthorised or offline client doesn't hammer the API.
+  const delay = Math.min(RETRY_BASE_MS * 2 ** failedAttempts, RETRY_MAX_MS)
+  failedAttempts += 1
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    openStream(onEvent)
+  }, delay)
+}
+
+const dispatch = (onEvent, { event, data }) => {
+  if (!onEvent || !TRACKED_EVENTS.has(event)) return
+  let payload = {}
+  try {
+    payload = JSON.parse(data)
+  } catch (_) {
+    payload = {}
+  }
+  onEvent(event, payload)
+}
+
+const openStream = async (onEvent) => {
+  if (!isActive) return
+  const token = useAuthStore.getState().accessToken
+  if (!token) {
+    scheduleReconnect(onEvent)
+    return
+  }
+
+  const controller = new AbortController()
+  abortController = controller
 
   try {
-    const url = '/api/v1/reports/dashboard/live'
-    eventSource = new EventSource(url, { withCredentials: true })
-
-    const events = ['attendance:updated', 'fee:paid', 'challans:generated', 'dashboard:refresh']
-    events.forEach((evt) => {
-      eventSource.addEventListener(evt, (e) => {
-        try {
-          const parsed = JSON.parse(e.data)
-          if (onEvent) onEvent(evt, parsed)
-        } catch (_) {
-          if (onEvent) onEvent(evt, {})
-        }
-      })
+    const response = await fetch(SSE_URL, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'text/event-stream' },
+      credentials: 'include',
+      cache: 'no-store',
+      signal: controller.signal,
     })
+    if (!response.ok || !response.body) {
+      throw new Error(`SSE connection rejected (HTTP ${response.status})`)
+    }
 
-    eventSource.onerror = () => {
-      eventSource?.close()
-      eventSource = null
+    failedAttempts = 0
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
 
-      if (!reconnectTimer) {
-        reconnectTimer = setTimeout(() => {
-          reconnectTimer = null
-          connectSSE(onEvent)
-        }, 5000)
-      }
+    for (;;) {
+      const { value, done } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const { events, remainder } = parseSSEBuffer(buffer)
+      buffer = remainder
+      events.forEach((evt) => dispatch(onEvent, evt))
     }
   } catch (err) {
-    console.warn('SSE connection failed:', err)
+    if (err?.name === 'AbortError') return
+  } finally {
+    if (abortController === controller) abortController = null
   }
+
+  scheduleReconnect(onEvent)
+}
+
+export const connectSSE = (onEvent) => {
+  if (isActive) return
+  isActive = true
+  failedAttempts = 0
+  openStream(onEvent)
 }
 
 export const disconnectSSE = () => {
+  isActive = false
   if (reconnectTimer) {
     clearTimeout(reconnectTimer)
     reconnectTimer = null
   }
-  if (eventSource) {
-    eventSource.close()
-    eventSource = null
+  if (abortController) {
+    abortController.abort()
+    abortController = null
   }
 }

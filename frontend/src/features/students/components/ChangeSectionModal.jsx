@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowRightLeft, X, AlertCircle } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 export default function ChangeSectionModal({
   open,
@@ -11,7 +11,7 @@ export default function ChangeSectionModal({
   onClose,
   onSuccess,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [selectedSection, setSelectedSection] = useState('')
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(false)

@@ -13,14 +13,14 @@ import {
   Users,
 } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 export default function ImportStudentsModal({
   open,
   onClose,
   onSuccess,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const fileInputRef = useRef(null)
 
   const [file, setFile] = useState(null)

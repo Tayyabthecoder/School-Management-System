@@ -93,6 +93,8 @@ const addSectionToClass = async (req, res, next) => {
       { new: true }
     ).populate('subjects')
 
+    if (!updatedClass) throw new ApiError(404, 'Class not found')
+
     await invalidateCache('ref:classes:all')
 
     res.json({ success: true, data: updatedClass })

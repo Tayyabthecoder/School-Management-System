@@ -8,7 +8,7 @@ import Badge from '../../components/ui/Badge'
 import { SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -20,7 +20,7 @@ const CURRENT_YEAR = new Date().getFullYear()
 
 // ─── Add Staff Modal ──────────────────────────────────────────────────────────
 function AddStaffModal({ open, onClose, onAdded }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     fullName: '', cnic: '', phone: '', email: '',
     designation: '', department: 'Academics', joiningDate: '', salary: '',
@@ -116,7 +116,7 @@ function AddStaffModal({ open, onClose, onAdded }) {
 
 // ─── Leave Request Table ──────────────────────────────────────────────────────
 function LeaveRequestsPanel({ onStatusChange }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [leaves, setLeaves] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('Pending')
@@ -225,7 +225,7 @@ function LeaveRequestsPanel({ onStatusChange }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HRPage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')

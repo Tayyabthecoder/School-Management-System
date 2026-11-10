@@ -3,7 +3,13 @@ const { redisClient, checkRedisAvailable, createRedisClient } = require('../conf
 
 let feeOverdueQueue = null
 
+/**
+ * Creates the fee-overdue queue and registers its daily repeat job.
+ * Idempotent: server start-up calls this once Redis has had time to connect, and
+ * repeated calls must not open duplicate Redis connections or Queue instances.
+ */
 const initQueues = () => {
+  if (feeOverdueQueue) return feeOverdueQueue
   try {
     if (redisClient && checkRedisAvailable()) {
       const queueConnection = createRedisClient('QueueConnection') || redisClient
@@ -31,12 +37,12 @@ const initQueues = () => {
   } catch (err) {
     // Silent fallback
   }
+  return feeOverdueQueue
 }
 
-// Initialize on load
-initQueues()
+const getFeeOverdueQueue = () => feeOverdueQueue
 
 module.exports = {
-  feeOverdueQueue,
   initQueues,
+  getFeeOverdueQueue,
 }

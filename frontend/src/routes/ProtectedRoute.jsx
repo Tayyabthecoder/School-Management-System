@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import PageLoader from '../components/ui/PageLoader'
-import api from '../lib/axios'
+import api, { refreshAccessToken } from '../lib/axios'
 import { CalendarX } from 'lucide-react'
 
 // R6: In-App Day Blocked Component for active sessions on restricted days
@@ -42,7 +42,7 @@ function DayBlockedScreen({ today, allowedDays, onLogout }) {
 }
 
 export default function ProtectedRoute() {
-  const { isAuthenticated, isInitializing, user, setAccessToken, logout } = useAuthStore()
+  const { isAuthenticated, isInitializing, user, logout } = useAuthStore()
   const location = useLocation()
 
   // R6: Day restriction state
@@ -51,19 +51,12 @@ export default function ProtectedRoute() {
 
   useEffect(() => {
     if (isInitializing && !isAuthenticated && user) {
-      api.post('/auth/refresh')
-        .then((res) => {
-          if (res.data?.success && res.data?.data?.accessToken) {
-            setAccessToken(res.data.data.accessToken)
-          } else {
-            logout()
-          }
-        })
-        .catch(() => {
-          logout()
-        })
+      // Shared, de-duplicated refresh (StrictMode double effects / parallel 401s reuse it).
+      refreshAccessToken().catch(() => {
+        logout()
+      })
     }
-  }, [isInitializing, isAuthenticated, user, setAccessToken, logout])
+  }, [isInitializing, isAuthenticated, user, logout])
 
   // Fetch day restrictions info
   useEffect(() => {

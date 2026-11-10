@@ -7,7 +7,7 @@ import Breadcrumb from '../../components/layout/Breadcrumb'
 import Badge from '../../components/ui/Badge'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 import { GRADE_THEMES, FALLBACK_GRADES as INITIAL_FALLBACK_GRADES } from '../../constants/grades'
 import ChangeSectionModal from '../students/components/ChangeSectionModal'
@@ -23,7 +23,7 @@ import {
 } from './components/ClassModals'
 
 export default function ClassesPage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const { user } = useAuthStore()
   const userRole = user?.roleName || (typeof user?.role === 'object' ? user?.role?.name : user?.role) || ''
   const isSuperAdmin = userRole === 'super_admin'

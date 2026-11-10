@@ -19,7 +19,7 @@ import {
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -33,7 +33,7 @@ const GRADE_BADGES = {
 }
 
 export default function StudentPortalPage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('timetable') // 'timetable' | 'attendance' | 'grades' | 'fees'

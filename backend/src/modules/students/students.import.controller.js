@@ -19,10 +19,22 @@ const bulkImportStudents = (generateUniqueStudentId) => async (req, res, next) =
 
     const studentRole = await Role.findOne({ name: 'student' })
     const defaultPasswordHash = await bcrypt.hash('Student@1234', BCRYPT_ROUNDS)
+    const activeClasses = await Class.find({ isActive: true })
+    const classById = new Map(activeClasses.map(c => [c._id.toString(), c]))
 
     for (let i = 0; i < rawList.length; i++) {
       const item = rawList[i]
       try {
+        // A well-formed but unknown classId would otherwise create an orphaned enrolment.
+        const targetClass = classById.get(String(item.classId))
+        if (!targetClass) {
+          throw new Error(`Class "${item.classId}" does not exist or is inactive`)
+        }
+        const sectionId = String(item.sectionId || 'A').trim().toUpperCase()
+        if (Array.isArray(targetClass.sections) && targetClass.sections.length > 0 && !targetClass.sections.includes(sectionId)) {
+          throw new Error(`Section "${sectionId}" does not exist in class "${targetClass.name}"`)
+        }
+
         const studentId = await generateUniqueStudentId()
 
         const doc = await Student.create({
@@ -30,8 +42,8 @@ const bulkImportStudents = (generateUniqueStudentId) => async (req, res, next) =
           fullName: item.fullName,
           dob: item.dob || new Date('2010-01-01'),
           gender: item.gender || 'Male',
-          classId: item.classId,
-          sectionId: item.sectionId || 'A',
+          classId: targetClass._id,
+          sectionId,
           guardian: {
             name: item.guardianName || 'Guardian',
             phone: item.guardianPhone || '+923000000000',
@@ -142,17 +154,21 @@ const importStudentsFromExcel = (generateUniqueStudentId) => async (req, res, ne
           }
         }
 
-        // Fallback to first available class if not found
+        // Never guess: silently enrolling a mistyped class (e.g. "Grade 13") into the first
+        // class corrupts data, so the row is reported back for correction instead.
         if (!targetClass) {
-          targetClass = allClasses[0]
-        }
-
-        if (!targetClass) {
-          throw new Error('No academic classes configured in the system')
+          if (allClasses.length === 0) {
+            throw new Error('No academic classes configured in the system')
+          }
+          throw new Error(
+            item.className
+              ? `Class "${String(item.className).trim()}" was not found. Use an existing class name (e.g. "${allClasses[0].name}")`
+              : 'Class / Grade is required'
+          )
         }
 
         // Ensure section exists in class
-        const targetSection = item.sectionId || 'A'
+        const targetSection = String(item.sectionId || 'A').trim().toUpperCase()
         if (targetClass.sections && !targetClass.sections.includes(targetSection)) {
           targetClass.sections.push(targetSection)
           await targetClass.save()

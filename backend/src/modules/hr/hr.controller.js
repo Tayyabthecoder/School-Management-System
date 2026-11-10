@@ -82,31 +82,40 @@ const generateUniqueStaffId = async (joiningDate) => {
   return candidateId
 }
 
+const HR_PATTERN = /\bhr\b|human\s+resources?/i
+const FINANCE_PATTERN = /\bfinance\b|\baccount(s|ant|ing)?\b/i
+
+/**
+ * Picks the login role for a new staff member. Uses whole-word matching: a plain
+ * substring test for "hr" would grant hr_manager to e.g. "Christian Studies" staff.
+ */
+const resolveStaffRoleName = (department = '', designation = '') => {
+  if (FINANCE_PATTERN.test(department) || FINANCE_PATTERN.test(designation)) return 'accountant'
+  if (HR_PATTERN.test(department) || HR_PATTERN.test(designation)) return 'hr_manager'
+  return 'teacher'
+}
+
 const createStaff = async (req, res, next) => {
   try {
     const { fullName, cnic, phone, email, designation, department, joiningDate, salary } = req.body
 
-    const staffId = await generateUniqueStaffId(joiningDate)
+    // The DTO treats both as optional; default them so Staff model validation can't reject the request.
+    const effectiveJoiningDate = joiningDate || new Date()
+    const staffId = await generateUniqueStaffId(effectiveJoiningDate)
 
     const staff = await Staff.create({
       staffId,
       fullName,
       cnic,
       phone,
-      email,
+      email: email || '',
       designation,
       department,
-      joiningDate,
+      joiningDate: effectiveJoiningDate,
       salary,
     })
 
-    // Assign appropriate user account role
-    let roleName = 'teacher'
-    if (department.toLowerCase().includes('finance') || designation.toLowerCase().includes('account')) {
-      roleName = 'accountant'
-    } else if (department.toLowerCase().includes('hr') || designation.toLowerCase().includes('hr')) {
-      roleName = 'hr_manager'
-    }
+    const roleName = resolveStaffRoleName(department, designation)
 
     const targetRole = await Role.findOne({ name: roleName })
     if (targetRole) {
@@ -162,6 +171,15 @@ const submitLeaveRequest = async (req, res, next) => {
       throw new ApiError(400, 'Staff ID is required to submit a leave request')
     }
 
+    const fromDate = new Date(payload.fromDate)
+    const toDate = new Date(payload.toDate)
+    if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) {
+      throw new ApiError(400, 'From date and to date must be valid dates')
+    }
+    if (toDate < fromDate) {
+      throw new ApiError(400, 'Leave end date cannot be before the start date')
+    }
+
     const leave = await LeaveRequest.create({
       ...payload,
       staffId,
@@ -178,6 +196,15 @@ const submitLeaveRequest = async (req, res, next) => {
 const reviewLeaveRequest = async (req, res, next) => {
   try {
     const { leaveId, status, reviewRemarks } = req.body
+    const existing = await LeaveRequest.findById(leaveId)
+    if (!existing) throw new ApiError(404, 'Leave request not found')
+
+    // Segregation of duties: an HR manager must not approve or reject their own leave.
+    const isOwnRequest = req.user.staffId && existing.staffId?.toString() === req.user.staffId.toString()
+    if (isOwnRequest && req.user.roleName !== 'super_admin') {
+      throw new ApiError(403, 'Forbidden: You cannot review your own leave request')
+    }
+
     const leave = await LeaveRequest.findByIdAndUpdate(
       leaveId,
       { status, reviewRemarks, reviewedBy: req.user._id },
@@ -365,4 +392,5 @@ module.exports = {
   finalizePayroll,
   getPayrollRecords,
   downloadPayslipPDF,
+  resolveStaffRoleName,
 }

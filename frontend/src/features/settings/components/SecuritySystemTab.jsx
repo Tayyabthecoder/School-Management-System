@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import Button from '../../../components/ui/Button'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 export default function SecuritySystemTab({
   user,
@@ -16,7 +16,7 @@ export default function SecuritySystemTab({
   systemHealth,
   onCheckHealth,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
 
   const handlePasswordChange = async (e) => {
     e.preventDefault()

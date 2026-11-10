@@ -24,3 +24,20 @@ export const useToastStore = create((set) => ({
   info: (msg) => useToastStore.getState().addToast(msg, 'info'),
   warning: (msg) => useToastStore.getState().addToast(msg, 'warning'),
 }))
+
+/**
+ * Referentially stable toast helpers for components.
+ *
+ * `useToastStore()` without a selector returns the whole store state, which is a new
+ * object every time a toast is added or removed. Pages that listed that object as a
+ * hook dependency re-ran their data loaders on every toast, and a failing request
+ * (whose error toast changed the store) refetched in an endless loop.
+ */
+const toastActions = Object.freeze({
+  success: (msg) => useToastStore.getState().success(msg),
+  error: (msg) => useToastStore.getState().error(msg),
+  info: (msg) => useToastStore.getState().info(msg),
+  warning: (msg) => useToastStore.getState().warning(msg),
+})
+
+export const useToast = () => toastActions

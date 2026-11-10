@@ -1,5 +1,6 @@
 import React from 'react'
 import { User, Camera, Upload, Trash2, AlertCircle } from 'lucide-react'
+import { toLocalDateInput } from '../../../../lib/formatters'
 
 export default function StepBasicInfo({
   newStudent,
@@ -90,7 +91,7 @@ export default function StepBasicInfo({
                       <input
                         type="date"
                         value={newStudent.dob}
-                        max={new Date().toISOString().split('T')[0]}
+                        max={toLocalDateInput()}
                         onChange={(e) => {
                           setNewStudent({ ...newStudent, dob: e.target.value })
                           clearFieldError('dob')

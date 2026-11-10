@@ -26,7 +26,7 @@ import api from '../../lib/axios'
 import { formatPKR } from '../../lib/formatters'
 
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 import {
   RecordPaymentModal,
   ApplyConcessionModal,
@@ -35,7 +35,7 @@ import {
 
 
 export default function FinancePage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [classes, setClasses] = useState([])
   const [students, setStudents] = useState([])
   const [studentFees, setStudentFees] = useState([])

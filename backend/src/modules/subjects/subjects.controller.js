@@ -75,9 +75,19 @@ const updateSubject = async (req, res, next) => {
     if (name !== undefined) subject.name = name
     if (code !== undefined) subject.code = code.toUpperCase().trim()
     if (description !== undefined) subject.description = description
+    const activationChanged = isActive !== undefined && Boolean(isActive) !== Boolean(subject.isActive)
     if (isActive !== undefined) subject.isActive = isActive
 
     await subject.save()
+
+    // Keep Class.subjects in step with the active flag, as createSubject/deleteSubject do;
+    // otherwise a deactivated subject still shows on the class (and a reactivated one never returns).
+    if (activationChanged && subject.classId) {
+      const membership = subject.isActive
+        ? { $addToSet: { subjects: subject._id } }
+        : { $pull: { subjects: subject._id } }
+      await Class.findByIdAndUpdate(subject.classId, membership)
+    }
 
     await invalidateCache('ref:subjects:class:all')
     if (subject.classId) await invalidateCache(`ref:subjects:class:${subject.classId}`)

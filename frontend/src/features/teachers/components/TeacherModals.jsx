@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { GraduationCap, Calendar, Clock, BookOpen, Layers } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 import { SkeletonTable } from '../../../components/ui/Skeleton'
 
 export const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -19,7 +19,7 @@ export const PERIOD_TIMES = [
 
 // ─── Modal: Add Teacher ───────────────────────────────────────────────────────
 export function AddTeacherModal({ open, onClose, onCreated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -181,7 +181,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
 
 // ─── Modal: Assign Teacher to Class/Period ────────────────────────────────────
 export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, onAssigned }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     classId: '',
     sectionId: 'A',

@@ -1,5 +1,6 @@
 const TimetableEntry = require('../../models/TimetableEntry.model')
 const { ApiError } = require('../../middleware/error.middleware')
+const { assertTeacherAvailable } = require('./timetable.service')
 
 const PERIOD_TIMES = [
   { start: '08:00', end: '08:45' },
@@ -40,21 +41,7 @@ const createTimetableEntry = async (req, res, next) => {
       throw new ApiError(400, 'All schedule fields (classId, sectionId, subjectId, teacherId, dayOfWeek, periodNumber) are required')
     }
 
-    // Check for teacher schedule conflict across different classes/sections
-    const conflict = await TimetableEntry.findOne({
-      teacherId,
-      dayOfWeek,
-      periodNumber,
-      $nor: [{ classId, sectionId }],
-    }).populate('classId')
-
-    if (conflict) {
-      const clsName = conflict.classId?.name || 'another class'
-      throw new ApiError(
-        409,
-        `Teacher is already assigned to ${clsName} (Section ${conflict.sectionId}) on ${dayOfWeek}, Period ${periodNumber}`
-      )
-    }
+    await assertTeacherAvailable({ teacherId, dayOfWeek, periodNumber, classId, sectionId })
 
     const entry = await TimetableEntry.findOneAndUpdate(
       { classId, sectionId, dayOfWeek, periodNumber },

@@ -4,11 +4,11 @@ import Modal from '../../../../components/ui/Modal'
 import Button from '../../../../components/ui/Button'
 import api from '../../../../lib/axios'
 import { formatPKR } from '../../../../lib/formatters'
-import { useToastStore } from '../../../../store/toastStore'
+import { useToast } from '../../../../store/toastStore'
 
 // ─── Modal: Adjust Concession / Scholarship ──────────────────────────────────
 export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [concessionType, setConcessionType] = useState('Need-Based Scholarship')
   const [discountType, setDiscountType] = useState('fixed')
   const [discountValue, setDiscountValue] = useState(0)
@@ -200,7 +200,7 @@ export function RecordPaymentModal({
   onSuccess,
   onDownloadReceipt,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [amountPaid, setAmountPaid] = useState(0)
   const [paymentMode, setPaymentMode] = useState('Cash')
   const [referenceNo, setReferenceNo] = useState('')
@@ -397,7 +397,7 @@ export function RecordPaymentModal({
 
 // ─── Modal: Assign Additional Fee ─────────────────────────────────────────────
 export function AssignFeeModal({ open, student, onClose, onSuccess }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [structures, setStructures] = useState([])
   const [selectedStructureId, setSelectedStructureId] = useState('')
   const [discount, setDiscount] = useState(0)

@@ -9,11 +9,11 @@ import {
 import Modal from '../../../components/ui/Modal'
 import Button from '../../../components/ui/Button'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 // ─── Modal: Create User ───────────────────────────────────────────────────────
 export function CreateUserModal({ open, onClose, onCreated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     username: '',
     password: '',
@@ -108,7 +108,7 @@ export function CreateUserModal({ open, onClose, onCreated }) {
 
 // ─── Modal: Reset Password ────────────────────────────────────────────────────
 export function ResetPasswordModal({ open, user, onClose }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [newPassword, setNewPassword] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -180,7 +180,7 @@ export function ResetPasswordModal({ open, user, onClose }) {
 
 // ─── Modal: Create Academic Year ──────────────────────────────────────────────
 export function CreateAcademicYearModal({ open, onClose, onCreated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     year: new Date().getFullYear() + 1,
     startDate: '',

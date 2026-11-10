@@ -123,5 +123,28 @@ describe('Attendance Controller Tests', () => {
 
       expect(res.json).toHaveBeenCalledWith({ success: true, data: mockData })
     })
+
+    it('filters by student at query level instead of loading every register', async () => {
+      const studentId = '64b000000000000000000001'
+      req = { query: { studentId } }
+      StudentAttendance.find.mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue([]),
+      })
+
+      await attendanceController.getStudentAttendance(req, res, next)
+
+      expect(StudentAttendance.find).toHaveBeenCalledWith({ 'records.studentId': studentId })
+      expect(next).not.toHaveBeenCalled()
+    })
+
+    it('rejects a malformed studentId with 400', async () => {
+      req = { query: { studentId: 'not-an-id' } }
+
+      await attendanceController.getStudentAttendance(req, res, next)
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 400 }))
+      expect(StudentAttendance.find).not.toHaveBeenCalled()
+    })
   })
 })

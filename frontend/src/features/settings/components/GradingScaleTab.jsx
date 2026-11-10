@@ -9,7 +9,7 @@ import {
   CheckCircle,
 } from 'lucide-react'
 import Button from '../../../components/ui/Button'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 const DEFAULT_SCALE = [
   { label: 'A+', minPercent: 90, maxPercent: 100 },
@@ -26,7 +26,7 @@ export default function GradingScaleTab({
   onSaveGradingScale,
   savingGradingScale,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [newGrade, setNewGrade] = useState({ label: '', minPercent: 0, maxPercent: 100 })
 
   const scale = Array.isArray(gradingScale) && gradingScale.length > 0 ? gradingScale : DEFAULT_SCALE

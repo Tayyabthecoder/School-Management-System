@@ -21,13 +21,13 @@ import Breadcrumb from '../../components/layout/Breadcrumb'
 import Badge from '../../components/ui/Badge'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
-import { formatDate } from '../../lib/formatters'
-import { useToastStore } from '../../store/toastStore'
+import { formatDate, toLocalDateInput } from '../../lib/formatters'
+import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 
 // ─── Fast Period Attendance Modal ─────────────────────────────────────────────
 function QuickPeriodAttendanceModal({ open, period, onClose, onAttendanceMarked }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -84,7 +84,7 @@ function QuickPeriodAttendanceModal({ open, period, onClose, onAttendanceMarked 
       const payload = {
         classId: period.class._id,
         sectionId: period.sectionId,
-        date: new Date().toISOString().split('T')[0],
+        date: toLocalDateInput(),
         periodNumber: period.periodNumber || 1,
         records: students.map(s => ({
           studentId: s._id,
@@ -244,7 +244,7 @@ function QuickPeriodAttendanceModal({ open, period, onClose, onAttendanceMarked 
 // ─── Main Teacher Workspace Page ──────────────────────────────────────────────
 export default function TeacherWorkspacePage() {
   const { user } = useAuthStore()
-  const toast = useToastStore()
+  const toast = useToast()
 
   const [workspace, setWorkspace] = useState(null)
   const [leaveRequests, setLeaveRequests] = useState([])

@@ -20,7 +20,7 @@ import Badge from '../../components/ui/Badge'
 import StatCard from '../../components/ui/StatCard'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 import {
   DAYS,
   PERIODS,
@@ -44,7 +44,7 @@ const SUBJECT_COLORS = [
 
 // ─── Main Teachers Page ───────────────────────────────────────────────────────
 export default function TeachersPage() {
-  const toast = useToastStore()
+  const toast = useToast()
 
   // State
   const [activeTab, setActiveTab] = useState('directory') // 'directory' | 'matrix' | 'schedule'

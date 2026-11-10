@@ -13,7 +13,7 @@ import {
   Award,
 } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 import { downloadBlobResponse } from './downloadHelper'
 
 const MONTH_NAMES = [
@@ -117,7 +117,7 @@ function DateRange({ label, fromVal, toVal, onFrom, onTo }) {
 }
 
 export default function ExportReportsTab() {
-  const toast = useToastStore()
+  const toast = useToast()
   const [feeFrom, setFeeFrom] = useState('')
   const [feeTo, setFeeTo] = useState('')
   const [attFrom, setAttFrom] = useState('')

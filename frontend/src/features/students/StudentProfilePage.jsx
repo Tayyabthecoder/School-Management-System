@@ -10,7 +10,19 @@ import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { formatDate } from '../../lib/formatters'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
+import { useAuthStore } from '../../store/authStore'
+
+// Which profile sections each staff role may load (mirrors the backend route RBAC), so the
+// page doesn't fire requests that are guaranteed to fail with 403 and spam error toasts.
+const PROFILE_DATA_ACCESS = {
+  super_admin: { fees: true, grades: true, attendance: true },
+  teacher: { fees: false, grades: true, attendance: true },
+  accountant: { fees: true, grades: false, attendance: false },
+  hr_manager: { fees: false, grades: false, attendance: true },
+}
+const NO_ACCESS = { fees: false, grades: false, attendance: false }
+const skipped = Promise.resolve({ data: { success: true, data: [] } })
 
 // Modular Subcomponents
 import ProfileHeader from './components/StudentProfile/ProfileHeader'
@@ -61,7 +73,10 @@ const formatWhatsAppUrl = (phone) => {
 
 export default function StudentProfilePage() {
   const { id } = useParams()
-  const toast = useToastStore()
+  const toast = useToast()
+  const user = useAuthStore((state) => state.user)
+  const roleName = user?.roleName || (typeof user?.role === 'object' ? user?.role?.name : user?.role)
+  const access = PROFILE_DATA_ACCESS[roleName] || NO_ACCESS
 
   const [student, setStudent] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -142,9 +157,10 @@ export default function StudentProfilePage() {
     try {
       const [stRes, feeRes, grdRes, attRes] = await Promise.allSettled([
         api.get(`/students/${id}`),
-        api.get('/finance/student-fees', { params: { studentId: id } }),
-        api.get(`/grades/student/${id}`),
-        api.get('/attendance', { params: { studentId: id } }),
+        access.fees ? api.get('/finance/student-fees', { params: { studentId: id } }) : skipped,
+        access.grades ? api.get(`/grades/student/${id}`) : skipped,
+        // GET /attendance does not exist; student attendance lives at /attendance/student.
+        access.attendance ? api.get('/attendance/student', { params: { studentId: id } }) : skipped,
       ])
 
       if (stRes.status === 'fulfilled' && stRes.value.data?.success) {
@@ -169,7 +185,7 @@ export default function StudentProfilePage() {
     } finally {
       setLoading(false)
     }
-  }, [id, toast, initEditForm])
+  }, [id, toast, initEditForm, access.fees, access.grades, access.attendance])
 
   useEffect(() => {
     loadAllStudentData()

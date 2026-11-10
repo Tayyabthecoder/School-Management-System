@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import api from '../../lib/axios'
-import { useToastStore } from '../../store/toastStore'
+import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 
 import {
@@ -185,7 +185,7 @@ const mergeChallanConfig = (incoming) => {
 
 // ─── Main Settings Page ───────────────────────────────────────────────────────
 export default function SettingsPage() {
-  const toast = useToastStore()
+  const toast = useToast()
   const { user } = useAuthStore()
 
   const [activeTab, setActiveTab] = useState('profile')

@@ -102,6 +102,9 @@ const updateSettings = async (req, res, next) => {
         if (!item.label || typeof item.minPercent !== 'number' || typeof item.maxPercent !== 'number') {
           return res.status(400).json({ success: false, error: { message: 'Each grade scale item must have label, minPercent, and maxPercent' } })
         }
+        if (item.minPercent > item.maxPercent) {
+          return res.status(400).json({ success: false, error: { message: `Grade "${item.label}": minPercent cannot be greater than maxPercent` } })
+        }
       }
     }
 

@@ -3,6 +3,7 @@ const Staff = require('../../models/Staff.model')
 const StudentFee = require('../../models/StudentFee.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
 const Grade = require('../../models/Grade.model')
+const { toRangeStart, toRangeEnd } = require('../../utils/date.util')
 
 /**
  * Field configuration dictionary for Dynamic Custom Report Builder (FR-RP-03)
@@ -92,8 +93,8 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
     if (filters.gender && filters.gender !== 'ALL') query.gender = filters.gender
     if (filters.from || filters.to) {
       query.joiningDate = {}
-      if (filters.from) query.joiningDate.$gte = new Date(filters.from)
-      if (filters.to) query.joiningDate.$lte = new Date(filters.to)
+      if (filters.from) query.joiningDate.$gte = toRangeStart(filters.from)
+      if (filters.to) query.joiningDate.$lte = toRangeEnd(filters.to)
     }
     const sortField = sortBy === 'fullName' ? 'fullName' : 'studentId'
     rawDocs = await Student.find(query).populate('classId').sort({ [sortField]: sortOrder === -1 ? -1 : 1 })
@@ -111,8 +112,8 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
     if (filters.status && filters.status !== 'ALL') query.status = filters.status
     if (filters.from || filters.to) {
       query.dueDate = {}
-      if (filters.from) query.dueDate.$gte = new Date(filters.from)
-      if (filters.to) query.dueDate.$lte = new Date(filters.to)
+      if (filters.from) query.dueDate.$gte = toRangeStart(filters.from)
+      if (filters.to) query.dueDate.$lte = toRangeEnd(filters.to)
     }
     if (filters.classId && filters.classId !== 'ALL') {
       const studentMatch = { classId: filters.classId, deletedAt: null }
@@ -130,8 +131,8 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
     if (filters.sectionId && filters.sectionId !== 'ALL') query.sectionId = filters.sectionId
     if (filters.from || filters.to) {
       query.date = {}
-      if (filters.from) query.date.$gte = new Date(filters.from)
-      if (filters.to) query.date.$lte = new Date(filters.to)
+      if (filters.from) query.date.$gte = toRangeStart(filters.from)
+      if (filters.to) query.date.$lte = toRangeEnd(filters.to)
     }
     const attDocs = await StudentAttendance.find(query)
       .populate('classId')
@@ -160,8 +161,8 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
     }
     if (filters.from || filters.to) {
       gradesQuery.createdAt = {}
-      if (filters.from) gradesQuery.createdAt.$gte = new Date(filters.from)
-      if (filters.to) gradesQuery.createdAt.$lte = new Date(filters.to)
+      if (filters.from) gradesQuery.createdAt.$gte = toRangeStart(filters.from)
+      if (filters.to) gradesQuery.createdAt.$lte = toRangeEnd(filters.to)
     }
 
     rawDocs = await Grade.find(gradesQuery)

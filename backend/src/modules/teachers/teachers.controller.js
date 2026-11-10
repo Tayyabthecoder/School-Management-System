@@ -7,7 +7,9 @@ const Subject = require('../../models/Subject.model')
 const Student = require('../../models/Student.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
 const StudentLeaveRequest = require('../../models/StudentLeaveRequest.model')
+const Counter = require('../../models/Counter.model')
 const bcrypt = require('bcryptjs')
+const { assertTeacherAvailable } = require('../timetable/timetable.service')
 const { ApiError } = require('../../middleware/error.middleware')
 const { logAudit } = require('../../utils/audit-log.util')
 const { escapeRegex } = require('../../utils/regex.util')
@@ -139,6 +141,10 @@ const assignTeacherPeriod = async (req, res, next) => {
       throw new ApiError(400, 'Class, section, subject, teacher, dayOfWeek, and periodNumber are required')
     }
 
+    // Same double-booking guard as POST /timetable; without it this endpoint could put
+    // one teacher in two classrooms during the same period.
+    await assertTeacherAvailable({ teacherId, dayOfWeek, periodNumber, classId, sectionId })
+
     const entry = await TimetableEntry.findOneAndUpdate(
       { classId, sectionId, dayOfWeek, periodNumber },
       {
@@ -163,12 +169,38 @@ const assignTeacherPeriod = async (req, res, next) => {
 /**
  * Create a new faculty member with credentials
  */
+/**
+ * Allocates TCH-<current year>-NNN from an atomic per-year counter. The previous
+ * `TCH-2026-${count + 1}` was pinned to 2026 and collided under concurrent creates.
+ */
+const generateTeacherStaffId = async () => {
+  const year = new Date().getFullYear()
+  const prefix = `TCH-${year}-`
+  const counterKey = `teacher-${year}`
+
+  if (!(await Counter.findById(counterKey))) {
+    // Seed from existing ids so the sequence continues after legacy records.
+    const existing = await Staff.find({ staffId: { $regex: `^${prefix}` } }).select('staffId').lean()
+    const maxSeq = existing.reduce((max, s) => {
+      const seq = parseInt((s.staffId || '').slice(prefix.length), 10)
+      return Number.isNaN(seq) ? max : Math.max(max, seq)
+    }, 0)
+    await Counter.findByIdAndUpdate(counterKey, { $max: { seq: maxSeq } }, { upsert: true })
+  }
+
+  let candidate
+  do {
+    const seq = await Counter.getNextSequence(counterKey)
+    candidate = `${prefix}${String(seq).padStart(3, '0')}`
+  } while (await Staff.exists({ staffId: candidate }))
+  return candidate
+}
+
 const createTeacher = async (req, res, next) => {
   try {
     const { fullName, cnic, phone, email, designation, department, joiningDate, salary, qualification } = req.body
 
-    const count = await Staff.countDocuments()
-    const staffId = `TCH-2026-${String(count + 1).padStart(3, '0')}`
+    const staffId = await generateTeacherStaffId()
 
     const teacher = await Staff.create({
       staffId,
@@ -434,7 +466,12 @@ const getMyClasses = async (req, res, next) => {
 const getTeacherLeaveRequests = async (req, res, next) => {
   try {
     let filter = {}
-    if (req.user.roleName === 'teacher' && req.user.staffId) {
+    if (req.user.roleName === 'teacher') {
+      // A teacher account without a staff profile has no classes; previously it fell
+      // through with an empty filter and could read every student's leave request.
+      if (!req.user.staffId) {
+        return res.json({ success: true, count: 0, data: [] })
+      }
       const entries = await TimetableEntry.find({ teacherId: req.user.staffId })
       const classIds = entries.map(e => e.classId).filter(Boolean)
       filter.classId = { $in: classIds }

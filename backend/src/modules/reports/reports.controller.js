@@ -15,6 +15,7 @@ const { generatePDFBuffer, buildTabularReportPDF } = require('../../utils/pdf.ut
 const { getPagination, formatPaginatedResponse } = require('../../utils/pagination.util')
 const { getOrSet } = require('../../utils/cache.util')
 const { compileDynamicCustomReport } = require('./reports.builder')
+const { toRangeStart, toRangeEnd } = require('../../utils/date.util')
 
 const getPKTTodayRange = () => {
   const now = new Date()
@@ -261,8 +262,8 @@ const getAuditLogs = async (req, res, next) => {
     if (mod) filter.module = mod
     if (from || to) {
       filter.createdAt = {}
-      if (from) filter.createdAt.$gte = new Date(from)
-      if (to) filter.createdAt.$lte = new Date(to)
+      if (from) filter.createdAt.$gte = toRangeStart(from)
+      if (to) filter.createdAt.$lte = toRangeEnd(to)
     }
 
     const [logs, total] = await Promise.all([
@@ -336,8 +337,8 @@ const exportCustomReport = async (req, res, next) => {
     // ── Fees ──────────────────────────────────────────────────────
     } else if (entity === 'fees') {
       const filter = {}
-      if (from) filter.createdAt = { $gte: new Date(from) }
-      if (to) filter.createdAt = { ...filter.createdAt, $lte: new Date(to) }
+      if (from) filter.createdAt = { $gte: toRangeStart(from) }
+      if (to) filter.createdAt = { ...filter.createdAt, $lte: toRangeEnd(to) }
 
       const fees = await StudentFee.find(filter).populate({
         path: 'studentId',
@@ -410,8 +411,8 @@ const exportCustomReport = async (req, res, next) => {
     // ── Attendance ────────────────────────────────────────────────
     } else if (entity === 'attendance') {
       const filter = {}
-      if (from) filter.date = { $gte: new Date(from) }
-      if (to) filter.date = { ...filter.date, $lte: new Date(to) }
+      if (from) filter.date = { $gte: toRangeStart(from) }
+      if (to) filter.date = { ...filter.date, $lte: toRangeEnd(to) }
 
       const records = await StudentAttendance.find(filter)
         .populate({ path: 'classId' })
@@ -492,8 +493,8 @@ const exportCustomReport = async (req, res, next) => {
         filter.date = { $gte: start, $lte: end }
       } else if (from || to) {
         filter.date = {}
-        if (from) filter.date.$gte = new Date(from)
-        if (to) filter.date.$lte = new Date(to)
+        if (from) filter.date.$gte = toRangeStart(from)
+        if (to) filter.date.$lte = toRangeEnd(to)
       }
 
       const staffList = await Staff.find({ isActive: true, deletedAt: null })

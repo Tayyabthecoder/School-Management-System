@@ -3,7 +3,7 @@ import {
   BookOpen, Plus, X, AlertCircle, Trash2
 } from 'lucide-react'
 import api from '../../../lib/axios'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 export const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -20,7 +20,7 @@ export const PERIOD_TIMES = [
 
 export // ─── Modal: Add Subject ───────────────────────────────────────────────────────
 function AddSubjectModal({ open, classId, className, onClose, onCreated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     name: '',
     code: '',
@@ -126,7 +126,7 @@ function AssignPeriodModal({
   onClose,
   onSaved,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [form, setForm] = useState({
     subjectId: '',
     teacherId: '',
@@ -372,7 +372,7 @@ function DeleteConfirmModal({
 
 
 export function AddClassModal({ open, onClose, onCreated }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [name, setName] = useState('')
   const [level, setLevel] = useState(1)
   const [sections, setSections] = useState('A, B')
@@ -482,7 +482,7 @@ export function AddClassModal({ open, onClose, onCreated }) {
 }
 
 export function AddSectionModal({ open, grade, onClose, onAdded }) {
-  const toast = useToastStore()
+  const toast = useToast()
   const [sectionName, setSectionName] = useState('')
   const [submitting, setSubmitting] = useState(false)
 

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import Badge from '../../../components/ui/Badge'
 import Button from '../../../components/ui/Button'
-import { useToastStore } from '../../../store/toastStore'
+import { useToast } from '../../../store/toastStore'
 
 // Preset sample student profiles for interactive preview verification
 const SAMPLE_STUDENTS = {
@@ -78,7 +78,7 @@ export default function ChallanBuilderTab({
   DEFAULT_CHALLAN_CONFIG,
   mergeChallanConfig,
 }) {
-  const toast = useToastStore()
+  const toast = useToast()
 
   // Interactive preview state
   const [sampleStudentKey, setSampleStudentKey] = useState('ali')
