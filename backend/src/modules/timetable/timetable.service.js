@@ -23,4 +23,11 @@ const assertTeacherAvailable = async ({ teacherId, dayOfWeek, periodNumber, clas
   }
 }
 
-module.exports = { assertTeacherAvailable }
+/**
+ * Staff fields that are safe to embed in timetable responses. The timetable is readable
+ * by every role (students and guardians included), so salary, CNIC, phone and bank
+ * details must never be populated here.
+ */
+const TEACHER_PUBLIC_FIELDS = 'fullName staffId designation department'
+
+module.exports = { assertTeacherAvailable, TEACHER_PUBLIC_FIELDS }

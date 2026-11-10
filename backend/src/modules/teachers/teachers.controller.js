@@ -9,7 +9,7 @@ const StudentAttendance = require('../../models/StudentAttendance.model')
 const StudentLeaveRequest = require('../../models/StudentLeaveRequest.model')
 const Counter = require('../../models/Counter.model')
 const bcrypt = require('bcryptjs')
-const { assertTeacherAvailable } = require('../timetable/timetable.service')
+const { assertTeacherAvailable, TEACHER_PUBLIC_FIELDS } = require('../timetable/timetable.service')
 const { ApiError } = require('../../middleware/error.middleware')
 const { logAudit } = require('../../utils/audit-log.util')
 const { escapeRegex } = require('../../utils/regex.util')
@@ -158,7 +158,7 @@ const assignTeacherPeriod = async (req, res, next) => {
     )
       .populate('classId')
       .populate('subjectId')
-      .populate('teacherId')
+      .populate('teacherId', TEACHER_PUBLIC_FIELDS)
 
     res.json({ success: true, message: 'Class period assigned successfully', data: entry })
   } catch (error) {

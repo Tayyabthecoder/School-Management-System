@@ -414,6 +414,7 @@ const downloadChallanPDF = async (req, res, next) => {
             discount: feeRecord.discount || 0,
             concessionType: feeRecord.concessionType || 'None',
             netAmount: feeRecord.netAmount,
+            amountPaid: feeRecord.amountPaid || 0,
             outstandingAmount: feeRecord.outstandingAmount,
             status: feeRecord.status,
           },

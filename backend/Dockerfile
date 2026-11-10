@@ -18,6 +18,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package*.json ./
 COPY src ./src
 COPY seed ./seed
+COPY scripts ./scripts
 
 # Create logs and uploads directory and assign ownership to appuser
 RUN mkdir -p logs uploads && chown -R appuser:appgroup /app

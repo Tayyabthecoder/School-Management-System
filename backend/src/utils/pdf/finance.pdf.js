@@ -92,6 +92,43 @@ const DEFAULT_CHALLAN_SETTINGS = {
   },
 }
 
+/**
+ * Amount rows printed on every challan copy. The payable figures are based on the
+ * remaining balance (outstandingAmount), not the original net fee: after a partial
+ * payment, printing the full net amount invites the payer to pay it again.
+ */
+const buildChallanAmountRows = (data, settings = {}) => {
+  const surchargeSetting = settings.lateFeeSurcharge !== undefined ? Number(settings.lateFeeSurcharge) || 0 : 500
+  const netAmount = Number(data.netAmount) || 0
+  const amountPaid = Number(data.amountPaid) || 0
+  const balance = Number.isFinite(Number(data.outstandingAmount))
+    ? Math.max(0, Number(data.outstandingAmount))
+    : Math.max(0, netAmount - amountPaid)
+  // Nothing is owed on a settled challan, so no late surcharge applies either.
+  const surcharge = balance > 0 ? surchargeSetting : 0
+
+  const lineItems = [
+    { title: data.feeTitle || 'Monthly Tuition Fee', amount: data.amountDue, bold: false, color: '#1E293B', bg: '#FFFFFF' },
+    {
+      title: `Concession: ${data.concessionType !== 'None' ? data.concessionType : 'Institutional Aid'}`,
+      amount: data.discount > 0 ? `- ${Number(data.discount).toLocaleString()}` : '0',
+      bold: false,
+      color: data.discount > 0 ? '#16A34A' : '#64748B',
+      bg: '#F8FAFC',
+    },
+  ]
+  if (amountPaid > 0) {
+    lineItems.push({ title: 'Less: Already Paid', amount: `- ${amountPaid.toLocaleString()}`, bold: false, color: '#16A34A', bg: '#FFFFFF' })
+  }
+  lineItems.push(
+    { title: 'NET PAYABLE (Within Due Date)', amount: balance.toLocaleString(), bold: true, color: '#1E3A8A', bg: '#EEF2FF' },
+    { title: 'Late Surcharge (After Due Date)', amount: String(surcharge), bold: false, color: '#DC2626', bg: '#FFFFFF' },
+    { title: 'GROSS AMOUNT (After Due Date)', amount: (balance + surcharge).toLocaleString(), bold: true, color: '#991B1B', bg: '#FEF2F2' },
+  )
+
+  return { lineItems, balance, surcharge }
+}
+
 const drawChallanSinglePanel = (doc, { startX, width, copyTitle, copySubtitle, badgeColor, data, settings }) => {
   const panelHeight = 565
   const topY = 15
@@ -204,21 +241,7 @@ const drawChallanSinglePanel = (doc, { startX, width, copyTitle, copySubtitle, b
   doc.text('AMOUNT (PKR)', startX + width - (isCompact ? 55 : 70), y + 4, { align: 'right', width: isCompact ? 48 : 62 })
 
   y += tableH
-  const surcharge = settings.lateFeeSurcharge !== undefined ? settings.lateFeeSurcharge : 500
-
-  const lineItems = [
-    { title: data.feeTitle || 'Monthly Tuition Fee', amount: data.amountDue, bold: false, color: '#1E293B', bg: '#FFFFFF' },
-    {
-      title: `Concession: ${data.concessionType !== 'None' ? data.concessionType : 'Institutional Aid'}`,
-      amount: data.discount > 0 ? `- ${Number(data.discount).toLocaleString()}` : '0',
-      bold: false,
-      color: data.discount > 0 ? '#16A34A' : '#64748B',
-      bg: '#F8FAFC',
-    },
-    { title: 'NET PAYABLE (Within Due Date)', amount: Number(data.netAmount).toLocaleString(), bold: true, color: '#1E3A8A', bg: '#EEF2FF' },
-    { title: 'Late Surcharge (After Due Date)', amount: String(surcharge), bold: false, color: '#DC2626', bg: '#FFFFFF' },
-    { title: 'GROSS AMOUNT (After Due Date)', amount: Number(data.netAmount + surcharge).toLocaleString(), bold: true, color: '#991B1B', bg: '#FEF2F2' },
-  ]
+  const { lineItems } = buildChallanAmountRows(data, settings)
 
   const rowHeight = isCompact ? 15 : 17
   lineItems.forEach((item) => {
@@ -380,6 +403,7 @@ const buildFeeChallanPDF = (doc, data, customSettings = {}) => {
 }
 
 module.exports = {
+  buildChallanAmountRows,
   buildPaymentReceiptPDF,
   DEFAULT_CHALLAN_SETTINGS,
   drawChallanSinglePanel,

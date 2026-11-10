@@ -17,6 +17,10 @@ const { getOrSet } = require('../../utils/cache.util')
 const { compileDynamicCustomReport } = require('./reports.builder')
 const { toRangeStart, toRangeEnd } = require('../../utils/date.util')
 
+// A fee is in arrears when it is unpaid and past due, whatever its stored status says:
+// the job that flips Pending -> Overdue may not have run (no Redis, or not since midnight).
+const UNPAID_FEE_FILTER = { status: { $ne: 'Paid' } }
+
 const getPKTTodayRange = () => {
   const now = new Date()
   const pktDateStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' }) // YYYY-MM-DD
@@ -79,7 +83,13 @@ const getDashboardStats = async (req, res, next) => {
           },
         ]),
         StudentFee.aggregate([
-          { $match: { status: 'Overdue', ...feeYearFilter } },
+          {
+            $match: {
+              ...UNPAID_FEE_FILTER,
+              outstandingAmount: { $gt: 0 },
+              dueDate: { ...(feeYearFilter.dueDate || {}), $lt: todayStart },
+            },
+          },
           { $group: { _id: null, count: { $sum: 1 }, total: { $sum: '$outstandingAmount' } } },
         ]),
         LeaveRequest.countDocuments({ status: 'Pending' }),
@@ -374,7 +384,7 @@ const exportCustomReport = async (req, res, next) => {
       sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
 
       const fees = await StudentFee.find({
-        status: { $in: ['Overdue', 'Partial'] },
+        ...UNPAID_FEE_FILTER,
         dueDate: { $lte: sixtyDaysAgo },
         outstandingAmount: { $gt: 0 },
       })
@@ -767,7 +777,7 @@ const getDefaulterAging = async (req, res, next) => {
     const [result] = await StudentFee.aggregate([
       {
         $match: {
-          status: { $in: ['Overdue', 'Partial'] },
+          ...UNPAID_FEE_FILTER,
           dueDate: { $lt: today },
           outstandingAmount: { $gt: 0 },
         },

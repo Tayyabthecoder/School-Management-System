@@ -4,12 +4,23 @@ const connectDB = require('./config/database')
 
 const startServer = async () => {
   await connectDB()
+
+  // Bring built-in role permissions in existing databases in line with src/config/roles.js
+  try {
+    const { syncDefaultRoles } = require('./config/roles')
+    await syncDefaultRoles(require('./models/Role.model'))
+    console.log('[RBAC]: Built-in role permissions synchronised.')
+  } catch (err) {
+    console.error('[RBAC]: Failed to synchronise role permissions:', err.message)
+  }
+
   const PORT = env.PORT || 5000
 
   // Start background queue workers & cron schedules
   const { initQueues } = require('./jobs/queues')
   initQueues()
-  require('./jobs/fee-overdue.worker')
+  const { initFeeOverdueSchedule } = require('./jobs/fee-overdue.worker')
+  initFeeOverdueSchedule()
   const { initMonthlyChallanCron } = require('./jobs/monthly-challan.cron')
   initMonthlyChallanCron()
 

@@ -151,7 +151,7 @@ The system enforces strict permission gates at both API route and UI levels acro
 
 ## 🔑 Demo Credentials
 
-When seeded using `npm run db:seed`, the database is populated with sample datasets and ready-to-use accounts:
+When seeded using `npm run db:seed`, the database is populated with sample datasets and ready-to-use accounts. The login page shows 1-click buttons for these accounts only in development (`npm run dev`) or when built with `VITE_ENABLE_DEMO_LOGIN=true`; production builds never contain them.
 
 | Role | Username | Password | Notes |
 |---|---|---|---|
@@ -291,14 +291,18 @@ Run the full stack (MongoDB, Redis, Backend, and Frontend reverse-proxied by Ngi
    docker-compose up -d --build
    ```
 
-3. **Seed demo data into the containerized MongoDB:**
+3. **Create the first super admin** (the container runs with `NODE_ENV=production`, where the demo seed is blocked):
    ```bash
-   docker exec -it sms-backend npm run db:seed
+   docker exec -it -e ADMIN_PASSWORD='choose-a-long-secret-2026' sms-backend npm run admin:create
    ```
+   The password must be at least 12 characters with letters and numbers. Re-run with `-e ADMIN_RESET=true` to rotate it.
+   The command never deletes data and refuses to run if a super admin already exists.
+
+   *Demo data only (never on a real school's database):* `docker exec -it -e ALLOW_PRODUCTION_SEED=true sms-backend npm run db:seed`
 
 4. **Access the application:**
-   - **Frontend Application:** [http://localhost](http://localhost) (Port 80)
-   - **Backend REST API:** [http://localhost/api/v1/health](http://localhost/api/v1/health)
+   - **Frontend Application:** [https://localhost](https://localhost) (port 443, with HTTP on port 80 redirecting to it). A self-signed certificate is generated on first start. Mount real certificates at `./certs/fullchain.pem` and `./certs/privkey.pem` for a public hostname.
+   - **Backend REST API:** [https://localhost/api/v1/health](https://localhost/api/v1/health)
 
 To view real-time logs:
 ```bash

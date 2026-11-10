@@ -50,7 +50,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://localhost}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -70,6 +70,13 @@ services:
     restart: unless-stopped
     ports:
       - '80:80'
+      - '443:443'
+    environment:
+      - TLS_COMMON_NAME=${TLS_COMMON_NAME:-localhost}
+    volumes:
+      # Put fullchain.pem + privkey.pem here for a real hostname; otherwise a
+      # self-signed pair is generated into this folder on first start.
+      - ./certs:/etc/nginx/certs
     depends_on:
       - backend
     networks:

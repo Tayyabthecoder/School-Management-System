@@ -4,6 +4,21 @@ import { School, Lock, User, AlertCircle, KeyRound, CalendarX, ShieldCheck } fro
 import api from '../../lib/axios'
 import { useAuthStore } from '../../store/authStore'
 
+// Seeded demo credentials must never ship in a production bundle: anyone could click
+// "Super Admin" and, via the forced first-login password change, take over the account.
+// Vite replaces these env flags at build time, so the array is dropped from prod builds.
+const SHOW_DEMO_LOGIN = import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEMO_LOGIN === 'true'
+const DEMO_ACCOUNTS = SHOW_DEMO_LOGIN
+  ? [
+      { label: 'Super Admin', username: 'admin', pass: 'Admin@1234', color: 'bg-indigo-600 hover:bg-indigo-700' },
+      { label: 'Teacher', username: 'teacher1', pass: 'Staff@1234', color: 'bg-emerald-600 hover:bg-emerald-700' },
+      { label: 'Parent / Guardian', username: 'parent1', pass: 'Parent@1234', color: 'bg-rose-600 hover:bg-rose-700' },
+      { label: 'Student', username: 'stu-2026-0001', pass: 'Student@1234', color: 'bg-purple-600 hover:bg-purple-700' },
+      { label: 'Accountant', username: 'accountant1', pass: 'Staff@1234', color: 'bg-amber-600 hover:bg-amber-700' },
+      { label: 'HR Manager', username: 'hr_manager', pass: 'Staff@1234', color: 'bg-teal-600 hover:bg-teal-700' },
+    ]
+  : []
+
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -68,15 +83,6 @@ export default function LoginPage() {
     e.preventDefault()
     handleLogin(username, password)
   }
-
-  const demoAccounts = [
-    { label: 'Super Admin', username: 'admin', pass: 'Admin@1234', color: 'bg-indigo-600 hover:bg-indigo-700' },
-    { label: 'Teacher', username: 'teacher1', pass: 'Staff@1234', color: 'bg-emerald-600 hover:bg-emerald-700' },
-    { label: 'Parent / Guardian', username: 'parent1', pass: 'Parent@1234', color: 'bg-rose-600 hover:bg-rose-700' },
-    { label: 'Student', username: 'stu-2026-0001', pass: 'Student@1234', color: 'bg-purple-600 hover:bg-purple-700' },
-    { label: 'Accountant', username: 'accountant1', pass: 'Staff@1234', color: 'bg-amber-600 hover:bg-amber-700' },
-    { label: 'HR Manager', username: 'hr_manager', pass: 'Staff@1234', color: 'bg-teal-600 hover:bg-teal-700' },
-  ]
 
   // ── R6: Day-Blocked Screen ──────────────────────────────────────────────────
   if (!dayLoading && dayInfo && !dayInfo.isAllowedToday && !showAdminBypass) {
@@ -200,13 +206,14 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* 1-Click Quick Demo Sign-In Buttons */}
+        {/* 1-Click Quick Demo Sign-In Buttons (development / explicit demo builds only) */}
+        {DEMO_ACCOUNTS.length > 0 && (
         <div className="mt-8 pt-6 border-t border-gray-100">
           <div className="flex items-center gap-1 text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">
             <KeyRound className="w-4 h-4 text-indigo-600" /> 1-Click Demo Sign-In
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {demoAccounts.map((acc) => (
+            {DEMO_ACCOUNTS.map((acc) => (
               <button
                 key={acc.label}
                 type="button"
@@ -223,6 +230,7 @@ export default function LoginPage() {
             ))}
           </div>
         </div>
+        )}
       </div>
     </div>
   )

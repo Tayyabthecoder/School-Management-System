@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const env = require('../src/config/env')
 const connectDB = require('../src/config/database')
+const { DEFAULT_ROLES } = require('../src/config/roles')
 
 const Role = require('../src/models/Role.model')
 const User = require('../src/models/User.model')
@@ -57,82 +58,8 @@ const seedComprehensiveDatabase = async () => {
     ])
 
     console.log('[Seed Engine] 1. Seeding System Roles...')
-    const rolesData = [
-      {
-        name: 'super_admin',
-        displayName: 'Super Admin',
-        description: 'Full administrative and configuration privileges',
-        permissions: [
-          { module: 'students', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'classes', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'academics', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'attendance', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'grades', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'finance', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'hr', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'payroll', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'staff', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'reports', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'timetable', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'settings', actions: ['create', 'read', 'update', 'delete'] },
-        ],
-      },
-      {
-        name: 'teacher',
-        displayName: 'Teacher',
-        description: 'Academic rosters, attendance, and grade management',
-        permissions: [
-          { module: 'attendance', actions: ['create', 'read', 'update'] },
-          { module: 'grades', actions: ['create', 'read', 'update'] },
-          { module: 'academics', actions: ['read'] },
-          { module: 'students', actions: ['read'] },
-          { module: 'timetable', actions: ['read'] },
-        ],
-      },
-      {
-        name: 'student',
-        displayName: 'Student',
-        description: 'Personal academic history, timetable, and announcements',
-        permissions: [
-          { module: 'grades', actions: ['read'] },
-          { module: 'timetable', actions: ['read'] },
-          { module: 'attendance', actions: ['read'] },
-          { module: 'finance', actions: ['read'] },
-        ],
-      },
-      {
-        name: 'guardian',
-        displayName: 'Guardian / Parent',
-        description: 'Child academic progress, attendance, and fee status',
-        permissions: [
-          { module: 'attendance', actions: ['read', 'create'] },
-          { module: 'grades', actions: ['read'] },
-          { module: 'finance', actions: ['read'] },
-        ],
-      },
-      {
-        name: 'accountant',
-        displayName: 'Accountant',
-        description: 'Fee structure, payments, and financial ledger management',
-        permissions: [
-          { module: 'finance', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'reports', actions: ['read'] },
-          { module: 'students', actions: ['read'] },
-        ],
-      },
-      {
-        name: 'hr_manager',
-        displayName: 'HR Manager',
-        description: 'Staff profiles, leave approvals, and monthly payroll processing',
-        permissions: [
-          { module: 'hr', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'payroll', actions: ['create', 'read', 'update'] },
-          { module: 'staff', actions: ['create', 'read', 'update', 'delete'] },
-          { module: 'attendance', actions: ['create', 'read', 'update'] },
-          { module: 'reports', actions: ['read'] },
-        ],
-      },
-    ]
+    // Role permissions live in src/config/roles.js (shared with the runtime role sync)
+    const rolesData = DEFAULT_ROLES
     const createdRoles = await Role.insertMany(rolesData)
     const roleMap = {}
     createdRoles.forEach(r => { roleMap[r.name] = r._id })

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { Award, ChevronRight, Download, Save, Search, BookOpen, FileText } from 'lucide-react'
+import { Award, ChevronRight, Download, Save, Search, BookOpen, FileText, Send, CheckCircle2 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonGradeCards } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
@@ -186,21 +186,47 @@ function ExamModal({ open, onClose, grades, onCreated }) {
 }
 
 // ─── Grade Entry Table ────────────────────────────────────────────────────────
-function GradeEntryTable({ students, exam }) {
+function GradeEntryTable({ students, exam, onExamUpdated }) {
   const toast = useToast()
   const [marks, setMarks] = useState({})
   const [existing, setExisting] = useState({})
   const [saving, setSaving] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+
+  // Students, guardians, report cards and transcripts only show published exams, so
+  // results stay invisible to families until a teacher/admin publishes them here.
+  const handlePublish = async () => {
+    if (!exam || exam.isPublished) return
+    const confirmed = window.confirm(
+      `Publish "${exam.title}" results? Students and guardians will be able to see these marks.`
+    )
+    if (!confirmed) return
+    setPublishing(true)
+    try {
+      const res = await api.patch(`/grades/exams/${exam._id}/publish`)
+      if (res.data?.success) {
+        toast.success('Results published to student and guardian portals')
+        onExamUpdated?.(res.data.data)
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to publish results')
+    } finally {
+      setPublishing(false)
+    }
+  }
   const [search, setSearch] = useState('')
 
+  // Keyed on the exam id, not the object: publishing replaces the exam object and must
+  // not wipe marks the teacher has typed but not yet saved.
+  const examId = exam?._id
   useEffect(() => {
-    if (!exam) return
+    if (!examId) return
     const init = {}
     students.forEach((s) => { init[s._id] = 0 })
     setMarks(init)
 
     // Load existing grades for this exam
-    api.get(`/grades/entry/${exam._id}`)
+    api.get(`/grades/entry/${examId}`)
       .then((res) => {
         if (res.data?.success) {
           const existMap = {}
@@ -217,7 +243,7 @@ function GradeEntryTable({ students, exam }) {
         }
       })
       .catch(() => {})
-  }, [exam, students])
+  }, [examId, students])
 
   const filtered = students.filter((s) =>
     s.fullName.toLowerCase().includes(search.toLowerCase()) ||
@@ -308,6 +334,20 @@ function GradeEntryTable({ students, exam }) {
             <Save className="w-4 h-4" />
             {saving ? 'Saving…' : 'Save All Grades'}
           </button>
+          {exam.isPublished ? (
+            <span className="flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg font-semibold">
+              <CheckCircle2 className="w-4 h-4" /> Published
+            </span>
+          ) : (
+            <button
+              onClick={handlePublish}
+              disabled={publishing}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-lg shadow-sm disabled:opacity-60"
+            >
+              <Send className="w-4 h-4" />
+              {publishing ? 'Publishing…' : 'Publish Results'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -616,7 +656,7 @@ export default function GradesPage() {
                   <option value="">— Select Exam —</option>
                   {exams.map((ex) => (
                     <option key={ex._id} value={ex._id}>
-                      {ex.title} ({ex.termName})
+                      {ex.title} ({ex.termName}){ex.isPublished ? '' : ' · Draft'}
                     </option>
                   ))}
                 </select>
@@ -633,7 +673,14 @@ export default function GradesPage() {
             </div>
           </div>
 
-          <GradeEntryTable students={students} exam={selectedExam} />
+          <GradeEntryTable
+            students={students}
+            exam={selectedExam}
+            onExamUpdated={(updated) => {
+              setExams((prev) => prev.map((ex) => (ex._id === updated._id ? updated : ex)))
+              setSelectedExam(updated)
+            }}
+          />
         </>
       )}
 

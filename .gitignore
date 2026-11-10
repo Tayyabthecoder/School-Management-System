@@ -45,3 +45,5 @@ Thumbs.db
 #AI Folder and docs files
 .agents/
 docs/
+# TLS certificates for the nginx container
+certs/
