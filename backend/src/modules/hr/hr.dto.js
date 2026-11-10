@@ -15,7 +15,9 @@ const createStaffSchema = z.object({
 
 const submitLeaveRequestSchema = z.object({
   body: z.object({
-    staffId: z.string().min(1, 'Staff ID is required'),
+    // Optional: staff file leave for themselves (the controller uses their own staff record);
+    // only HR / super admin may name another staff member.
+    staffId: z.string().min(1).optional(),
     // Kept in sync with LeaveRequest.leaveType (the model also accepts 'Sick').
     leaveType: z.enum(['Annual', 'Sick', 'Casual', 'Unpaid', 'Medical', 'Maternity', 'Paternity']),
     fromDate: z.string().or(z.date()),

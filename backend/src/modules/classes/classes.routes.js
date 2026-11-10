@@ -21,5 +21,6 @@ router.post('/subjects', checkPermission(['super_admin'], 'classes', 'create'), 
 
 router.get('/academic-years', classesController.getAcademicYears)
 router.post('/academic-years', checkPermission(['super_admin'], 'classes', 'create'), validate(createAcademicYearSchema), classesController.createAcademicYear)
+router.patch('/academic-years/:id/activate', checkPermission(['super_admin'], 'classes', 'update'), classesController.activateAcademicYear)
 
 module.exports = router

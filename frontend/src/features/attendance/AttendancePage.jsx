@@ -20,6 +20,7 @@ import api from '../../lib/axios'
 import { formatDate, toLocalDateInput } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
+import { logWarn } from '../../lib/logger'
 
 export default function AttendancePage() {
   const toast = useToast()
@@ -164,7 +165,7 @@ export default function AttendancePage() {
       }
       setAttendance(initial)
     } catch (err) {
-      console.warn('Could not fetch existing attendance or roster, using defaults', err)
+      logWarn('Could not fetch existing attendance or roster, using defaults', err)
     } finally {
       setRosterLoading(false)
     }

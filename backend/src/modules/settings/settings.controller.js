@@ -1,3 +1,4 @@
+const { getSchoolDayName } = require('../../utils/date.util')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { getOrSet, invalidateCache } = require('../../utils/cache.util')
 const { logAudit } = require('../../utils/audit-log.util')
@@ -29,7 +30,7 @@ const getSettings = async (req, res, next) => {
 const getAllowedDays = async (req, res, next) => {
   try {
     const dayNames = ALL_DAYS
-    const today = dayNames[new Date().getDay()] // e.g. "Thursday"
+    const today = getSchoolDayName() // e.g. "Thursday", in the school's timezone
 
     let doc = await SchoolSettings.findOne({ isActive: true }).sort({ updatedAt: -1 })
     if (!doc) {

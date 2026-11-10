@@ -9,7 +9,8 @@ const ROLES = {
 
 const ATTENDANCE_STATUS = {
   STUDENT: ['Present', 'Absent', 'Late', 'Excused'],
-  STAFF: ['Present', 'Absent', 'Late', 'On Leave'],
+  // Canonical staff statuses (LOW-13). Legacy documents may still hold 'Leave' (= 'On Leave').
+  STAFF: ['Present', 'Absent', 'Late', 'On Leave', 'Half Day'],
 }
 
 const FEE_STATUS = {

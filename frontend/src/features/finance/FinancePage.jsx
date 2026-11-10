@@ -32,6 +32,7 @@ import {
   ApplyConcessionModal,
   GenerateMonthlyChallansModal,
 } from './components/FinanceModals'
+import { logError } from '../../lib/logger'
 
 
 export default function FinancePage() {
@@ -295,7 +296,7 @@ export default function FinancePage() {
       await fetchData()
       toast.success(`Successfully downloaded ${count} fee challans!`)
     } catch (err) {
-      console.error('Bulk challan error', err)
+      logError('Bulk challan error', err)
       toast.error('Failed while downloading bulk challans')
     } finally {
       setBulkPrinting(false)

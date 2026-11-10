@@ -34,6 +34,9 @@ export default function GuardianPortalPage() {
   const [activeTab, setActiveTab] = useState('child')
   const [loading, setLoading] = useState(true)
   const [child, setChild] = useState(null)
+  // FUNC-04: a guardian may have several children; every request is scoped with ?studentId=
+  const [children, setChildren] = useState([])
+  const [selectedChildId, setSelectedChildId] = useState(null)
   const [attendance, setAttendance] = useState(null)
   const [leaveRequests, setLeaveRequests] = useState([])
   const [grades, setGrades] = useState([])
@@ -51,17 +54,34 @@ export default function GuardianPortalPage() {
   })
   const [submittingLeave, setSubmittingLeave] = useState(false)
 
-  const fetchPortalData = async () => {
+  const fetchPortalData = async (requestedChildId = selectedChildId) => {
     setLoading(true)
     setError(null)
     try {
+      let childId = requestedChildId
+      if (!childId) {
+        const listRes = await api.get('/guardian/my-children').catch(() => null)
+        const list = listRes?.data?.data || []
+        setChildren(list)
+        childId = list[0]?._id || null
+        setSelectedChildId(childId)
+      }
+      const scope = childId ? { params: { studentId: childId } } : undefined
+
       const [childRes, attRes, leavesRes, gradesRes, feesRes] = await Promise.allSettled([
-        api.get('/guardian/my-child'),
-        api.get('/guardian/attendance'),
-        api.get('/guardian/leave-requests'),
-        api.get('/guardian/grades'),
-        api.get('/guardian/fees'),
+        api.get('/guardian/my-child', scope),
+        api.get('/guardian/attendance', scope),
+        api.get('/guardian/leave-requests', scope),
+        api.get('/guardian/grades', scope),
+        api.get('/guardian/fees', scope),
       ])
+
+      // Reset per-child data so nothing from the previously selected child lingers
+      setAttendance(null)
+      setLeaveRequests([])
+      setGrades([])
+      setFees([])
+      setSelectedTerm('All')
 
       if (childRes.status === 'fulfilled' && childRes.value.data?.success) {
         setChild(childRes.value.data.data)
@@ -92,8 +112,14 @@ export default function GuardianPortalPage() {
   }
 
   useEffect(() => {
-    fetchPortalData()
+    fetchPortalData(null)
   }, [])
+
+  const handleSelectChild = (childId) => {
+    if (!childId || childId === selectedChildId) return
+    setSelectedChildId(childId)
+    fetchPortalData(childId)
+  }
 
   const handleSubmitLeave = async (e) => {
     e.preventDefault()
@@ -104,15 +130,15 @@ export default function GuardianPortalPage() {
 
     setSubmittingLeave(true)
     try {
-      const res = await api.post('/guardian/leave-requests', leaveForm)
+      const res = await api.post('/guardian/leave-requests', { ...leaveForm, studentId: selectedChildId || undefined })
       if (res.data?.success) {
         toast.success('Leave application submitted to class teacher successfully!')
         setShowLeaveModal(false)
         setLeaveForm({ startDate: '', endDate: '', category: 'Sick', reason: '' })
-        fetchPortalData()
+        fetchPortalData(selectedChildId)
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to submit leave request')
+      toast.error(err.response?.data?.error?.message || err.response?.data?.message || 'Failed to submit leave request')
     } finally {
       setSubmittingLeave(false)
     }
@@ -166,6 +192,29 @@ export default function GuardianPortalPage() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
+      {children.length > 1 && (
+        <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Select child">
+          <span className="text-xs font-semibold text-gray-500 mr-1">Viewing:</span>
+          {children.map((c) => {
+            const selected = c._id === selectedChildId
+            return (
+              <button
+                key={c._id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => handleSelectChild(c._id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                  selected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-200 hover:border-indigo-400'
+                }`}
+              >
+                {c.fullName}{c.classId?.name ? ` · ${c.classId.name}` : ''}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       {/* ── Student Header Card ────────────────────────────────────── */}
       <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-4">
@@ -373,7 +422,7 @@ export default function GuardianPortalPage() {
                   if (rec.status === 'Excused') statusBg = 'bg-blue-100 text-blue-800'
 
                   return (
-                    <div key={i} className="p-3.5 flex items-center justify-between text-xs hover:bg-gray-50">
+                    <div key={rec.date ? String(rec.date) : i} className="p-3.5 flex items-center justify-between text-xs hover:bg-gray-50">
                       <div>
                         <span className="font-bold text-gray-800">{formatDate(rec.date)}</span>
                         {rec.remarks && <p className="text-[11px] text-gray-400 mt-0.5">{rec.remarks}</p>}

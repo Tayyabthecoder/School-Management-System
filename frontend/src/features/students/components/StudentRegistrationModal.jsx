@@ -23,6 +23,7 @@ import StepAcademics from './RegistrationSteps/StepAcademics'
 import StepFeeConcession from './RegistrationSteps/StepFeeConcession'
 import StepHealthEmergency from './RegistrationSteps/StepHealthEmergency'
 import RegistrationSuccessDialog from './RegistrationSteps/RegistrationSuccessDialog'
+import { logError } from '../../../lib/logger'
 
 const INITIAL_STUDENT_STATE = {
   // Step 1: Basic Info
@@ -156,7 +157,7 @@ export default function StudentRegistrationModal({
         })
       }
     } catch (err) {
-      console.error('Failed to fetch fee structures', err)
+      logError('Failed to fetch fee structures', err)
     } finally {
       setLoadingFeeStructures(false)
     }
@@ -183,7 +184,7 @@ export default function StudentRegistrationModal({
       downloadBlobResponse(res, filename)
       toast.success('Document downloaded successfully')
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error('Failed to download PDF document')
     }
   }
@@ -365,7 +366,7 @@ export default function StudentRegistrationModal({
         if (onSuccess) onSuccess(res.data.data)
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error(err.response?.data?.error?.message || err.response?.data?.message || 'Failed to register student')
     } finally {
       setSubmitting(false)

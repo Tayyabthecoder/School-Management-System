@@ -6,7 +6,7 @@ const updateSettingsSchema = z.object({
     attendanceAlertThreshold: z.coerce.number().min(50).max(100).optional(),
     autoFeeOverdueAlerts: z.boolean().optional(),
     allowedDays: z.array(z.enum(DAYS_OF_WEEK, {
-      errorMap: () => ({ message: 'Invalid day of the week' }),
+      error: () => 'Invalid day of the week',
     })).min(1, 'At least one operating day must remain enabled').optional(),
     
     // Identification & Branding

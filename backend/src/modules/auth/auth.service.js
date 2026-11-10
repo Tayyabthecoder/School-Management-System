@@ -7,9 +7,27 @@ const { ApiError } = require('../../middleware/error.middleware')
 const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
-const { getRedisClient, checkRedisAvailable } = require('../../config/redis')
+const RefreshToken = require('../../models/RefreshToken.model')
 
 const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60 // 7 days
+
+/**
+ * Refresh tokens are tracked in MongoDB (SEC-04). Previously they were tracked only in
+ * Redis, so without Redis they could not be revoked, and in production every refresh
+ * failed with 503 instead.
+ */
+const issueRefreshToken = async (user) => {
+  const jti = crypto.randomUUID()
+  const token = jwt.sign(
+    { id: user._id, jti, tokenVersion: user.tokenVersion || 0 },
+    env.JWT_REFRESH_SECRET,
+    { expiresIn: env.JWT_REFRESH_EXPIRES_IN }
+  )
+  const { exp } = jwt.decode(token)
+  const expiresAt = exp ? new Date(exp * 1000) : new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000)
+  await RefreshToken.create({ jti, userId: user._id, expiresAt })
+  return token
+}
 
 const login = async (username, password) => {
   const user = await User.findOne({ username, deletedAt: null }).populate('role')
@@ -53,24 +71,7 @@ const login = async (username, password) => {
     { expiresIn: env.JWT_EXPIRES_IN }
   )
 
-  const jti = crypto.randomUUID()
-  const refreshToken = jwt.sign(
-    { id: user._id, jti, tokenVersion: user.tokenVersion || 0 },
-    env.JWT_REFRESH_SECRET,
-    { expiresIn: env.JWT_REFRESH_EXPIRES_IN }
-  )
-
-  // Track active refresh token in Redis for revocation capability
-  try {
-    const redis = getRedisClient()
-    if (redis && checkRedisAvailable()) {
-      await redis.set(`rt:${jti}`, user._id.toString(), 'EX', REFRESH_TOKEN_TTL_SECONDS)
-      await redis.sadd(`user_tokens:${user._id}`, jti)
-      await redis.expire(`user_tokens:${user._id}`, REFRESH_TOKEN_TTL_SECONDS)
-    }
-  } catch (err) {
-    // Redis optional fallback
-  }
+  const refreshToken = await issueRefreshToken(user)
 
   return {
     user: {
@@ -92,27 +93,12 @@ const refreshToken = async (token) => {
   }
   const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET)
 
-  // Check server-side revocation if JTI is present and Redis is running
-  if (decoded.jti) {
-    const redis = getRedisClient()
-    if (redis && checkRedisAvailable()) {
-      try {
-        const active = await redis.get(`rt:${decoded.jti}`)
-        if (!active) {
-          throw new ApiError(401, 'Refresh token has expired or been revoked')
-        }
-        // ROTATION: Revoke old JTI immediately to prevent replay attacks
-        await redis.del(`rt:${decoded.jti}`)
-        if (decoded.id) {
-          await redis.srem(`user_tokens:${decoded.id}`, decoded.jti)
-        }
-      } catch (err) {
-        if (err instanceof ApiError) throw err
-        throw new ApiError(503, 'Authentication service temporarily unavailable')
-      }
-    } else if (process.env.NODE_ENV === 'production') {
-      throw new ApiError(503, 'Authentication service temporarily unavailable')
-    }
+  // ROTATION: consume the token atomically, so a revoked, rotated or replayed token is rejected.
+  const consumed = decoded.jti
+    ? await RefreshToken.findOneAndDelete({ jti: decoded.jti, userId: decoded.id })
+    : null
+  if (!consumed) {
+    throw new ApiError(401, 'Refresh token has expired or been revoked')
   }
 
   const user = await User.findById(decoded.id).populate('role')
@@ -132,44 +118,13 @@ const refreshToken = async (token) => {
   )
 
   // Issue new rotated refresh token with fresh JTI
-  const newJti = crypto.randomUUID()
-  const newRefreshToken = jwt.sign(
-    { id: user._id, jti: newJti, tokenVersion: user.tokenVersion || 0 },
-    env.JWT_REFRESH_SECRET,
-    { expiresIn: env.JWT_REFRESH_EXPIRES_IN }
-  )
-
-  try {
-    const redis = getRedisClient()
-    if (redis && checkRedisAvailable()) {
-      await redis.set(`rt:${newJti}`, user._id.toString(), 'EX', REFRESH_TOKEN_TTL_SECONDS)
-      await redis.sadd(`user_tokens:${user._id}`, newJti)
-      await redis.expire(`user_tokens:${user._id}`, REFRESH_TOKEN_TTL_SECONDS)
-    }
-  } catch (err) {
-    // Redis optional fallback
-  }
+  const newRefreshToken = await issueRefreshToken(user)
 
   return { accessToken: newAccessToken, refreshToken: newRefreshToken, user }
 }
 
 const invalidateUserSessions = async (userId) => {
-  try {
-    const redis = getRedisClient()
-    if (redis && checkRedisAvailable()) {
-      const jtis = await redis.smembers(`user_tokens:${userId}`)
-      if (jtis && jtis.length > 0) {
-        const pipeline = redis.pipeline()
-        for (const jti of jtis) {
-          pipeline.del(`rt:${jti}`)
-        }
-        pipeline.del(`user_tokens:${userId}`)
-        await pipeline.exec()
-      }
-    }
-  } catch (err) {
-    // Redis optional fallback
-  }
+  await RefreshToken.deleteMany({ userId })
 }
 
 /**
@@ -181,13 +136,7 @@ const revokeRefreshToken = async (token) => {
   try {
     const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET, { ignoreExpiration: true })
     if (decoded && decoded.jti) {
-      const redis = getRedisClient()
-      if (redis && checkRedisAvailable()) {
-        await redis.del(`rt:${decoded.jti}`)
-        if (decoded.id) {
-          await redis.srem(`user_tokens:${decoded.id}`, decoded.jti)
-        }
-      }
+      await RefreshToken.deleteOne({ jti: decoded.jti })
     }
     return decoded?.id || null
   } catch (err) {

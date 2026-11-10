@@ -44,10 +44,11 @@ const buildReportCardPDF = (doc, data, branding = {}) => {
       doc.fillColor('#111827')
       doc.text(g.subjectName, 50, y + 6)
       doc.text(String(g.maxMarks), 220, y + 6)
-      doc.text(String(g.marksObtained), 320, y + 6)
-      doc.text(`${g.percentage}%`, 420, y + 6)
+      const pending = g.marksObtained === null || g.marksObtained === undefined
+      doc.text(pending ? '—' : String(g.marksObtained), 320, y + 6)
+      doc.text(pending ? '—' : `${g.percentage}%`, 420, y + 6)
 
-      const gradeColor = g.gradeLetter === 'F' ? '#DC2626' : '#16A34A'
+      const gradeColor = pending ? '#6B7280' : g.gradeLetter === 'F' ? '#DC2626' : '#16A34A'
       doc.fillColor(gradeColor).font('Helvetica-Bold').text(g.gradeLetter, 500, y + 6).font('Helvetica')
 
       y += 22

@@ -41,6 +41,9 @@ import {
 import api from '../../../lib/axios'
 import { formatPKR } from '../../../lib/formatters'
 import { SkeletonCard } from '../../../components/ui/Skeleton'
+import { logError } from '../../../lib/logger'
+
+const formatPct = (value) => (typeof value === 'number' ? `${value}%` : '—')
 
 export default function AnalyticsIntelligenceTab() {
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
@@ -109,7 +112,7 @@ export default function AnalyticsIntelligenceTab() {
           setPaymentVelocity(velocityRes.value.data.data)
         }
       } catch (err) {
-        console.error('Failed to load analytics', err)
+        logError('Failed to load analytics', err)
       } finally {
         setAnalyticsLoading(false)
       }
@@ -255,15 +258,26 @@ export default function AnalyticsIntelligenceTab() {
                       </div>
                     </div>
 
+                    {cashflowForecast.insufficientData && (
+                      <div className="mb-6 p-4 rounded-xl border border-amber-200 bg-amber-50 text-xs text-amber-900">
+                        <p className="font-bold mb-1">Not enough history to forecast yet</p>
+                        <p>
+                          A forecast needs at least {cashflowForecast.basis?.minimumPaymentsRequired ?? 10} payments against due dates in the last 180 days,
+                          plus fee records and active students. Found {cashflowForecast.basis?.paymentsAnalyzed ?? 0} payments,{' '}
+                          {cashflowForecast.basis?.feeRecordsAnalyzed ?? 0} fee records and {cashflowForecast.basis?.activeStudents ?? 0} active students.
+                        </p>
+                      </div>
+                    )}
+
                     {/* 3-Month Forecast Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       {(cashflowForecast.forecast || []).map((m, idx) => (
-                        <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-linear-to-b from-gray-50/70 to-white flex flex-col justify-between shadow-2xs">
+                        <div key={m.month || idx} className="p-4 rounded-xl border border-gray-200 bg-linear-to-b from-gray-50/70 to-white flex flex-col justify-between shadow-2xs">
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <span className="text-xs font-bold text-gray-800 uppercase tracking-wider">{m.month}</span>
                               <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
-                                {m.confidenceScore}% Confidence
+                                Based on {cashflowForecast.basis?.paymentsAnalyzed ?? 0} payments
                               </span>
                             </div>
                             <div className="space-y-1 mt-2">
@@ -347,40 +361,40 @@ export default function AnalyticsIntelligenceTab() {
                             <div>
                               <div className="flex justify-between text-[11px] mb-1">
                                 <span className="font-semibold text-emerald-800">Early Settlers (Prior to Due Date)</span>
-                                <span className="font-bold text-emerald-700">{cashflowForecast.historicalVelocity?.earlyPercentage || 18}%</span>
+                                <span className="font-bold text-emerald-700">{formatPct(cashflowForecast.historicalVelocity?.earlyPercentage)}</span>
                               </div>
                               <div className="w-full bg-emerald-100 rounded-full h-1.5">
-                                <div className="bg-emerald-600 h-1.5 rounded-full" style={{ width: `${cashflowForecast.historicalVelocity?.earlyPercentage || 18}%` }}></div>
+                                <div className="bg-emerald-600 h-1.5 rounded-full" style={{ width: `${formatPct(cashflowForecast.historicalVelocity?.earlyPercentage)}` }}></div>
                               </div>
                             </div>
 
                             <div>
                               <div className="flex justify-between text-[11px] mb-1">
                                 <span className="font-semibold text-indigo-800">Due Date Rush (1–10 Days)</span>
-                                <span className="font-bold text-indigo-700">{cashflowForecast.historicalVelocity?.onTimePercentage || 64}%</span>
+                                <span className="font-bold text-indigo-700">{formatPct(cashflowForecast.historicalVelocity?.onTimePercentage)}</span>
                               </div>
                               <div className="w-full bg-indigo-100 rounded-full h-1.5">
-                                <div className="bg-indigo-600 h-1.5 rounded-full" style={{ width: `${cashflowForecast.historicalVelocity?.onTimePercentage || 64}%` }}></div>
+                                <div className="bg-indigo-600 h-1.5 rounded-full" style={{ width: `${formatPct(cashflowForecast.historicalVelocity?.onTimePercentage)}` }}></div>
                               </div>
                             </div>
 
                             <div>
                               <div className="flex justify-between text-[11px] mb-1">
                                 <span className="font-semibold text-amber-800">Grace & Reminder Window (11–30 Days)</span>
-                                <span className="font-bold text-amber-700">{cashflowForecast.historicalVelocity?.delayedPercentage || 11}%</span>
+                                <span className="font-bold text-amber-700">{formatPct(cashflowForecast.historicalVelocity?.delayedPercentage)}</span>
                               </div>
                               <div className="w-full bg-amber-100 rounded-full h-1.5">
-                                <div className="bg-amber-600 h-1.5 rounded-full" style={{ width: `${cashflowForecast.historicalVelocity?.delayedPercentage || 11}%` }}></div>
+                                <div className="bg-amber-600 h-1.5 rounded-full" style={{ width: `${formatPct(cashflowForecast.historicalVelocity?.delayedPercentage)}` }}></div>
                               </div>
                             </div>
 
                             <div>
                               <div className="flex justify-between text-[11px] mb-1">
                                 <span className="font-semibold text-rose-800">Chronic Delinquent Debt (&gt;30 Days)</span>
-                                <span className="font-bold text-rose-700">{cashflowForecast.historicalVelocity?.delinquentPercentage || 7}%</span>
+                                <span className="font-bold text-rose-700">{formatPct(cashflowForecast.historicalVelocity?.delinquentPercentage)}</span>
                               </div>
                               <div className="w-full bg-rose-100 rounded-full h-1.5">
-                                <div className="bg-rose-600 h-1.5 rounded-full" style={{ width: `${cashflowForecast.historicalVelocity?.delinquentPercentage || 7}%` }}></div>
+                                <div className="bg-rose-600 h-1.5 rounded-full" style={{ width: `${formatPct(cashflowForecast.historicalVelocity?.delinquentPercentage)}` }}></div>
                               </div>
                             </div>
                           </div>
@@ -441,7 +455,7 @@ export default function AnalyticsIntelligenceTab() {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {concessionAnalytics.categories.map((c, idx) => (
-                                <tr key={idx} className="hover:bg-gray-50/70 transition-colors">
+                                <tr key={c.type || idx} className="hover:bg-gray-50/70 transition-colors">
                                   <td className="px-4 py-2.5 font-bold text-gray-900">{c.type}</td>
                                   <td className="px-4 py-2.5 text-center font-medium text-gray-700">{c.headcount}</td>
                                   <td className="px-4 py-2.5 text-right font-bold text-indigo-700">{formatPKR(c.totalAmount)}</td>
@@ -523,7 +537,7 @@ export default function AnalyticsIntelligenceTab() {
                       {/* Payment Channels Breakdown */}
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                         {(paymentVelocity.channelBreakdown || []).map((ch, idx) => (
-                          <div key={idx} className="p-3 bg-gray-50 border border-gray-200 rounded-xl text-center">
+                          <div key={ch.mode || idx} className="p-3 bg-gray-50 border border-gray-200 rounded-xl text-center">
                             <p className="text-xs font-bold text-gray-800">{ch.mode}</p>
                             <p className="text-sm font-extrabold text-indigo-700 mt-1">{formatPKR(ch.totalAmount)}</p>
                             <p className="text-[11px] text-gray-500 mt-0.5">{ch.transactionCount} transactions ({ch.share}%)</p>
@@ -740,7 +754,7 @@ export default function AnalyticsIntelligenceTab() {
                 <p className="py-8 text-center text-xs text-gray-400">All merit scholarship recipients currently meet the academic standard.</p>
               ) : (
                 concessionAnalytics.flaggedStudents.map((s, idx) => (
-                  <div key={idx} className="p-4 bg-rose-50/60 border border-rose-200 rounded-xl flex items-center justify-between gap-4">
+                  <div key={s.studentId || s._id || idx} className="p-4 bg-rose-50/60 border border-rose-200 rounded-xl flex items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-gray-900 text-sm">{s.fullName}</span>

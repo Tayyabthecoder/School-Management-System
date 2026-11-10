@@ -5,6 +5,7 @@ import { SkeletonGradeCards } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
+import { logError } from '../../lib/logger'
 
 const LETTER_COLORS = {
   'A+': 'bg-emerald-100 text-emerald-800',
@@ -288,7 +289,7 @@ function GradeEntryTable({ students, exam, onExamUpdated }) {
       window.URL.revokeObjectURL(downloadUrl)
       toast.success('Report card downloaded successfully')
     } catch (err) {
-      console.error('Failed to download report card', err)
+      logError('Failed to download report card', err)
       toast.error('Failed to download report card')
     }
   }
@@ -540,7 +541,7 @@ export default function GradesPage() {
       {view !== 'grades' && (
         <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
           {crumb.map((c, i) => (
-            <React.Fragment key={i}>
+            <React.Fragment key={`${i}-${c.label}`}>
               {i > 0 && <ChevronRight className="w-4 h-4 text-gray-300" />}
               {c.onClick ? (
                 <button

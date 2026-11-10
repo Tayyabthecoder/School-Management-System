@@ -3,6 +3,7 @@ const fs = require('fs')
 const Student = require('../../models/Student.model')
 const { ApiError } = require('../../middleware/error.middleware')
 const { UPLOADS_DIR } = require('../../middleware/upload.middleware')
+const { assertStudentAccess } = require('../../utils/guardian-auth.util')
 
 /**
  * Builds the authenticated serving URL (/uploads/<subfolder>/<file>) for a stored file.
@@ -112,7 +113,57 @@ const uploadStudentPhoto = async (req, res, next) => {
   }
 }
 
+/**
+ * Maps a stored "/uploads/<subfolder>/<file>" URL back to a path inside UPLOADS_DIR.
+ * Returns null for anything that would resolve outside it.
+ */
+const resolveStoredFile = (url) => {
+  if (typeof url !== 'string' || !url.startsWith('/uploads/')) return null
+  const relative = decodeURIComponent(url.slice('/uploads/'.length))
+  const root = path.resolve(UPLOADS_DIR)
+  const filePath = path.resolve(root, relative)
+  if (!filePath.startsWith(root + path.sep)) return null
+  return filePath
+}
+
+/**
+ * GET /students/:id/documents/:docId
+ * Streams one of a student's documents after checking that the caller may see that
+ * student (SEC-05). Students and guardians only reach their own (or their children's).
+ */
+const downloadStudentDocument = async (req, res, next) => {
+  try {
+    const { id, docId } = req.params
+    if (['student', 'guardian'].includes(req.user?.roleName)) {
+      assertStudentAccess(req.user, id, 'student document')
+    }
+
+    const student = await Student.findOne({ _id: id, deletedAt: null }).select('documents')
+    if (!student) throw new ApiError(404, 'Student not found')
+
+    const doc = (student.documents || []).find((d) => String(d._id) === String(docId))
+    if (!doc) throw new ApiError(404, 'Document not found')
+
+    const filePath = resolveStoredFile(doc.url)
+    if (!filePath || !fs.existsSync(filePath)) throw new ApiError(404, 'Document file is missing')
+
+    const ext = path.extname(filePath)
+    const baseName = (doc.name || 'document').replace(/[^\w .-]/g, '_').slice(0, 80) || 'document'
+    const downloadName = baseName.toLowerCase().endsWith(ext.toLowerCase()) ? baseName : baseName + ext
+
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader('Cache-Control', 'private, no-store')
+    res.download(filePath, downloadName, (err) => {
+      if (err && !res.headersSent) next(err)
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
+  downloadStudentDocument,
+  resolveStoredFile,
   uploadSingleFile,
   uploadStudentDocument,
   uploadStudentPhoto,

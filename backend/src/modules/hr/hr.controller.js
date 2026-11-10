@@ -240,14 +240,15 @@ const runPayroll = async (req, res, next) => {
           {
             $match: {
               staffId: { $in: staffIds },
-              status: 'Absent',
+              status: { $in: ['Absent', 'Half Day'] },
               date: { $gte: startDate, $lte: endDate },
             },
           },
           {
+            // A half day is deducted as half an absent day
             $group: {
               _id: '$staffId',
-              count: { $sum: 1 },
+              count: { $sum: { $cond: [{ $eq: ['$status', 'Half Day'] }, 0.5, 1] } },
             },
           },
         ])

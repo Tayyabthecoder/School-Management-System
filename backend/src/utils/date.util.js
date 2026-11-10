@@ -1,6 +1,20 @@
 const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/
 
 /**
+ * Weekday name ("Monday") of an instant in the school's timezone. A UTC container would
+ * otherwise report the previous day between 00:00 and 05:00 PKT (LOW-04).
+ */
+const getSchoolDayName = (date = new Date(), timeZone = require('../config/env').SCHOOL_TIMEZONE) =>
+  new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone }).format(date)
+
+/** Minutes since midnight of an instant on the school's clock (for "current period" checks). */
+const getSchoolMinutesOfDay = (date = new Date(), timeZone = require('../config/env').SCHOOL_TIMEZONE) => {
+  const parts = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone }).formatToParts(date)
+  const get = (type) => Number(parts.find((p) => p.type === type)?.value || 0)
+  return get('hour') * 60 + get('minute')
+}
+
+/**
  * Normalises a calendar date to local midnight.
  *
  * Plain "YYYY-MM-DD" strings (what <input type="date"> sends) are read as a local
@@ -62,4 +76,6 @@ const toRangeEnd = (value) => {
   return day
 }
 
-module.exports = { toStartOfLocalDay, toRangeStart, toRangeEnd }
+module.exports = {
+  getSchoolDayName,
+  getSchoolMinutesOfDay, toStartOfLocalDay, toRangeStart, toRangeEnd }

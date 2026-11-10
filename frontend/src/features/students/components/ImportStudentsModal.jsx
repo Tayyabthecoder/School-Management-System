@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import api from '../../../lib/axios'
 import { useToast } from '../../../store/toastStore'
+import { logError } from '../../../lib/logger'
 
 export default function ImportStudentsModal({
   open,
@@ -55,17 +56,17 @@ export default function ImportStudentsModal({
   }
 
   const validateAndSetFile = (selectedFile) => {
-    const validExtensions = ['.xlsx', '.xls', '.csv']
+    const validExtensions = ['.xlsx', '.csv']
     const fileName = selectedFile.name.toLowerCase()
     const isValid = validExtensions.some((ext) => fileName.endsWith(ext))
 
     if (!isValid) {
-      toast.error('Please upload an Excel spreadsheet (.xlsx, .xls) or CSV file.')
+      toast.error('Please upload an Excel spreadsheet (.xlsx) or CSV file. Save legacy .xls files as .xlsx first.')
       return
     }
 
-    if (selectedFile.size > 15 * 1024 * 1024) {
-      toast.error('File size exceeds the 15MB limit.')
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      toast.error('File size exceeds the 10MB limit.')
       return
     }
 
@@ -92,7 +93,7 @@ export default function ImportStudentsModal({
       window.URL.revokeObjectURL(downloadUrl)
       toast.success('Excel import template downloaded successfully!')
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error('Failed to download template. Please try again.')
     } finally {
       setDownloadingTemplate(false)
@@ -129,7 +130,7 @@ export default function ImportStudentsModal({
         }
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       const msg =
         err.response?.data?.error?.message ||
         err.response?.data?.message ||
@@ -165,7 +166,7 @@ export default function ImportStudentsModal({
             <div>
               <h2 className="text-lg font-extrabold tracking-tight">Import Students Directory</h2>
               <p className="text-xs text-emerald-100/80">
-                Bulk upload students roster via Excel (.xlsx, .xls, .csv)
+                Bulk upload students roster via Excel (.xlsx) or CSV
               </p>
             </div>
           </div>
@@ -287,7 +288,7 @@ export default function ImportStudentsModal({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".xlsx, .xls, .csv"
+                  accept=".xlsx, .csv"
                   onChange={handleFileChange}
                   className="hidden"
                 />
@@ -321,7 +322,7 @@ export default function ImportStudentsModal({
                       or <span className="text-emerald-600 font-semibold underline">browse file</span> from your computer
                     </p>
                     <p className="text-[11px] text-gray-400 mt-2">
-                      Supports .xlsx, .xls, and .csv up to 15MB
+                      Supports .xlsx and .csv up to 10MB
                     </p>
                   </div>
                 )}

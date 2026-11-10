@@ -10,6 +10,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=5000
+# Local-day logic (attendance dates, "today" ranges) follows the school's calendar, not UTC
+ENV TZ=Asia/Karachi
+ENV SCHOOL_TIMEZONE=Asia/Karachi
+RUN apk add --no-cache tzdata
 
 # Run container under unprivileged user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

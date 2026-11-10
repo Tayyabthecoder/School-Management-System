@@ -13,6 +13,9 @@ import {
 import api from '../../../lib/axios'
 import { useToast } from '../../../store/toastStore'
 import { downloadBlobResponse } from './downloadHelper'
+import { useAuthStore } from '../../../store/authStore'
+import { canExportEntity } from '../exportAccess'
+import { logError } from '../../../lib/logger'
 
 const REPORT_ENTITIES = [
   {
@@ -99,8 +102,11 @@ const REPORT_ENTITIES = [
 
 export default function CustomReportBuilderTab({ classesList = [] }) {
   const toast = useToast()
-  const [customEntity, setCustomEntity] = useState('students')
-  const [selectedFields, setSelectedFields] = useState(REPORT_ENTITIES[0].fields.map(f => f.id))
+  const user = useAuthStore((s) => s.user)
+  const allowedEntities = REPORT_ENTITIES.filter((e) => canExportEntity(user, e.id))
+  const firstEntity = allowedEntities[0] || REPORT_ENTITIES[0]
+  const [customEntity, setCustomEntity] = useState(firstEntity.id)
+  const [selectedFields, setSelectedFields] = useState(firstEntity.fields.map(f => f.id))
   const [customFrom, setCustomFrom] = useState('')
   const [customTo, setCustomTo] = useState('')
   const [customClassId, setCustomClassId] = useState('ALL')
@@ -164,7 +170,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
         toast.success(`Preview generated: ${res.data.data?.total || 0} records found`)
       }
     } catch (err) {
-      console.error('Preview failed:', err)
+      logError('Preview failed:', err)
       toast.error(err.response?.data?.error?.message || 'Failed to generate custom report preview')
     } finally {
       setPreviewLoading(false)
@@ -196,7 +202,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
       await downloadBlobResponse(response, `${customEntity}_custom_report_${Date.now()}.${ext}`)
       toast.success(`Custom ${format.toUpperCase()} export downloaded successfully`)
     } catch (err) {
-      console.error('Export failed:', err)
+      logError('Export failed:', err)
       let msg = `Failed to generate ${format.toUpperCase()} export`
       if (err.response?.data instanceof Blob) {
         try {
@@ -236,7 +242,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 1. Select Primary Data Entity
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {REPORT_ENTITIES.map((ent) => {
+                {allowedEntities.map((ent) => {
                   const isSelected = customEntity === ent.id
                   return (
                     <button

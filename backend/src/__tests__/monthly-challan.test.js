@@ -308,14 +308,14 @@ describe('Automated Monthly Challan Service & Feature Tests', () => {
       )
     })
 
-    it('downloadChallanPDF updates fee record due date to exactly 10 days after download and updates tracking', async () => {
-      const originalDueDate = new Date('2026-05-15')
+    it('downloadChallanPDF gives a not-yet-due, never-issued challan 10 days from download and updates tracking', async () => {
+      const originalDueDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
       const mockFee = {
         _id: 'fee123456',
         amountDue: 8000,
         netAmount: 8000,
         outstandingAmount: 8000,
-        status: 'Overdue',
+        status: 'Pending',
         dueDate: originalDueDate,
         studentId: { _id: 's1', fullName: 'Ali', studentId: 'STU-001', classId: { name: 'Play Jouior' } },
         feeStructureId: { title: 'Tuition' },
@@ -354,7 +354,7 @@ describe('Automated Monthly Challan Service & Feature Tests', () => {
       // Verify that dueDate is updated to 10 days after downloadDate
       const diffDays = Math.floor((mockFee.dueDate.getTime() - beforeDownload.getTime()) / (1000 * 60 * 60 * 24))
       expect(diffDays).toBe(10)
-      expect(mockFee.status).toBe('Pending') // Overdue reset to Pending upon fresh download
+      expect(mockFee.status).toBe('Pending')
 
       expect(dlRes.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf')
       expect(dlRes.send).toHaveBeenCalled()

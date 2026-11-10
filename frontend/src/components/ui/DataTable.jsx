@@ -205,7 +205,7 @@ export default function DataTable({
 
                     return (
                       <th
-                        key={index}
+                        key={sortKey || col.header || index}
                         onClick={() => isSortable && handleSort(sortKey)}
                         className={`px-5 py-3 select-none ${
                           isSortable ? 'cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition-colors' : ''

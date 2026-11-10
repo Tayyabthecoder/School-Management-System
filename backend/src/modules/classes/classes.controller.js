@@ -6,6 +6,7 @@ const TimetableEntry = require('../../models/TimetableEntry.model')
 const { ApiError } = require('../../middleware/error.middleware')
 const { getOrSet, invalidateCache } = require('../../utils/cache.util')
 const { logAudit } = require('../../utils/audit-log.util')
+const { activateAcademicYear, invalidateAcademicYearCaches } = require('../../services/academic-year.service')
 
 const getClasses = async (req, res, next) => {
   try {
@@ -218,9 +219,27 @@ const getAcademicYears = async (req, res, next) => {
 const createAcademicYear = async (req, res, next) => {
   try {
     const { year, startDate, endDate, terms } = req.body
-    const ay = await AcademicYear.create({ year, startDate, endDate, terms })
-    await invalidateCache('ref:academic-years:all')
+    if (new Date(startDate) >= new Date(endDate)) {
+      return next(new ApiError(400, 'Start date must be before end date'))
+    }
+    // A new year starts inactive (DATA-01); only the very first year becomes active automatically.
+    const hasActiveYear = await AcademicYear.exists({ isActive: true })
+    const ay = await AcademicYear.create({ year, startDate, endDate, terms, isActive: !hasActiveYear })
+    await invalidateAcademicYearCaches()
     res.status(201).json({ success: true, data: ay })
+  } catch (error) {
+    if (error.code === 11000) {
+      return next(new ApiError(409, 'An academic year with this year already exists'))
+    }
+    next(error)
+  }
+}
+
+const activateAcademicYearHandler = async (req, res, next) => {
+  try {
+    const ay = await activateAcademicYear(req.params.id)
+    if (!ay) return next(new ApiError(404, 'Academic year not found'))
+    res.json({ success: true, data: ay })
   } catch (error) {
     next(error)
   }
@@ -236,4 +255,5 @@ module.exports = {
   createSubject,
   getAcademicYears,
   createAcademicYear,
+  activateAcademicYear: activateAcademicYearHandler,
 }

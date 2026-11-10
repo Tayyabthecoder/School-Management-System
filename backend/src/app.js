@@ -28,8 +28,7 @@ const settingsRoutes = require('./modules/settings/settings.routes')
 const uploadsRoutes = require('./modules/uploads/uploads.routes')
 const serveUploadsRoutes = require('./modules/uploads/serve.routes')
 const { verifyToken } = require('./middleware/auth.middleware')
-const { RedisStore } = require('rate-limit-redis')
-const { getRedisClient, checkRedisAvailable } = require('./config/redis')
+const { AdaptiveRateLimitStore } = require('./middleware/rate-limit-store')
 
 const app = express()
 
@@ -53,20 +52,8 @@ if (env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware)
 }
 
-// Helper to configure Redis-backed rate limiter store if available
-const createRateLimiterStore = () => {
-  try {
-    const client = getRedisClient()
-    if (client && checkRedisAvailable()) {
-      return new RedisStore({
-        sendCommand: (...args) => client.call(...args),
-      })
-    }
-  } catch (e) {
-    // Fall back to in-memory store
-  }
-  return undefined
-}
+// Each limiter gets its own key prefix; the store picks Redis or memory per request (SEC-04)
+const createRateLimiterStore = (name) => new AdaptiveRateLimitStore({ prefix: `rl:${name}:` })
 
 // Rate Limiter for Login Endpoint (10 attempts per 15 mins)
 const loginLimiter = rateLimit({
@@ -74,7 +61,7 @@ const loginLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  store: createRateLimiterStore(),
+  store: createRateLimiterStore('login'),
   message: { success: false, error: { message: 'Too many login attempts. Please try again in 15 minutes.' } },
 })
 app.use('/api/v1/auth/login', loginLimiter)
@@ -85,7 +72,7 @@ const refreshLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  store: createRateLimiterStore(),
+  store: createRateLimiterStore('refresh'),
   message: { success: false, error: { message: 'Too many token refresh attempts. Please try again later.' } },
 })
 app.use('/api/v1/auth/refresh', refreshLimiter)
@@ -96,7 +83,7 @@ const changePasswordLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
-  store: createRateLimiterStore(),
+  store: createRateLimiterStore('change-password'),
   message: { success: false, error: { message: 'Too many password change attempts. Please try again later.' } },
 })
 app.use('/api/v1/auth/change-password', changePasswordLimiter)
@@ -107,7 +94,7 @@ const heavyLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
-  store: createRateLimiterStore(),
+  store: createRateLimiterStore('heavy'),
   message: { success: false, error: { message: 'Too many requests. Please wait a moment.' } },
 })
 app.use('/api/v1/students/import', heavyLimiter)

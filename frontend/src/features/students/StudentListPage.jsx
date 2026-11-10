@@ -13,6 +13,7 @@ import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
 import ChangeSectionModal from './components/ChangeSectionModal'
 import ImportStudentsModal from './components/ImportStudentsModal'
 import StudentRegistrationModal from './components/StudentRegistrationModal'
+import { logError } from '../../lib/logger'
 
 export default function StudentListPage() {
   const toast = useToast()
@@ -43,7 +44,7 @@ export default function StudentListPage() {
         setStudents(res.data.data)
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
     } finally {
       setLoading(false)
     }

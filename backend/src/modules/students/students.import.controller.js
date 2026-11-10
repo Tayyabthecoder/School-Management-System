@@ -109,10 +109,17 @@ const downloadImportTemplate = async (req, res, next) => {
 const importStudentsFromExcel = (generateUniqueStudentId) => async (req, res, next) => {
   try {
     if (!req.file) {
-      throw new ApiError(400, 'Please upload an Excel spreadsheet (.xlsx, .xls, .csv)')
+      throw new ApiError(400, 'Please upload an Excel spreadsheet (.xlsx or .csv)')
     }
 
-    const { rows, parseErrors } = await parseStudentExcel(req.file.path)
+    let parsed
+    try {
+      parsed = await parseStudentExcel(req.file.path)
+    } catch (parseError) {
+      // An unreadable workbook is the uploader's problem (400), not a server error (500)
+      throw new ApiError(400, parseError.statusCode === 400 ? parseError.message : 'The uploaded file could not be read as an .xlsx or .csv spreadsheet')
+    }
+    const { rows, parseErrors } = parsed
 
     if (rows.length === 0 && parseErrors.length === 0) {
       throw new ApiError(400, 'The uploaded Excel file contains no valid student records')

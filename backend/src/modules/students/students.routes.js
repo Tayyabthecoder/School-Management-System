@@ -12,6 +12,7 @@ const {
 const { upload } = require('../../middleware/upload.middleware')
 
 const promotionController = require('./promotion.controller')
+const { downloadStudentDocument } = require('../uploads/uploads.controller')
 
 router.use(verifyToken)
 
@@ -33,6 +34,7 @@ router.get('/', checkPermission(['super_admin', 'teacher', 'accountant', 'hr_man
 router.get('/:id', checkPermission(['super_admin', 'teacher', 'accountant', 'hr_manager', 'student', 'guardian'], 'students', 'read'), studentsController.getStudentById)
 router.post('/', checkPermission(['super_admin', 'hr_manager'], 'students', 'create'), validate(createStudentSchema), studentsController.createStudent)
 router.post('/import', checkPermission(['super_admin', 'hr_manager'], 'students', 'create'), validate(bulkImportSchema), studentsController.bulkImportStudents)
+router.get('/:id/documents/:docId', checkPermission(['super_admin', 'teacher', 'accountant', 'hr_manager', 'student', 'guardian'], 'students', 'read'), downloadStudentDocument)
 router.put('/:id', checkPermission(['super_admin', 'hr_manager'], 'students', 'update'), validate(updateStudentSchema), studentsController.updateStudent)
 router.patch('/:id/section', checkPermission(['super_admin', 'hr_manager'], 'students', 'update'), studentsController.changeStudentSection)
 router.delete('/:id', checkPermission(['super_admin'], 'students', 'delete'), studentsController.deleteStudent)

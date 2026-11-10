@@ -9,6 +9,8 @@ import { SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
+import StaffAttendanceRegister from './components/StaffAttendanceRegister'
+import { logError } from '../../lib/logger'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -183,7 +185,7 @@ function LeaveRequestsPanel({ onStatusChange }) {
                   {leave.staffId?.fullName || 'Staff Member'}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {leave.leaveType} · {formatDate(leave.startDate)} — {formatDate(leave.endDate)}
+                  {leave.leaveType} · {formatDate(leave.fromDate)} — {formatDate(leave.toDate)}
                 </p>
                 {leave.reason && (
                   <p className="text-xs text-gray-400 mt-0.5 italic">"{leave.reason}"</p>
@@ -237,14 +239,40 @@ export default function HRPage() {
   const [payYear, setPayYear] = useState(CURRENT_YEAR)
   const [runningPayroll, setRunningPayroll] = useState(false)
   const [payrollRecords, setPayrollRecords] = useState([])
-  const [payrollRun, setPayrollRun] = useState(false)
+  const [finalizing, setFinalizing] = useState(false)
+  const payrollRun = payrollRecords.length > 0
+  const draftCount = payrollRecords.filter((r) => r.status !== 'Finalized').length
 
   useEffect(() => {
     api.get('/hr/staff')
       .then((res) => { if (res.data?.success) setStaff(res.data.data) })
       .catch(() => toast.error('Could not load staff list'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [toast])
+
+  // Show the payroll already generated for the selected month, so it can be finalized later
+  useEffect(() => {
+    let cancelled = false
+    api.get(`/hr/payroll?month=${payMonth}&year=${payYear}`)
+      .then((res) => { if (!cancelled) setPayrollRecords(res.data?.data || []) })
+      .catch(() => { if (!cancelled) setPayrollRecords([]) })
+    return () => { cancelled = true }
+  }, [payMonth, payYear])
+
+  const handleFinalizePayroll = async () => {
+    const period = `${MONTHS[payMonth - 1]} ${payYear}`
+    if (!window.confirm(`Finalize ${draftCount} draft payroll record(s) for ${period}? Finalized records are locked and are not recalculated by later runs.`)) return
+    setFinalizing(true)
+    try {
+      const res = await api.put('/hr/payroll/finalize', { month: payMonth, year: payYear })
+      toast.success(res.data?.message || `Payroll finalized for ${period}`)
+      setPayrollRecords((prev) => prev.map((r) => ({ ...r, status: 'Finalized' })))
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to finalize payroll')
+    } finally {
+      setFinalizing(false)
+    }
+  }
 
   const filtered = staff.filter(
     (s) =>
@@ -260,7 +288,6 @@ export default function HRPage() {
       if (res.data?.success) {
         toast.success(`Payroll executed for ${res.data.count} staff for ${MONTHS[payMonth - 1]} ${payYear}!`)
         setPayrollRecords(res.data.data)
-        setPayrollRun(true)
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Payroll execution failed')
@@ -286,7 +313,7 @@ export default function HRPage() {
       window.URL.revokeObjectURL(downloadUrl)
       toast.success(`Payslip downloaded for ${staffName}`)
     } catch (err) {
-      console.error('Failed to download payslip', err)
+      logError('Failed to download payslip', err)
       toast.error('Failed to download payslip')
     }
   }
@@ -314,7 +341,7 @@ export default function HRPage() {
               <label className="block text-xs font-semibold text-indigo-200 mb-1">Month</label>
               <select
                 value={payMonth}
-                onChange={(e) => { setPayMonth(Number(e.target.value)); setPayrollRun(false) }}
+                onChange={(e) => setPayMonth(Number(e.target.value))}
                 className="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
               >
                 {MONTHS.map((m, i) => (
@@ -326,10 +353,10 @@ export default function HRPage() {
               <label className="block text-xs font-semibold text-indigo-200 mb-1">Year</label>
               <select
                 value={payYear}
-                onChange={(e) => { setPayYear(Number(e.target.value)); setPayrollRun(false) }}
+                onChange={(e) => setPayYear(Number(e.target.value))}
                 className="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
               >
-                {[2025, 2026, 2027].map((y) => (
+                {[CURRENT_YEAR - 1, CURRENT_YEAR, CURRENT_YEAR + 1].map((y) => (
                   <option key={y} value={y} className="text-gray-800">{y}</option>
                 ))}
               </select>
@@ -341,6 +368,15 @@ export default function HRPage() {
             >
               {runningPayroll ? 'Processing…' : `Run ${MONTHS[payMonth - 1]} ${payYear} Payroll`}
             </button>
+            {payrollRun && draftCount > 0 && (
+              <button
+                onClick={handleFinalizePayroll}
+                disabled={finalizing}
+                className="px-5 py-2 bg-emerald-500 text-white hover:bg-emerald-600 font-bold text-sm rounded-lg shadow-sm disabled:opacity-60 transition-colors"
+              >
+                {finalizing ? 'Finalizing…' : `Finalize ${draftCount} Draft${draftCount === 1 ? '' : 's'}`}
+              </button>
+            )}
           </div>
         </div>
 
@@ -348,7 +384,8 @@ export default function HRPage() {
         {payrollRun && payrollRecords.length > 0 && (
           <div className="mt-5 bg-white/10 rounded-xl p-4">
             <p className="text-sm font-semibold text-indigo-100 mb-3">
-              ✓ Payroll processed for {payrollRecords.length} staff members
+              {payrollRecords.length} payroll record(s) for {MONTHS[payMonth - 1]} {payYear}
+              {draftCount === 0 ? ' · all finalized' : ` · ${draftCount} draft`}
             </p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {payrollRecords.map((rec) => {
@@ -358,6 +395,9 @@ export default function HRPage() {
                   <div key={rec._id} className="flex items-center justify-between bg-white/10 rounded-lg px-3 py-2">
                     <span className="text-sm text-white font-medium">{name}</span>
                     <div className="flex items-center gap-3">
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${rec.status === 'Finalized' ? 'bg-emerald-400/30 text-emerald-100' : 'bg-amber-400/30 text-amber-100'}`}>
+                        {rec.status || 'Draft'}
+                      </span>
                       <span className="text-sm font-bold text-emerald-300">{formatPKR(rec.netPay)}</span>
                       <button
                         onClick={() => handleDownloadPayslip(rec._id, name)}
@@ -374,6 +414,9 @@ export default function HRPage() {
           </div>
         )}
       </div>
+
+      {/* ── Staff Attendance (FUNC-03) ───────────────────────────────────── */}
+      <StaffAttendanceRegister staff={staff} />
 
       {/* ── Staff List & Leave Requests ──────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

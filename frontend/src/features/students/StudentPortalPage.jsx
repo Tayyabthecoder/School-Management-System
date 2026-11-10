@@ -327,7 +327,7 @@ export default function StudentPortalPage() {
                   else if (record.status === 'Excused') statusColor = 'bg-blue-100 text-blue-800'
 
                   return (
-                    <div key={i} className="p-4 flex items-center justify-between text-xs hover:bg-gray-50">
+                    <div key={record.date ? String(record.date) : i} className="p-4 flex items-center justify-between text-xs hover:bg-gray-50">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         <div>

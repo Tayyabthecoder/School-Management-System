@@ -52,7 +52,7 @@ describe('Reports Controller Unit Tests', () => {
       Student.countDocuments.mockResolvedValue(150)
       Staff.countDocuments.mockResolvedValue(20)
       AcademicYear.findOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue({ name: '2025-2026' }),
+        lean: jest.fn().mockResolvedValue({ year: 2026 }),
       })
 
       StudentFee.aggregate
@@ -89,7 +89,7 @@ describe('Reports Controller Unit Tests', () => {
         data: expect.objectContaining({
           totalStudents: 150,
           totalStaff: 20,
-          academicYear: '2025-2026',
+          academicYear: 2026,
           totalCollections: 75000,
           totalOutstandingFees: 25000,
           feeCollectionRate: 75,
@@ -292,6 +292,7 @@ describe('Reports Controller Unit Tests', () => {
   describe('exportCustomReport', () => {
     it('generates Excel report with proper headers', async () => {
       req = {
+        user: { roleName: 'super_admin' },
         query: { entity: 'students', format: 'excel' },
       }
       Student.find.mockReturnValue({
@@ -325,6 +326,7 @@ describe('Reports Controller Unit Tests', () => {
 
     it('generates PDF report with application/pdf Content-Type', async () => {
       req = {
+        user: { roleName: 'super_admin' },
         query: { entity: 'students', format: 'pdf' },
       }
       Student.find.mockReturnValue({
@@ -358,6 +360,7 @@ describe('Reports Controller Unit Tests', () => {
   describe('previewCustomReport', () => {
     it('delegates to reportsBuilder.compileDynamicCustomReport with slice for preview', async () => {
       req = {
+        user: { roleName: 'super_admin' },
         body: {
           entity: 'students',
           fields: ['studentId', 'fullName'],
@@ -407,13 +410,13 @@ describe('Reports Controller Unit Tests', () => {
         ]),
       })
 
+      // 12 payments: 6 early, 6 a few days late -> enough history for a forecast
+      const payments = Array.from({ length: 12 }, (_, i) => ({
+        paymentDate: new Date(i < 6 ? '2026-05-01' : '2026-05-08'),
+        studentFeeId: { dueDate: new Date('2026-05-05') },
+      }))
       Payment.find.mockReturnValue({
-        populate: jest.fn().mockReturnValue({
-          lean: jest.fn().mockResolvedValue([
-            { paymentDate: new Date('2026-05-01'), studentFeeId: { dueDate: new Date('2026-05-05') } },
-            { paymentDate: new Date('2026-05-08'), studentFeeId: { dueDate: new Date('2026-05-05') } },
-          ]),
-        }),
+        populate: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue(payments) }),
       })
 
       Student.find.mockReturnValue({
@@ -434,17 +437,65 @@ describe('Reports Controller Unit Tests', () => {
             earlyPercentage: expect.any(Number),
             onTimePercentage: expect.any(Number),
           }),
+          insufficientData: false,
           forecast: expect.arrayContaining([
             expect.objectContaining({
               month: expect.any(String),
-              grossBillable: expect.any(Number),
-              projectedInflow: expect.any(Number),
+              grossBillable: 10000,
+              netBillable: 9000,
+              projectedInflow: 9000,
               payrollLiability: 120000,
-              netOperatingMargin: expect.any(Number),
+              netOperatingMargin: 9000 - 120000,
             }),
           ]),
         }),
       })
+      const { forecast } = res.json.mock.calls[0][0].data
+      expect(forecast).toHaveLength(3)
+      expect(forecast[0]).not.toHaveProperty('confidenceScore')
+    })
+
+    it('returns insufficientData instead of invented figures when history is thin (RPT-01)', async () => {
+      req = {}
+      Staff.find.mockReturnValue({ select: jest.fn().mockResolvedValue([{ salary: 50000 }]) })
+      Payment.find.mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue([
+            { paymentDate: new Date('2026-05-01'), studentFeeId: { dueDate: new Date('2026-05-05') } },
+          ]),
+        }),
+      })
+      Student.find.mockReturnValue({ select: jest.fn().mockResolvedValue([]) })
+      StudentFee.aggregate.mockResolvedValue([])
+
+      await reportsController.getCashFlowForecast(req, res, next)
+
+      const { data } = res.json.mock.calls[0][0]
+      expect(data).toMatchObject({ insufficientData: true, historicalVelocity: null, forecast: [] })
+      expect(data.basis).toMatchObject({ paymentsAnalyzed: 1, activeStudents: 0 })
+    })
+  })
+
+  describe('buildDashboardSparklines (RPT-01)', () => {
+    const todayStart = new Date('2026-06-10T00:00:00+05:00')
+
+    it('derives every series from stored data and leaves unmarked days null', () => {
+      const s = reportsController.buildDashboardSparklines({
+        todayStart,
+        attendance: [{ _id: '2026-06-09', total: 10, present: 8 }, { _id: '2026-06-10', total: 4, present: 0 }],
+        studentJoins: [{ _id: '2026-06-08', count: 3 }, { _id: '2026-06-10', count: 1 }],
+        staffJoins: [],
+        collections: [{ _id: '2026-06-09', total: 4500 }],
+        totalStudents: 50,
+        totalStaff: 9,
+      })
+
+      expect(s.days).toEqual(['2026-06-04', '2026-06-05', '2026-06-06', '2026-06-07', '2026-06-08', '2026-06-09', '2026-06-10'])
+      // a real 0% stays 0, an unmarked day stays null (it used to become 90%)
+      expect(s.attendance).toEqual([null, null, null, null, null, 80, 0])
+      expect(s.students).toEqual([46, 46, 46, 46, 49, 49, 50])
+      expect(s.staff).toEqual([9, 9, 9, 9, 9, 9, 9])
+      expect(s.fees).toEqual([0, 0, 0, 0, 0, 4500, 0])
     })
   })
 

@@ -5,6 +5,7 @@ import Button from '../../../../components/ui/Button'
 import api from '../../../../lib/axios'
 import { formatPKR } from '../../../../lib/formatters'
 import { useToast } from '../../../../store/toastStore'
+import { logError } from '../../../../lib/logger'
 
 // ─── Modal: Adjust Concession / Scholarship ──────────────────────────────────
 export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
@@ -55,7 +56,7 @@ export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
         onClose()
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error(err.response?.data?.message || 'Failed to update fee concession')
     } finally {
       setSaving(false)
@@ -249,7 +250,7 @@ export function RecordPaymentModal({
         onSuccess()
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error(err.response?.data?.message || 'Failed to record payment')
     } finally {
       setSaving(false)
@@ -432,7 +433,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
               }
             }
           })
-          .catch((err) => console.error(err))
+          .catch((err) => logError(err))
           .finally(() => setLoadingStructures(false))
       }
     }
@@ -472,7 +473,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
         onClose()
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error(err.response?.data?.message || 'Failed to assign fee')
     } finally {
       setSaving(false)

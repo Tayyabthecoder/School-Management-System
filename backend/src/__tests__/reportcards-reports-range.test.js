@@ -66,6 +66,49 @@ describe('report card result visibility', () => {
     expect(Exam.find.mock.calls[0][0]).not.toHaveProperty('isPublished')
   })
 
+  test('an exam without a grade is Pending and excluded from totals, not 0 / F (RPT-02)', async () => {
+    arrangeStudent()
+    Exam.find.mockReturnValue({
+      populate: jest.fn().mockResolvedValue([
+        { _id: 'e1', maxMarks: 100, passMarks: 40, subjectId: { name: 'Maths' } },
+        { _id: 'e2', maxMarks: 100, passMarks: 40, subjectId: { name: 'Science' } },
+      ]),
+    })
+    Grade.find.mockReturnValue({
+      populate: jest.fn().mockResolvedValue([
+        { marksObtained: 80, gradeLetter: 'A', remarks: '', examId: { _id: 'e1' } },
+      ]),
+    })
+    const res = mockRes()
+
+    await reportcardsController.getReportCard(
+      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher' } }, res, jest.fn()
+    )
+
+    const { grades, summary } = res.json.mock.calls[0][0].data
+    expect(grades.find((g) => g.subjectName === 'Science')).toMatchObject({
+      marksObtained: null, percentage: null, gradeLetter: 'Pending', isPassed: null, status: 'Pending',
+    })
+    expect(summary).toMatchObject({
+      totalMaxMarks: 100, totalMarksObtained: 80, overallPercentage: 80,
+      passedSubjects: 1, failedSubjects: 0, pendingSubjects: 1,
+    })
+  })
+
+  test('a report card with nothing graded yet has no overall result', async () => {
+    arrangeStudent()
+    Exam.find.mockReturnValue({
+      populate: jest.fn().mockResolvedValue([{ _id: 'e1', maxMarks: 100, passMarks: 40, subjectId: { name: 'Maths' } }]),
+    })
+    const res = mockRes()
+
+    await reportcardsController.getReportCard(
+      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher' } }, res, jest.fn()
+    )
+
+    expect(res.json.mock.calls[0][0].data.summary).toMatchObject({ overallPercentage: null, overallGradeLetter: 'Pending', failedSubjects: 0 })
+  })
+
   test('a guardian transcript omits unpublished exams', async () => {
     Student.findOne.mockImplementation(() => {
       const doc = { _id: STUDENT, studentId: 'STU-1', fullName: 'Sara', classId: { name: 'Grade 5' } }

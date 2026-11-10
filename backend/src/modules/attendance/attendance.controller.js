@@ -149,7 +149,8 @@ const getStudentAttendance = async (req, res, next) => {
 
 const markStaffAttendance = async (req, res, next) => {
   try {
-    const { staffId, date, status, remarks } = req.body
+    const { staffId, date, remarks } = req.body
+    const status = req.body.status === 'Leave' ? 'On Leave' : req.body.status
     const attendanceDate = requireDay(date)
 
     const doc = await StaffAttendance.findOneAndUpdate(

@@ -14,6 +14,17 @@ const startServer = async () => {
     console.error('[RBAC]: Failed to synchronise role permissions:', err.message)
   }
 
+  // Older databases may have several active academic years (DATA-01); keep exactly one
+  try {
+    const { normalizeActiveAcademicYear } = require('./services/academic-year.service')
+    const { previouslyActive, activeId } = await normalizeActiveAcademicYear()
+    if (previouslyActive !== 1) {
+      console.log(`[AcademicYear]: ${previouslyActive} active years found; active year is now ${activeId || 'none'}.`)
+    }
+  } catch (err) {
+    console.error('[AcademicYear]: Failed to normalise the active academic year:', err.message)
+  }
+
   const PORT = env.PORT || 5000
 
   // Start background queue workers & cron schedules

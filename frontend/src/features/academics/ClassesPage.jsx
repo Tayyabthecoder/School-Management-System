@@ -21,6 +21,7 @@ import {
   AddClassModal,
   AddSectionModal,
 } from './components/ClassModals'
+import { logError } from '../../lib/logger'
 
 export default function ClassesPage() {
   const toast = useToast()
@@ -121,7 +122,7 @@ export default function ClassesPage() {
       if (subRes.data?.success) setClassSubjects(subRes.data.data)
       if (ttRes.data?.success) setTimetableEntries(ttRes.data.data)
     } catch (err) {
-      console.error(err)
+      logError(err)
     } finally {
       setLoadingDetails(false)
     }

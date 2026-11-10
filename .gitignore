@@ -47,3 +47,5 @@ Thumbs.db
 docs/
 # TLS certificates for the nginx container
 certs/
+# Test coverage output
+coverage/

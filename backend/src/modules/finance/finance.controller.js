@@ -349,6 +349,31 @@ const downloadReceiptPDF = async (req, res, next) => {
   }
 }
 
+const CHALLAN_GRACE_DAYS = 10
+
+/**
+ * The first download of a challan that is not yet due gives the payer CHALLAN_GRACE_DAYS
+ * from the download. It never applies to a fee that is paid, already overdue, already past
+ * its due date or already issued, so downloading can't be used to reset a deadline (DATA-02).
+ */
+const resolveChallanDueDate = (feeRecord, now = new Date()) => {
+  const graceDueDate = new Date(now.getTime() + CHALLAN_GRACE_DAYS * 24 * 60 * 60 * 1000)
+  graceDueDate.setHours(23, 59, 59, 999)
+
+  const startOfToday = new Date(now)
+  startOfToday.setHours(0, 0, 0, 0)
+  const currentDue = feeRecord.dueDate ? new Date(feeRecord.dueDate) : null
+
+  const neverIssued = !feeRecord.challanDownloadCount
+  const notYetDue = !currentDue || currentDue >= startOfToday
+  const eligible = neverIssued && notYetDue && !['Paid', 'Overdue'].includes(feeRecord.status)
+
+  if (!eligible) return { dueDate: currentDue || graceDueDate, extended: false }
+  // Only ever move the deadline later, never earlier than what was already promised.
+  if (currentDue && currentDue >= graceDueDate) return { dueDate: currentDue, extended: false }
+  return { dueDate: graceDueDate, extended: true }
+}
+
 const downloadChallanPDF = async (req, res, next) => {
   try {
     const feeRecord = await StudentFee.findById(req.params.feeId)
@@ -362,25 +387,16 @@ const downloadChallanPDF = async (req, res, next) => {
 
     assertOwnFeeDocument(req.user, feeRecord.studentId, 'fee challan')
 
-    // Dynamic Due Date: Falls exactly 10 days after the fee challan is downloaded
     const downloadDate = new Date()
-    const dynamicDueDate = new Date(downloadDate.getTime() + 10 * 24 * 60 * 60 * 1000)
-    dynamicDueDate.setHours(23, 59, 59, 999)
-
-    // Update fee record's due date and download tracking
-    // Sets 10 days on initial download; keeps it steady on repeat downloads so deadline doesn't slip
-    if (feeRecord.status !== 'Paid') {
-      if (!feeRecord.challanDownloadCount || feeRecord.challanDownloadCount === 0) {
-        feeRecord.effectiveDueDate = dynamicDueDate
-        feeRecord.dueDate = dynamicDueDate
-        if (feeRecord.status === 'Overdue') {
-          feeRecord.status = feeRecord.amountPaid > 0 ? 'Partial' : 'Pending'
-        }
-      }
+    const { dueDate: nextDueDate, extended } = resolveChallanDueDate(feeRecord, downloadDate)
+    if (extended) {
+      feeRecord.dueDate = nextDueDate
+      feeRecord.effectiveDueDate = nextDueDate
     }
     if (!feeRecord.effectiveDueDate) {
-      feeRecord.effectiveDueDate = feeRecord.dueDate || dynamicDueDate
+      feeRecord.effectiveDueDate = feeRecord.dueDate || nextDueDate
     }
+    const dynamicDueDate = nextDueDate
     feeRecord.challanDownloadedAt = downloadDate
     feeRecord.challanDownloadCount = (feeRecord.challanDownloadCount || 0) + 1
     await feeRecord.save()
@@ -633,6 +649,7 @@ module.exports = {
   recordPayment,
   downloadReceiptPDF,
   downloadChallanPDF,
+  resolveChallanDueDate,
   applyConcession,
   getChallanSettings,
   updateChallanSettings,

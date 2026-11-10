@@ -15,6 +15,7 @@ const { generatePDFBuffer, buildTabularReportPDF } = require('../../utils/pdf.ut
 const { getPagination, formatPaginatedResponse } = require('../../utils/pagination.util')
 const { getOrSet } = require('../../utils/cache.util')
 const { compileDynamicCustomReport } = require('./reports.builder')
+const { assertCanExport, limitExport, assertExportSize } = require('./export-access')
 const { toRangeStart, toRangeEnd } = require('../../utils/date.util')
 
 // A fee is in arrears when it is unpaid and past due, whatever its stored status says:
@@ -27,6 +28,38 @@ const getPKTTodayRange = () => {
   const start = new Date(`${pktDateStr}T00:00:00+05:00`)
   const end = new Date(`${pktDateStr}T23:59:59.999+05:00`)
   return { start, end, pktDateStr }
+}
+
+/**
+ * Seven daily points (oldest first, PKT days) for the dashboard sparklines. Every value is
+ * derived from stored data (RPT-01); a day with no attendance marked is null, never a guess.
+ * - attendance: % present/late per day
+ * - students / staff: active headcount at the end of each day (current total minus later joins)
+ * - fees: amount collected per day
+ */
+const buildDashboardSparklines = ({ todayStart, attendance = [], studentJoins = [], staffJoins = [], collections = [], totalStudents = 0, totalStaff = 0 }) => {
+  const dayKeys = []
+  for (let i = 6; i >= 0; i--) {
+    dayKeys.push(new Date(todayStart.getTime() - i * 86400000).toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' }))
+  }
+  const attMap = new Map((attendance || []).map((a) => [a._id, a.total > 0 ? Math.round((a.present / a.total) * 100) : null]))
+  const collectedMap = new Map((collections || []).map((c) => [c._id, c.total || 0]))
+
+  const headcountSeries = (joins, total) => {
+    const joinMap = new Map((joins || []).map((j) => [j._id, j.count || 0]))
+    return dayKeys.map((_, idx) => {
+      const joinedLater = dayKeys.slice(idx + 1).reduce((sum, key) => sum + (joinMap.get(key) || 0), 0)
+      return Math.max(0, total - joinedLater)
+    })
+  }
+
+  return {
+    days: dayKeys,
+    attendance: dayKeys.map((key) => (attMap.has(key) ? attMap.get(key) : null)),
+    students: headcountSeries(studentJoins, totalStudents),
+    staff: headcountSeries(staffJoins, totalStaff),
+    fees: dayKeys.map((key) => collectedMap.get(key) || 0),
+  }
 }
 
 const getDashboardStats = async (req, res, next) => {
@@ -51,6 +84,9 @@ const getDashboardStats = async (req, res, next) => {
         staffOnLeaveToday,
         staffPresentToday,
         recentAttAgg,
+        recentStudentJoins,
+        recentStaffJoins,
+        recentCollections,
       ] = await Promise.all([
         Student.countDocuments({ status: 'Active', deletedAt: null }),
         Staff.countDocuments({ isActive: true, deletedAt: null }),
@@ -112,6 +148,19 @@ const getDashboardStats = async (req, res, next) => {
             },
           },
         ]),
+        // Real daily series for the sparklines (RPT-01 replaced synthetic ones)
+        Student.aggregate([
+          { $match: { status: 'Active', deletedAt: null, createdAt: { $gte: sevenDaysAgo } } },
+          { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: '+05:00' } }, count: { $sum: 1 } } },
+        ]),
+        Staff.aggregate([
+          { $match: { isActive: true, deletedAt: null, createdAt: { $gte: sevenDaysAgo } } },
+          { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: '+05:00' } }, count: { $sum: 1 } } },
+        ]),
+        Payment.aggregate([
+          { $match: { paymentDate: { $gte: sevenDaysAgo } } },
+          { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$paymentDate', timezone: '+05:00' } }, total: { $sum: '$amountPaid' } } },
+        ]),
       ])
 
       const feeCollection = feeStats[0] || { totalDue: 0, totalPaid: 0, totalOutstanding: 0 }
@@ -119,21 +168,23 @@ const getDashboardStats = async (req, res, next) => {
         ? Math.round((feeCollection.totalPaid / feeCollection.totalDue) * 100)
         : 100
 
+      // null (not 0%) when no attendance has been marked today
       const attAgg = todayAttendance[0]
       const attendanceRate = attAgg && attAgg.total > 0
         ? Math.round((attAgg.present / attAgg.total) * 100)
-        : 0
+        : null
 
       const overdueAgg = overdueStats[0] || { count: 0, total: 0 }
 
-      // Compute 7-day sparklines
-      const attMap = new Map(recentAttAgg.map(a => [a._id, a.total > 0 ? Math.round((a.present / a.total) * 100) : 0]))
-      const attendanceSparkline = []
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(todayStart.getTime() - i * 86400000)
-        const key = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' })
-        attendanceSparkline.push(attMap.get(key) || (i === 0 ? attendanceRate : 90))
-      }
+      const sparklines = buildDashboardSparklines({
+        todayStart,
+        attendance: recentAttAgg,
+        studentJoins: recentStudentJoins,
+        staffJoins: recentStaffJoins,
+        collections: recentCollections,
+        totalStudents,
+        totalStaff,
+      })
 
       return {
         totalStudents,
@@ -147,13 +198,8 @@ const getDashboardStats = async (req, res, next) => {
         staffPresentToday,
         staffOnLeaveToday,
         pendingLeaveRequests: pendingLeaves,
-        academicYear: activeYear?.name || null,
-        sparklines: {
-          attendance: attendanceSparkline,
-          students: [Math.max(0, totalStudents - 8), Math.max(0, totalStudents - 5), Math.max(0, totalStudents - 3), Math.max(0, totalStudents - 2), Math.max(0, totalStudents - 1), totalStudents, totalStudents],
-          staff: [totalStaff, totalStaff, totalStaff, totalStaff, totalStaff, totalStaff, totalStaff],
-          fees: [collectionRate > 10 ? collectionRate - 10 : 0, collectionRate > 5 ? collectionRate - 5 : 0, collectionRate, collectionRate, collectionRate, collectionRate, collectionRate],
-        },
+        academicYear: activeYear?.year ?? null,
+        sparklines,
       }
     })
 
@@ -189,7 +235,8 @@ const getAttendanceTrend = async (req, res, next) => {
       const d = new Date(todayPKT.getTime() - i * 86400000)
       const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' })
       const dayLabel = d.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', timeZone: 'Asia/Karachi' })
-      datesMap.set(dateStr, { day: dayLabel, date: dateStr, rate: 0 })
+      // null = no attendance marked that day (RPT-01: it used to be plotted as 0%)
+      datesMap.set(dateStr, { day: dayLabel, date: dateStr, rate: null })
     }
 
     const agg = await StudentAttendance.aggregate([
@@ -208,8 +255,7 @@ const getAttendanceTrend = async (req, res, next) => {
 
     agg.forEach(item => {
       if (datesMap.has(item._id)) {
-        const rate = item.total > 0 ? Math.round((item.present / item.total) * 100) : 0
-        datesMap.get(item._id).rate = rate
+        datesMap.get(item._id).rate = item.total > 0 ? Math.round((item.present / item.total) * 100) : null
       }
     })
 
@@ -255,7 +301,7 @@ const getEnrollmentByGrade = async (req, res, next) => {
       },
       { $sort: { level: 1 } },
     ])
-    res.json({ success: true, data, academicYear: activeYear?.name || null })
+    res.json({ success: true, data, academicYear: activeYear?.year ?? null })
   } catch (error) {
     next(error)
   }
@@ -290,13 +336,14 @@ const getAuditLogs = async (req, res, next) => {
 const exportCustomReport = async (req, res, next) => {
   try {
     const { entity, format, from, to, month, year } = req.query
+    assertCanExport(req.user, entity)
     let rows = []
     let columns = []
     let sheetName = 'Report'
 
     // ── Students ──────────────────────────────────────────────────
     if (entity === 'students') {
-      const students = await Student.find({ status: 'Active' }).populate('classId')
+      const students = await limitExport(Student.find({ status: 'Active' }).populate('classId'))
       columns = [
         { header: 'Student ID', key: 'studentId', width: 15 },
         { header: 'Full Name', key: 'fullName', width: 25 },
@@ -321,7 +368,7 @@ const exportCustomReport = async (req, res, next) => {
 
     // ── Staff ─────────────────────────────────────────────────────
     } else if (entity === 'staff') {
-      const staff = await Staff.find({ isActive: true })
+      const staff = await limitExport(Staff.find({ isActive: true }))
       columns = [
         { header: 'Staff ID', key: 'staffId', width: 15 },
         { header: 'Full Name', key: 'fullName', width: 25 },
@@ -350,10 +397,10 @@ const exportCustomReport = async (req, res, next) => {
       if (from) filter.createdAt = { $gte: toRangeStart(from) }
       if (to) filter.createdAt = { ...filter.createdAt, $lte: toRangeEnd(to) }
 
-      const fees = await StudentFee.find(filter).populate({
+      const fees = await limitExport(StudentFee.find(filter).populate({
         path: 'studentId',
         populate: { path: 'classId' },
-      })
+      }))
       columns = [
         { header: 'Student ID', key: 'studentId', width: 15 },
         { header: 'Student Name', key: 'fullName', width: 25 },
@@ -383,13 +430,13 @@ const exportCustomReport = async (req, res, next) => {
       const sixtyDaysAgo = new Date()
       sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
 
-      const fees = await StudentFee.find({
+      const fees = await limitExport(StudentFee.find({
         ...UNPAID_FEE_FILTER,
         dueDate: { $lte: sixtyDaysAgo },
         outstandingAmount: { $gt: 0 },
       })
         .populate({ path: 'studentId', populate: { path: 'classId' } })
-        .sort({ outstandingAmount: -1 })
+        .sort({ outstandingAmount: -1 }))
 
       columns = [
         { header: 'Student ID', key: 'studentId', width: 15 },
@@ -424,10 +471,10 @@ const exportCustomReport = async (req, res, next) => {
       if (from) filter.date = { $gte: toRangeStart(from) }
       if (to) filter.date = { ...filter.date, $lte: toRangeEnd(to) }
 
-      const records = await StudentAttendance.find(filter)
+      const records = await limitExport(StudentAttendance.find(filter)
         .populate({ path: 'classId' })
         .populate({ path: 'records.studentId' })
-        .sort({ date: -1 })
+        .sort({ date: -1 }))
 
       columns = [
         { header: 'Date', key: 'date', width: 15 },
@@ -467,7 +514,7 @@ const exportCustomReport = async (req, res, next) => {
       if (month) filter.month = parseInt(month, 10)
       if (year) filter.year = parseInt(year, 10)
 
-      const records = await PayrollRecord.find(filter).populate('staffId')
+      const records = await limitExport(PayrollRecord.find(filter).populate('staffId'))
       columns = [
         { header: 'Staff ID', key: 'staffId', width: 15 },
         { header: 'Staff Name', key: 'fullName', width: 25 },
@@ -507,8 +554,8 @@ const exportCustomReport = async (req, res, next) => {
         if (to) filter.date.$lte = toRangeEnd(to)
       }
 
-      const staffList = await Staff.find({ isActive: true, deletedAt: null })
-      const attendanceDocs = await StaffAttendance.find(filter)
+      const staffList = await limitExport(Staff.find({ isActive: true, deletedAt: null }))
+      const attendanceDocs = await limitExport(StaffAttendance.find(filter))
 
       const staffAttMap = new Map()
       attendanceDocs.forEach(att => {
@@ -522,8 +569,10 @@ const exportCustomReport = async (req, res, next) => {
           st.present += 1
         } else if (att.status === 'Absent') {
           st.absent += 1
-        } else if (att.status === 'On Leave') {
+        } else if (['On Leave', 'Leave'].includes(att.status)) {
           st.onLeave += 1
+        } else if (att.status === 'Half Day') {
+          st.halfDay = (st.halfDay || 0) + 1
         }
       })
 
@@ -537,6 +586,7 @@ const exportCustomReport = async (req, res, next) => {
         { header: 'Present Days', key: 'presentDays', width: 12 },
         { header: 'Absent Days', key: 'absentDays', width: 12 },
         { header: 'On Leave', key: 'onLeave', width: 12 },
+        { header: 'Half Days', key: 'halfDays', width: 12 },
         { header: 'Attendance Rate', key: 'attendanceRate', width: 15 },
       ]
 
@@ -557,6 +607,7 @@ const exportCustomReport = async (req, res, next) => {
           presentDays: stats.present,
           absentDays: stats.absent,
           onLeave: stats.onLeave,
+          halfDays: stats.halfDay || 0,
           attendanceRate: rate,
         }
       })
@@ -564,10 +615,10 @@ const exportCustomReport = async (req, res, next) => {
 
     // ── Academic Performance ──────────────────────────────────────
     } else if (entity === 'academic-performance') {
-      const grades = await Grade.find({})
+      const grades = await limitExport(Grade.find({})
         .populate('studentId')
         .populate({ path: 'examId', populate: [{ path: 'subjectId' }, { path: 'classId' }] })
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1 }))
 
       columns = [
         { header: 'Student ID', key: 'studentId', width: 15 },
@@ -601,7 +652,10 @@ const exportCustomReport = async (req, res, next) => {
         deletedAt: null,
         $or: [{ department: 'Academics' }, { designation: /teacher|instructor|faculty/i }],
       })
-      const attendanceDocs = await StaffAttendance.find({})
+      // Bounded to the last 12 months instead of every staff-attendance document ever recorded
+      const performanceSince = new Date()
+      performanceSince.setFullYear(performanceSince.getFullYear() - 1)
+      const attendanceDocs = await limitExport(StaffAttendance.find({ date: { $gte: performanceSince } }))
       const attMap = new Map()
       attendanceDocs.forEach(att => {
         const id = att.staffId?.toString()
@@ -643,6 +697,8 @@ const exportCustomReport = async (req, res, next) => {
     } else {
       return res.status(400).json({ success: false, message: 'Unknown report entity' })
     }
+
+    assertExportSize(rows.length)
 
     if (format === 'pdf') {
       const isLandscape = columns.length > 6
@@ -839,7 +895,8 @@ const getDefaulterAging = async (req, res, next) => {
  */
 const previewCustomReport = async (req, res, next) => {
   try {
-    const { entity, fields, filters, sortBy, sortOrder } = req.body || req.query
+    const { entity = 'students', fields, filters, sortBy, sortOrder } = req.body || req.query
+    assertCanExport(req.user, entity)
     const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder })
 
     res.json({
@@ -861,7 +918,9 @@ const previewCustomReport = async (req, res, next) => {
 const exportCustomReportWithFields = async (req, res, next) => {
   try {
     const { entity = 'students', fields, filters, format = 'excel', title = 'Custom Report', sortBy, sortOrder } = req.body || req.query
+    assertCanExport(req.user, entity)
     const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder })
+    assertExportSize(rows.length)
 
     if (format === 'pdf') {
       const isLandscape = columns.length > 6
@@ -1069,22 +1128,15 @@ const getCashFlowForecast = async (req, res, next) => {
         else delinquentCount++
       })
 
-      const historicalVelocity = totalAnalyzed >= 10
+      const MIN_PAYMENTS_FOR_FORECAST = 10
+      const historicalVelocity = totalAnalyzed >= MIN_PAYMENTS_FOR_FORECAST
         ? {
             earlyPercentage: Math.round((earlyCount / totalAnalyzed) * 100),
             onTimePercentage: Math.round((onTimeCount / totalAnalyzed) * 100),
             delayedPercentage: Math.round((delayedCount / totalAnalyzed) * 100),
             delinquentPercentage: Math.max(0, 100 - Math.round((earlyCount / totalAnalyzed) * 100) - Math.round((onTimeCount / totalAnalyzed) * 100) - Math.round((delayedCount / totalAnalyzed) * 100)),
           }
-        : {
-            earlyPercentage: 18,
-            onTimePercentage: 64,
-            delayedPercentage: 11,
-            delinquentPercentage: 7,
-          }
-
-      // Expected recovery rate for a billing cycle (early + on-time + delayed)
-      const expectedRecoveryRate = Math.min(0.98, Math.max(0.70, (historicalVelocity.earlyPercentage + historicalVelocity.onTimePercentage + historicalVelocity.delayedPercentage) / 100))
+        : null
 
       // 3. Compute baseline monthly billing volume from active students
       const activeStudents = await Student.find({ status: 'Active', deletedAt: null }).select('classId')
@@ -1101,9 +1153,30 @@ const getCashFlowForecast = async (req, res, next) => {
         },
       ])
 
-      const baselineStudentCount = activeStudents.length || 100
-      const avgGrossPerStudent = Math.round(feeRecentAgg[0]?.avgGross || 4500)
-      const avgDiscountPerStudent = Math.round(feeRecentAgg[0]?.avgDiscount || 350)
+      const basis = {
+        paymentsAnalyzed: totalAnalyzed,
+        minimumPaymentsRequired: MIN_PAYMENTS_FOR_FORECAST,
+        feeRecordsAnalyzed: feeRecentAgg[0]?.totalFees || 0,
+        activeStudents: activeStudents.length,
+      }
+
+      // RPT-01: without enough real history there is nothing honest to project
+      if (!historicalVelocity || !basis.feeRecordsAnalyzed || !basis.activeStudents) {
+        return {
+          monthlyPayrollObligation,
+          historicalVelocity,
+          forecast: [],
+          insufficientData: true,
+          basis,
+        }
+      }
+
+      // Expected recovery rate for a billing cycle (early + on-time + delayed)
+      const expectedRecoveryRate = (historicalVelocity.earlyPercentage + historicalVelocity.onTimePercentage + historicalVelocity.delayedPercentage) / 100
+
+      const baselineStudentCount = activeStudents.length
+      const avgGrossPerStudent = Math.round(feeRecentAgg[0].avgGross || 0)
+      const avgDiscountPerStudent = Math.round(feeRecentAgg[0].avgDiscount || 0)
 
       const monthlyGross = Math.round(baselineStudentCount * avgGrossPerStudent)
       const monthlyConcessions = Math.round(baselineStudentCount * avgDiscountPerStudent)
@@ -1112,15 +1185,13 @@ const getCashFlowForecast = async (req, res, next) => {
       // 4. Forecast for next 3 months (Month +1, Month +2, Month +3)
       const now = new Date()
       const forecast = []
-      const confidenceScores = [92, 87, 82]
 
       for (let i = 1; i <= 3; i++) {
         const targetDate = new Date(now.getFullYear(), now.getMonth() + i, 1)
         const monthLabel = targetDate.toLocaleString('en-US', { month: 'short', year: 'numeric' })
 
-        // Seasonal slight decay / fluctuation adjustment
-        const decayFactor = 1 - (i - 1) * 0.02
-        const projectedInflow = Math.round(monthlyNet * expectedRecoveryRate * decayFactor)
+        // Same billing base every month, scaled by the observed recovery rate
+        const projectedInflow = Math.round(monthlyNet * expectedRecoveryRate)
         const netOperatingMargin = projectedInflow - monthlyPayrollObligation
 
         forecast.push({
@@ -1131,7 +1202,6 @@ const getCashFlowForecast = async (req, res, next) => {
           projectedInflow,
           payrollLiability: monthlyPayrollObligation,
           netOperatingMargin,
-          confidenceScore: confidenceScores[i - 1],
         })
       }
 
@@ -1139,6 +1209,8 @@ const getCashFlowForecast = async (req, res, next) => {
         monthlyPayrollObligation,
         historicalVelocity,
         forecast,
+        insufficientData: false,
+        basis,
       }
     })
 
@@ -1341,6 +1413,7 @@ const getPaymentVelocityAnalytics = async (req, res, next) => {
 }
 
 module.exports = {
+  buildDashboardSparklines,
   getDashboardStats,
   getAttendanceTrend,
   getEnrollmentByGrade,

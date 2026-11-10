@@ -4,6 +4,7 @@ import {
 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import api from '../../lib/axios'
+import { logError } from '../../lib/logger'
 
 export default function PromotionPage() {
   const [config, setConfig] = useState(null)
@@ -39,7 +40,7 @@ export default function PromotionPage() {
           setMappings(cfg.mappings || [])
         }
       } catch (err) {
-        console.error('Initialization error', err)
+        logError('Initialization error', err)
       } finally {
         setLoadingConfig(false)
       }
@@ -188,7 +189,7 @@ export default function PromotionPage() {
             {mappings.map((m, idx) => {
               const fromName = m.fromClassId?.name || classes.find(c => c._id === m.fromClassId)?.name || 'Class'
               return (
-                <div key={idx} className="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between gap-3 text-sm">
+                <div key={m.fromClassId?._id || m.fromClassId || idx} className="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between gap-3 text-sm">
                   <span className="font-bold text-gray-800">{fromName}</span>
                   <span className="text-gray-400 font-bold">➔</span>
                   <select

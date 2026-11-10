@@ -12,6 +12,7 @@ import api from '../../lib/axios'
 import { formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
+import { logError } from '../../lib/logger'
 
 // Which profile sections each staff role may load (mirrors the backend route RBAC), so the
 // page doesn't fire requests that are guaranteed to fail with 403 and spam error toasts.
@@ -30,6 +31,7 @@ import PersonalMedicalTab from './components/StudentProfile/PersonalMedicalTab'
 import AcademicRecordsTab from './components/StudentProfile/AcademicRecordsTab'
 import AttendanceHistoryTab from './components/StudentProfile/AttendanceHistoryTab'
 import FeeLedgerTab from './components/StudentProfile/FeeLedgerTab'
+import StudentDocumentsTab from './components/StudentProfile/StudentDocumentsTab'
 import StudentIdCardModal from './components/StudentProfile/StudentIdCardModal'
 import StudentStatusModal from './components/StudentProfile/StudentStatusModal'
 import ChangeSectionModal from './components/ChangeSectionModal'
@@ -114,7 +116,7 @@ export default function StudentProfilePage() {
       window.URL.revokeObjectURL(link.href)
       toast.success('Document downloaded successfully')
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error('Failed to download PDF document')
     }
   }
@@ -180,7 +182,7 @@ export default function StudentProfilePage() {
         setAttendanceRecords(attRes.value.data.data || [])
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error('Failed to load full student profile')
     } finally {
       setLoading(false)
@@ -269,7 +271,7 @@ export default function StudentProfilePage() {
         setEditMode(false)
       }
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error(err.response?.data?.message || 'Failed to update student profile')
     } finally {
       setSavingProfile(false)
@@ -531,79 +533,13 @@ export default function StudentProfilePage() {
         />
       )}
 
-      {/* ── TAB 6: DOCUMENTS & VERIFICATION ── */}
+      {/* ── TAB 6: DOCUMENTS (real attachments; the old tab listed hard-coded "Verified" files) ── */}
       {activeTab === 'documents' && (
-        <div className="card-surface p-6 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                Official Student Records & Dossier
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Verified admission documents on file with the registrar.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              {
-                title: 'Admission Application Form',
-                type: 'Registration',
-                status: 'Verified',
-                date: student.joiningDate,
-              },
-              {
-                title: 'NADRA B-Form / Birth Certificate Copy',
-                type: 'Identity',
-                status: 'Verified',
-                date: student.joiningDate,
-              },
-              {
-                title: 'School Leaving Certificate (Previous School)',
-                type: 'Academic',
-                status: 'On File',
-                date: student.joiningDate,
-              },
-              {
-                title: 'Guardian CNIC Copy',
-                type: 'Parental Consent',
-                status: 'Verified',
-                date: student.joiningDate,
-              },
-              {
-                title: 'Medical Fitness & Blood Group Report',
-                type: 'Health',
-                status: 'Verified',
-                date: student.joiningDate,
-              },
-              {
-                title: 'Passport-size Photographs (4x)',
-                type: 'Media',
-                status: 'Archived',
-                date: student.joiningDate,
-              },
-            ].map((doc, i) => (
-              <div
-                key={i}
-                className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/80 flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    {doc.title}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {doc.type} · Submitted {doc.date ? formatDate(doc.date) : '—'}
-                  </p>
-                </div>
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full flex items-center gap-1 border border-emerald-200 dark:border-emerald-800">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> {doc.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <StudentDocumentsTab
+          student={student}
+          canManage={['super_admin', 'hr_manager'].includes(roleName)}
+          onDocumentsChanged={(documents) => setStudent((prev) => ({ ...prev, documents }))}
+        />
       )}
 
       {/* ── MODALS ── */}

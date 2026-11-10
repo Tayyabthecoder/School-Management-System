@@ -15,6 +15,9 @@ import {
 import api from '../../../lib/axios'
 import { useToast } from '../../../store/toastStore'
 import { downloadBlobResponse } from './downloadHelper'
+import { useAuthStore } from '../../../store/authStore'
+import { canExportEntity } from '../exportAccess'
+import { logError } from '../../../lib/logger'
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -117,6 +120,7 @@ function DateRange({ label, fromVal, toVal, onFrom, onTo }) {
 }
 
 export default function ExportReportsTab() {
+  const user = useAuthStore((s) => s.user)
   const toast = useToast()
   const [feeFrom, setFeeFrom] = useState('')
   const [feeTo, setFeeTo] = useState('')
@@ -137,7 +141,7 @@ export default function ExportReportsTab() {
       await downloadBlobResponse(response, `${key}_${Date.now()}.${ext}`)
       toast.success('Report export downloaded successfully')
     } catch (err) {
-      console.error('Export failed:', err)
+      logError('Export failed:', err)
       let msg = 'Failed to generate report export'
       if (err.response?.data instanceof Blob) {
         try {
@@ -222,185 +226,203 @@ export default function ExportReportsTab() {
 
           {/* Grid of Standard Reports */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ReportCard
-              icon={Users}
-              color="indigo"
-              title="Student Master Directory"
-              description="Complete active student records including class, section, guardian information, and status."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['students-xlsx'],
-                  onClick: () => handleExport('students-xlsx', '/api/v1/reports/export?entity=students&format=excel'),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['students-pdf'],
-                  onClick: () => handleExport('students-pdf', '/api/v1/reports/export?entity=students&format=pdf'),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'students') && (
+              <ReportCard
+                icon={Users}
+                color="indigo"
+                title="Student Master Directory"
+                description="Complete active student records including class, section, guardian information, and status."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['students-xlsx'],
+                    onClick: () => handleExport('students-xlsx', '/api/v1/reports/export?entity=students&format=excel'),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['students-pdf'],
+                    onClick: () => handleExport('students-pdf', '/api/v1/reports/export?entity=students&format=pdf'),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={UserCheck}
-              color="emerald"
-              title="Staff & Faculty Directory"
-              description="Employee register with designation, department, CNIC, joining date, and salary breakdown."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['staff-xlsx'],
-                  onClick: () => handleExport('staff-xlsx', '/api/v1/reports/export?entity=staff&format=excel'),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['staff-pdf'],
-                  onClick: () => handleExport('staff-pdf', '/api/v1/reports/export?entity=staff&format=pdf'),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'staff') && (
+              <ReportCard
+                icon={UserCheck}
+                color="emerald"
+                title="Staff & Faculty Directory"
+                description="Employee register with designation, department, CNIC, joining date, and salary breakdown."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['staff-xlsx'],
+                    onClick: () => handleExport('staff-xlsx', '/api/v1/reports/export?entity=staff&format=excel'),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['staff-pdf'],
+                    onClick: () => handleExport('staff-pdf', '/api/v1/reports/export?entity=staff&format=pdf'),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={DollarSign}
-              color="amber"
-              title="Fee Collection & Ledger"
-              description="Student fee ledger with collected amounts, outstanding balances, and payment status breakdown."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['fees-xlsx'],
-                  onClick: () => handleExport('fees-xlsx', buildFeeUrl('excel')),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['fees-pdf'],
-                  onClick: () => handleExport('fees-pdf', buildFeeUrl('pdf')),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'fees') && (
+              <ReportCard
+                icon={DollarSign}
+                color="amber"
+                title="Fee Collection & Ledger"
+                description="Student fee ledger with collected amounts, outstanding balances, and payment status breakdown."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['fees-xlsx'],
+                    onClick: () => handleExport('fees-xlsx', buildFeeUrl('excel')),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['fees-pdf'],
+                    onClick: () => handleExport('fees-pdf', buildFeeUrl('pdf')),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={AlertTriangle}
-              color="rose"
-              title="Fee Defaulters List"
-              description="Students with outstanding fees beyond deadline — sorted for accounts follow-up."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['defaulters-xlsx'],
-                  onClick: () => handleExport('defaulters-xlsx', '/api/v1/reports/export?entity=defaulters&format=excel'),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['defaulters-pdf'],
-                  onClick: () => handleExport('defaulters-pdf', '/api/v1/reports/export?entity=defaulters&format=pdf'),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'defaulters') && (
+              <ReportCard
+                icon={AlertTriangle}
+                color="rose"
+                title="Fee Defaulters List"
+                description="Students with outstanding fees beyond deadline — sorted for accounts follow-up."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['defaulters-xlsx'],
+                    onClick: () => handleExport('defaulters-xlsx', '/api/v1/reports/export?entity=defaulters&format=excel'),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['defaulters-pdf'],
+                    onClick: () => handleExport('defaulters-pdf', '/api/v1/reports/export?entity=defaulters&format=pdf'),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={CalendarCheck}
-              color="teal"
-              title="Student Attendance Summary"
-              description="Grade-wise and section-wise daily attendance summary with present, absent, late counts."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['attendance-xlsx'],
-                  onClick: () => handleExport('attendance-xlsx', buildAttUrl('excel')),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['attendance-pdf'],
-                  onClick: () => handleExport('attendance-pdf', buildAttUrl('pdf')),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'attendance') && (
+              <ReportCard
+                icon={CalendarCheck}
+                color="teal"
+                title="Student Attendance Summary"
+                description="Grade-wise and section-wise daily attendance summary with present, absent, late counts."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['attendance-xlsx'],
+                    onClick: () => handleExport('attendance-xlsx', buildAttUrl('excel')),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['attendance-pdf'],
+                    onClick: () => handleExport('attendance-pdf', buildAttUrl('pdf')),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={Clock}
-              color="cyan"
-              title="Staff Monthly Attendance Ledger"
-              description="Staff member attendance records with total working days, present days, absent days, and rates."
-              actions={[
-                {
-                  label: `Excel (${payMonth}/${payYear})`,
-                  loading: loadingMap['staff-att-xlsx'],
-                  onClick: () => handleExport('staff-att-xlsx', `/api/v1/reports/export?entity=staff-attendance&month=${payMonth}&year=${payYear}&format=excel`),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['staff-att-pdf'],
-                  onClick: () => handleExport('staff-att-pdf', `/api/v1/reports/export?entity=staff-attendance&month=${payMonth}&year=${payYear}&format=pdf`),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'staff-attendance') && (
+              <ReportCard
+                icon={Clock}
+                color="cyan"
+                title="Staff Monthly Attendance Ledger"
+                description="Staff member attendance records with total working days, present days, absent days, and rates."
+                actions={[
+                  {
+                    label: `Excel (${payMonth}/${payYear})`,
+                    loading: loadingMap['staff-att-xlsx'],
+                    onClick: () => handleExport('staff-att-xlsx', `/api/v1/reports/export?entity=staff-attendance&month=${payMonth}&year=${payYear}&format=excel`),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['staff-att-pdf'],
+                    onClick: () => handleExport('staff-att-pdf', `/api/v1/reports/export?entity=staff-attendance&month=${payMonth}&year=${payYear}&format=pdf`),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={FileText}
-              color="violet"
-              title="Payroll Summary Report"
-              description="Monthly payroll summary showing basic pay, allowances, deductions, and net pay per staff member."
-              actions={[
-                {
-                  label: `Excel (${payMonth}/${payYear})`,
-                  loading: loadingMap['payroll-xlsx'],
-                  onClick: () => handleExport('payroll-xlsx', `/api/v1/reports/export?entity=payroll&month=${payMonth}&year=${payYear}&format=excel`),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['payroll-pdf'],
-                  onClick: () => handleExport('payroll-pdf', `/api/v1/reports/export?entity=payroll&month=${payMonth}&year=${payYear}&format=pdf`),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'payroll') && (
+              <ReportCard
+                icon={FileText}
+                color="violet"
+                title="Payroll Summary Report"
+                description="Monthly payroll summary showing basic pay, allowances, deductions, and net pay per staff member."
+                actions={[
+                  {
+                    label: `Excel (${payMonth}/${payYear})`,
+                    loading: loadingMap['payroll-xlsx'],
+                    onClick: () => handleExport('payroll-xlsx', `/api/v1/reports/export?entity=payroll&month=${payMonth}&year=${payYear}&format=excel`),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['payroll-pdf'],
+                    onClick: () => handleExport('payroll-pdf', `/api/v1/reports/export?entity=payroll&month=${payMonth}&year=${payYear}&format=pdf`),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={GraduationCap}
-              color="indigo"
-              title="Academic Performance Summary"
-              description="Term examination results, grading distributions, subject score averages, and class passing rates."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['academic-xlsx'],
-                  onClick: () => handleExport('academic-xlsx', '/api/v1/reports/export?entity=academic-performance&format=excel'),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['academic-pdf'],
-                  onClick: () => handleExport('academic-pdf', '/api/v1/reports/export?entity=academic-performance&format=pdf'),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'academic-performance') && (
+              <ReportCard
+                icon={GraduationCap}
+                color="indigo"
+                title="Academic Performance Summary"
+                description="Term examination results, grading distributions, subject score averages, and class passing rates."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['academic-xlsx'],
+                    onClick: () => handleExport('academic-xlsx', '/api/v1/reports/export?entity=academic-performance&format=excel'),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['academic-pdf'],
+                    onClick: () => handleExport('academic-pdf', '/api/v1/reports/export?entity=academic-performance&format=pdf'),
+                  },
+                ]}
+              />
+            )}
 
-            <ReportCard
-              icon={Award}
-              color="teal"
-              title="Teacher Performance Ledger"
-              description="Faculty workload metrics including assigned classes, subject allocations, and attendance rates."
-              actions={[
-                {
-                  label: 'Excel (.xlsx)',
-                  loading: loadingMap['teacher-xlsx'],
-                  onClick: () => handleExport('teacher-xlsx', '/api/v1/reports/export?entity=teacher-performance&format=excel'),
-                },
-                {
-                  label: 'PDF Report',
-                  variant: 'secondary',
-                  loading: loadingMap['teacher-pdf'],
-                  onClick: () => handleExport('teacher-pdf', '/api/v1/reports/export?entity=teacher-performance&format=pdf'),
-                },
-              ]}
-            />
+            {canExportEntity(user, 'teacher-performance') && (
+              <ReportCard
+                icon={Award}
+                color="teal"
+                title="Teacher Performance Ledger"
+                description="Faculty workload metrics including assigned classes, subject allocations, and attendance rates."
+                actions={[
+                  {
+                    label: 'Excel (.xlsx)',
+                    loading: loadingMap['teacher-xlsx'],
+                    onClick: () => handleExport('teacher-xlsx', '/api/v1/reports/export?entity=teacher-performance&format=excel'),
+                  },
+                  {
+                    label: 'PDF Report',
+                    variant: 'secondary',
+                    loading: loadingMap['teacher-pdf'],
+                    onClick: () => handleExport('teacher-pdf', '/api/v1/reports/export?entity=teacher-performance&format=pdf'),
+                  },
+                ]}
+              />
+            )}
           </div>
         </div>
   )

@@ -6,6 +6,7 @@ const auditUtil = require('../utils/audit-log.util')
 const authService = require('../modules/auth/auth.service')
 
 jest.mock('../models/User.model')
+jest.mock('../models/RefreshToken.model')
 jest.mock('../utils/audit-log.util')
 
 const buildUser = (overrides = {}) => ({

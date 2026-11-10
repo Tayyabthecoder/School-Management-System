@@ -6,6 +6,9 @@ dotenv.config({ path: path.join(__dirname, '../../.env') })
 const nodeEnv = process.env.NODE_ENV || 'development'
 
 const FORBIDDEN_SECRETS = [
+  // Placeholders shipped in .env.example (long enough to boot a dev copy, never valid in production)
+  'dev_only_change_me_access_token_secret_0000000000',
+  'dev_only_change_me_refresh_token_secret_000000000',
   'sms_jwt_super_secret_access_key_2026_x89a',
   'your_access_token_secret_here',
   'sms_jwt_refresh_super_secret_key_2026_z12b',
@@ -41,6 +44,8 @@ const env = {
   UPLOAD_DIR: process.env.UPLOAD_DIR || './uploads',
   MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB || '10', 10),
   REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
+  // The school's own calendar day (weekday rules, "today" views) regardless of the server clock (LOW-04)
+  SCHOOL_TIMEZONE: process.env.SCHOOL_TIMEZONE || 'Asia/Karachi',
 }
 
 module.exports = env

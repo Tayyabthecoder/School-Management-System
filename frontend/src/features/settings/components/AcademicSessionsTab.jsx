@@ -29,6 +29,7 @@ export default function AcademicSessionsTab({
   academicConfig,
   setAcademicConfig,
   onOpenAYModal,
+  onYearActivated,
   onSaveAcademicConfig,
   savingAcademic,
 }) {
@@ -41,6 +42,23 @@ export default function AcademicSessionsTab({
     'Friday',
   ])
   const [savingDays, setSavingDays] = useState(false)
+  const [activatingId, setActivatingId] = useState(null)
+
+  const handleActivateYear = async (ay) => {
+    if (!window.confirm(`Make Academic Session ${ay.year} the active year? Fees, challans, dashboards and promotion will use it from now on.`)) return
+    setActivatingId(ay._id)
+    try {
+      const res = await api.patch(`/classes/academic-years/${ay._id}/activate`)
+      if (res.data?.success) {
+        toast.success(`Academic Session ${ay.year} is now active.`)
+        onYearActivated?.(res.data.data)
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to activate academic year')
+    } finally {
+      setActivatingId(null)
+    }
+  }
 
   useEffect(() => {
     api.get('/settings/allowed-days')
@@ -169,25 +187,42 @@ export default function AcademicSessionsTab({
           <SkeletonTable rows={3} />
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800 border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden">
+            {(academicYears || []).length === 0 && (
+              <p className="p-4 text-sm text-gray-500 dark:text-slate-400">No academic sessions yet. Add one to get started.</p>
+            )}
             {(academicYears || []).map((ay) => (
               <div key={ay._id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div>
                   <div className="flex items-center gap-2.5">
                     <span className="font-bold text-gray-900 dark:text-white text-base">Academic Session {ay.year}</span>
-                    {ay.year === 2026 && (
+                    {ay.isActive && (
                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 text-xs font-bold rounded-full">
                         Current Active
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                    Span: {ay.startDate ? formatDate(ay.startDate) : 'Jan 2026'} — {ay.endDate ? formatDate(ay.endDate) : 'Dec 2026'}
+                    Span: {ay.startDate ? formatDate(ay.startDate) : '—'} — {ay.endDate ? formatDate(ay.endDate) : '—'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-lg">
-                    Terms: Term 1, Term 2, Midterm, Final
-                  </span>
+                  {ay.terms?.length > 0 && (
+                    <span className="text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-lg">
+                      Terms: {ay.terms.map((t) => t.name).join(', ')}
+                    </span>
+                  )}
+                  {!ay.isActive && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      loading={activatingId === ay._id}
+                      disabled={Boolean(activatingId)}
+                      onClick={() => handleActivateYear(ay)}
+                    >
+                      Set Active
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

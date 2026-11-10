@@ -15,13 +15,10 @@ const { logAudit } = require('../../utils/audit-log.util')
 const { escapeRegex } = require('../../utils/regex.util')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 
-/**
- * Helper to get current day of week string
- */
-const getDayName = (date = new Date()) => {
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  return days[date.getDay()]
-}
+const { getSchoolDayName, getSchoolMinutesOfDay } = require('../../utils/date.util')
+
+/** Current weekday in the school's timezone, not the server's */
+const getDayName = (date = new Date()) => getSchoolDayName(date)
 
 /**
  * Get all teachers with aggregated teaching workload metrics
@@ -270,9 +267,8 @@ const getTeacherWorkspace = async (req, res, next) => {
       .populate('subjectId', 'name code')
       .sort({ periodNumber: 1 })
 
-    // Calculate active period
-    const now = new Date()
-    const nowMinutes = now.getHours() * 60 + now.getMinutes()
+    // Calculate active period on the school's clock (LOW-04)
+    const nowMinutes = getSchoolMinutesOfDay()
 
     const parseTimeToMinutes = (tStr) => {
       if (!tStr) return 0

@@ -38,25 +38,36 @@ const compileStudentReportData = async (studentId, termName = 'Final Term', acad
   })
   const gradingScale = settings?.gradingScale || null
 
+  // RPT-02: an exam with no grade record is "Pending", not 0 marks and a fail.
   const formattedGrades = exams.map(exam => {
     const gradeRecord = grades.find(g => g.examId && g.examId._id.toString() === exam._id.toString())
-    const marksObtained = gradeRecord ? gradeRecord.marksObtained : 0
     const maxMarks = exam.maxMarks || 100
-    const percentage = Math.round((marksObtained / maxMarks) * 100)
-    const gradeLetter = gradeRecord ? gradeRecord.gradeLetter : calculateGradeLetter(percentage, gradingScale)
-
-    return {
+    const passMarks = exam.passMarks || 40
+    const base = {
       examId: exam._id,
       subjectName: exam.subjectId ? exam.subjectId.name : 'Subject',
       maxMarks,
-      passMarks: exam.passMarks || 40,
+      passMarks,
+    }
+
+    if (!gradeRecord) {
+      return { ...base, marksObtained: null, percentage: null, gradeLetter: 'Pending', isPassed: null, status: 'Pending', remarks: '' }
+    }
+
+    const marksObtained = gradeRecord.marksObtained
+    const percentage = Math.round((marksObtained / maxMarks) * 100)
+    const isPassed = marksObtained >= passMarks
+    return {
+      ...base,
       marksObtained,
       percentage,
-      gradeLetter,
-      isPassed: marksObtained >= (exam.passMarks || 40),
-      remarks: gradeRecord?.remarks || '',
+      gradeLetter: gradeRecord.gradeLetter || calculateGradeLetter(percentage, gradingScale),
+      isPassed,
+      status: isPassed ? 'Passed' : 'Failed',
+      remarks: gradeRecord.remarks || '',
     }
   })
+  const gradedSubjects = formattedGrades.filter((g) => g.status !== 'Pending')
 
   // Calculate student attendance % scoped to the active academic session or term
   let attDateFilter = null
@@ -96,10 +107,11 @@ const compileStudentReportData = async (studentId, termName = 'Final Term', acad
   })
   const attendancePercentage = totalDays > 0 ? `${Math.round((presentDays / totalDays) * 100)}%` : 'N/A'
 
-  const totalMaxMarks = formattedGrades.reduce((sum, g) => sum + g.maxMarks, 0)
-  const totalMarksObtained = formattedGrades.reduce((sum, g) => sum + g.marksObtained, 0)
-  const overallPercentage = totalMaxMarks > 0 ? Math.round((totalMarksObtained / totalMaxMarks) * 100) : 0
-  const overallGradeLetter = calculateGradeLetter(overallPercentage, gradingScale)
+  // Aggregates cover graded subjects only; with nothing graded there is no overall result yet
+  const totalMaxMarks = gradedSubjects.reduce((sum, g) => sum + g.maxMarks, 0)
+  const totalMarksObtained = gradedSubjects.reduce((sum, g) => sum + g.marksObtained, 0)
+  const overallPercentage = totalMaxMarks > 0 ? Math.round((totalMarksObtained / totalMaxMarks) * 100) : null
+  const overallGradeLetter = overallPercentage === null ? 'Pending' : calculateGradeLetter(overallPercentage, gradingScale)
 
   return {
     student,
@@ -116,8 +128,9 @@ const compileStudentReportData = async (studentId, termName = 'Final Term', acad
       totalMarksObtained,
       overallPercentage,
       overallGradeLetter,
-      passedSubjects: formattedGrades.filter(g => g.isPassed).length,
-      failedSubjects: formattedGrades.filter(g => !g.isPassed).length,
+      passedSubjects: formattedGrades.filter(g => g.status === 'Passed').length,
+      failedSubjects: formattedGrades.filter(g => g.status === 'Failed').length,
+      pendingSubjects: formattedGrades.filter(g => g.status === 'Pending').length,
     },
   }
 }

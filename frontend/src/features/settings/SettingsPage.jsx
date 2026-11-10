@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import api from '../../lib/axios'
+import { readStoredJson, writeStoredJson } from '../../lib/storage'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 
@@ -183,6 +184,29 @@ const mergeChallanConfig = (incoming) => {
   }
 }
 
+const DEFAULT_SCHOOL_PROFILE = {
+  schoolName: '',
+  regNo: '',
+  email: '',
+  phone: '',
+  hotline: '',
+  address: '',
+  website: '',
+  motto: '',
+  currency: 'PKR',
+  timezone: 'Asia/Karachi (GMT+5)',
+  dateFormat: 'DD/MM/YYYY',
+}
+
+const DEFAULT_ACADEMIC_CONFIG = {
+  activeTerm: 'Term 1',
+  passingPercentage: 50,
+  minAttendancePercentage: 75,
+  maxStudentsPerSection: 35,
+  attendanceAlertThreshold: 75,
+  autoFeeOverdueAlerts: true,
+}
+
 // ─── Main Settings Page ───────────────────────────────────────────────────────
 export default function SettingsPage() {
   const toast = useToast()
@@ -191,42 +215,15 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile')
 
   // School Profile state
-  const [profile, setProfile] = useState(() => {
-    const saved = localStorage.getItem('sms_school_profile')
-    return saved
-      ? JSON.parse(saved)
-      : {
-          schoolName: 'Al-Haq Model Academy & College',
-          regNo: 'SMS-REG-2026-994',
-          email: 'admin@alhaqacademy.edu.pk',
-          phone: '+92 300 1234567',
-          hotline: '+92 21 34567890',
-          address: 'Campus Plot 42, Block 6, Gulshan-e-Iqbal, Karachi',
-          website: 'https://alhaqacademy.edu.pk',
-          motto: 'Knowledge, Integrity, Excellence',
-          currency: 'PKR',
-          timezone: 'Asia/Karachi (GMT+5)',
-          dateFormat: 'DD/MM/YYYY',
-        }
-  })
+  // The server is the source of truth (fetchSchoolSettings); the cached copy only avoids an
+  // empty form while it loads. No sample school data is shown as if it were real.
+  const [profile, setProfile] = useState(() => readStoredJson('sms_school_profile', DEFAULT_SCHOOL_PROFILE))
 
   // Academic Sessions state
   const [academicYears, setAcademicYears] = useState([])
   const [loadingAY, setLoadingAY] = useState(true)
   const [showAYModal, setShowAYModal] = useState(false)
-  const [academicConfig, setAcademicConfig] = useState(() => {
-    const saved = localStorage.getItem('sms_academic_config')
-    return saved
-      ? JSON.parse(saved)
-      : {
-          activeTerm: 'Term 1',
-          passingPercentage: 50,
-          minAttendancePercentage: 75,
-          maxStudentsPerSection: 35,
-          attendanceAlertThreshold: 75,
-          autoFeeOverdueAlerts: true,
-        }
-  })
+  const [academicConfig, setAcademicConfig] = useState(() => readStoredJson('sms_academic_config', DEFAULT_ACADEMIC_CONFIG))
 
   // Grading Scale state
   const [gradingScale, setGradingScale] = useState([
@@ -250,14 +247,9 @@ export default function SettingsPage() {
   const [selectedUserForReset, setSelectedUserForReset] = useState(null)
 
   // Challan Customization state
-  const [challanConfig, setChallanConfig] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sms_challan_config')
-      return saved ? mergeChallanConfig(JSON.parse(saved)) : DEFAULT_CHALLAN_CONFIG
-    } catch {
-      return DEFAULT_CHALLAN_CONFIG
-    }
-  })
+  const [challanConfig, setChallanConfig] = useState(() =>
+    mergeChallanConfig(readStoredJson('sms_challan_config', DEFAULT_CHALLAN_CONFIG))
+  )
   const safeChallanConfig = mergeChallanConfig(challanConfig)
   const [savingChallan, setSavingChallan] = useState(false)
   const [newInstructionText, setNewInstructionText] = useState('')
@@ -278,21 +270,14 @@ export default function SettingsPage() {
     try {
       const res = await api.get('/classes/academic-years')
       if (res.data?.success) setAcademicYears(res.data.data)
-    } catch {
-      setAcademicYears([
-        {
-          _id: 'ay-2026',
-          year: 2026,
-          startDate: '2026-01-01',
-          endDate: '2026-12-31',
-          isActive: true,
-          terms: [{ name: 'Term 1' }, { name: 'Term 2' }],
-        },
-      ])
+    } catch (err) {
+      // Never show a made-up session: an empty list with an error is honest.
+      setAcademicYears([])
+      toast.error(err.response?.data?.error?.message || 'Failed to load academic sessions')
     } finally {
       setLoadingAY(false)
     }
-  }, [])
+  }, [toast])
 
   // Fetch Challan Settings
   const fetchChallanSettings = useCallback(async () => {
@@ -301,7 +286,7 @@ export default function SettingsPage() {
       if (res.data?.success && res.data.data) {
         const merged = mergeChallanConfig(res.data.data)
         setChallanConfig(merged)
-        localStorage.setItem('sms_challan_config', JSON.stringify(merged))
+        writeStoredJson('sms_challan_config', merged)
       }
     } catch {
       // Use existing localStorage fallback
@@ -396,7 +381,7 @@ export default function SettingsPage() {
       if (res.data?.success) {
         const merged = mergeChallanConfig(res.data.data || payload)
         setChallanConfig(merged)
-        localStorage.setItem('sms_challan_config', JSON.stringify(merged))
+        writeStoredJson('sms_challan_config', merged)
         toast.success('Fee Challan PDF settings and payment channels saved successfully!')
       }
     } catch (err) {
@@ -426,7 +411,7 @@ export default function SettingsPage() {
         dateFormat: profile.dateFormat,
       })
       if (res.data?.success) {
-        localStorage.setItem('sms_school_profile', JSON.stringify(profile))
+        writeStoredJson('sms_school_profile', profile)
         toast.success('Institution profile settings saved successfully to server!')
       }
     } catch (err) {
@@ -450,7 +435,7 @@ export default function SettingsPage() {
         autoFeeOverdueAlerts: academicConfig.autoFeeOverdueAlerts,
       })
       if (res.data?.success) {
-        localStorage.setItem('sms_academic_config', JSON.stringify(academicConfig))
+        writeStoredJson('sms_academic_config', academicConfig)
         toast.success('Academic policies and operational thresholds saved to server!')
       }
     } catch (err) {
@@ -615,6 +600,9 @@ export default function SettingsPage() {
           academicConfig={academicConfig}
           setAcademicConfig={setAcademicConfig}
           onOpenAYModal={() => setShowAYModal(true)}
+          onYearActivated={(activeYear) =>
+            setAcademicYears((prev) => prev.map((ay) => ({ ...ay, isActive: ay._id === activeYear._id })))
+          }
           onSaveAcademicConfig={handleSaveAcademicConfig}
           savingAcademic={savingAcademic}
         />

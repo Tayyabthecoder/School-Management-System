@@ -3,6 +3,12 @@ const { redisClient, checkRedisAvailable } = require('../config/redis')
 const MAX_MEMORY_ITEMS = 500
 const memoryCache = new Map()
 
+// The in-memory fallback is per process: an invalidation on one instance can't reach the
+// others. Capping its TTL bounds how long another instance can serve stale settings or
+// day restrictions (LOW-07). Run Redis when the backend has more than one instance.
+const parsedCap = parseInt(process.env.MEMORY_CACHE_MAX_TTL_SECONDS, 10)
+const MEMORY_CACHE_MAX_TTL_SECONDS = Number.isFinite(parsedCap) && parsedCap >= 0 ? parsedCap : 30
+
 const getOrSet = async (key, ttlSeconds = 300, fetcherFn) => {
   // 1. Try Redis cache
   if (redisClient && checkRedisAvailable()) {
@@ -42,7 +48,7 @@ const getOrSet = async (key, ttlSeconds = 300, fetcherFn) => {
     }
     memoryCache.set(key, {
       data: freshData,
-      expiry: Date.now() + ttlSeconds * 1000,
+      expiry: Date.now() + Math.min(ttlSeconds, MEMORY_CACHE_MAX_TTL_SECONDS) * 1000,
     })
   }
 
@@ -59,6 +65,7 @@ const invalidateCache = async (key) => {
 }
 
 module.exports = {
+  MEMORY_CACHE_MAX_TTL_SECONDS,
   getOrSet,
   invalidateCache,
 }

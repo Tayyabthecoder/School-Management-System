@@ -248,10 +248,17 @@ const normalizeHeader = (header) => {
 }
 
 /**
- * Parse an Excel file (.xlsx, .xls, .csv) into structured student data records
+ * Parse an Excel file (.xlsx or .csv) into structured student data records.
+ * Legacy binary .xls is not readable by ExcelJS, so it is rejected with a clear message.
  */
 const parseStudentExcel = async (filePathOrBuffer) => {
   const workbook = new ExcelJS.Workbook()
+
+  if (typeof filePathOrBuffer === 'string' && path.extname(filePathOrBuffer).toLowerCase() === '.xls') {
+    const err = new Error('Legacy .xls files are not supported. Save the sheet as .xlsx or .csv and upload it again.')
+    err.statusCode = 400
+    throw err
+  }
 
   if (Buffer.isBuffer(filePathOrBuffer)) {
     await workbook.xlsx.load(filePathOrBuffer)

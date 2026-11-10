@@ -15,6 +15,7 @@ import api from '../../lib/axios'
 import { formatPKR } from '../../lib/formatters'
 import { useAuthStore } from '../../store/authStore'
 import { connectSSE, disconnectSSE } from '../../lib/sseClient'
+import { logError } from '../../lib/logger'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const PIE_COLORS = ['#10b981', '#f59e0b']
@@ -76,6 +77,9 @@ const COLOR_MAP = {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+// Today's attendance is null until someone marks it; show that instead of a made-up rate (RPT-01)
+const formatRate = (rate) => (rate === null || rate === undefined ? 'Not marked' : `${rate}%`)
+
 export default function DashboardPage() {
   const { user } = useAuthStore()
   const userRole = user?.roleName || user?.role || 'student'
@@ -110,7 +114,7 @@ export default function DashboardPage() {
           })))
         }
       } catch (err) {
-        console.error('Dashboard load error', err)
+        logError('Dashboard load error', err)
       } finally {
         setLoading(false)
       }
@@ -162,7 +166,7 @@ export default function DashboardPage() {
               icon={CircleDollarSign}
               trend="Institutional revenue"
               color="green"
-              sparklineData={stats?.sparklines?.fees || [0, 0, 0, 0, 0, 0, stats?.feeCollectionRate || 0]}
+              sparklineData={stats?.sparklines?.fees}
             />
             <StatCard
               title="Total Outstanding"
@@ -178,7 +182,7 @@ export default function DashboardPage() {
               icon={TrendingUp}
               trend="Target: 95% recovery"
               color="amber"
-              sparklineData={stats?.sparklines?.fees || [0, 0, 0, 0, 0, 0, stats?.feeCollectionRate || 0]}
+              sparklineData={stats?.sparklines?.fees}
             />
             <StatCard
               title="Active Students"
@@ -186,7 +190,7 @@ export default function DashboardPage() {
               icon={Users}
               trend="Fee-bearing profiles"
               color="indigo"
-              sparklineData={stats?.sparklines?.totalStudents || [stats?.totalStudents || 0]}
+              sparklineData={stats?.sparklines?.students}
             />
           </>
         ) : userRole === 'hr_manager' ? (
@@ -197,7 +201,7 @@ export default function DashboardPage() {
               icon={UserCheck}
               trend="Faculty & Administration"
               color="indigo"
-              sparklineData={stats?.sparklines?.staffAttendance || [stats?.totalStaff || 0]}
+              sparklineData={stats?.sparklines?.staff}
             />
             <StatCard
               title="Staff Present Today"
@@ -205,7 +209,7 @@ export default function DashboardPage() {
               icon={CheckCircle}
               trend="Checked in today"
               color="green"
-              sparklineData={stats?.sparklines?.staffAttendance || [stats?.staffPresentToday || 0]}
+              sparklineData={stats?.sparklines?.staff}
             />
             <StatCard
               title="Staff On Leave Today"
@@ -232,15 +236,15 @@ export default function DashboardPage() {
               icon={Users}
               trend="Active student roster"
               color="indigo"
-              sparklineData={stats?.sparklines?.totalStudents || [stats?.totalStudents || 0]}
+              sparklineData={stats?.sparklines?.students}
             />
             <StatCard
               title="Today's Attendance Rate"
-              value={`${stats?.attendanceRate ?? 94}%`}
+              value={formatRate(stats?.attendanceRate)}
               icon={Calendar}
               trend="Target: 95%"
               color="green"
-              sparklineData={stats?.sparklines?.attendanceRate || [90, 92, 94]}
+              sparklineData={stats?.sparklines?.attendance}
             />
             <StatCard
               title="Total Faculty Roster"
@@ -248,15 +252,14 @@ export default function DashboardPage() {
               icon={UserCheck}
               trend="Teaching departments"
               color="teal"
-              sparklineData={stats?.sparklines?.staffAttendance || [stats?.totalStaff || 0]}
+              sparklineData={stats?.sparklines?.staff}
             />
             <StatCard
               title="Academic Term"
-              value={stats?.academicYear || 'Current'}
+              value={stats?.academicYear ?? 'Not set'}
               icon={BookOpen}
               trend="Active session"
               color="amber"
-              sparklineData={[1, 1, 1, 1, 1, 1, 1]}
             />
           </>
         ) : (
@@ -267,15 +270,15 @@ export default function DashboardPage() {
               icon={Users}
               trend="Enrolled learners"
               color="indigo"
-              sparklineData={stats?.sparklines?.totalStudents || [stats?.totalStudents || 0]}
+              sparklineData={stats?.sparklines?.students}
             />
             <StatCard
               title="Today's Attendance Rate"
-              value={`${stats?.attendanceRate ?? 94}%`}
+              value={formatRate(stats?.attendanceRate)}
               icon={Calendar}
               trend="Target: 95%"
               color="green"
-              sparklineData={stats?.sparklines?.attendanceRate || [90, 92, 94]}
+              sparklineData={stats?.sparklines?.attendance}
             />
             <StatCard
               title="Total Staff Headcount"
@@ -283,7 +286,7 @@ export default function DashboardPage() {
               icon={UserCheck}
               trend="Academics & Admin"
               color="teal"
-              sparklineData={stats?.sparklines?.staffAttendance || [stats?.totalStaff || 0]}
+              sparklineData={stats?.sparklines?.staff}
             />
             <StatCard
               title="Fee Collection Rate"
@@ -291,7 +294,7 @@ export default function DashboardPage() {
               icon={CircleDollarSign}
               trend={stats?.totalCollections !== undefined ? formatPKR(stats?.totalCollections) : 'Institutional'}
               color="amber"
-              sparklineData={stats?.sparklines?.fees || [stats?.feeCollectionRate || 0]}
+              sparklineData={stats?.sparklines?.fees}
             />
           </>
         )}
@@ -427,11 +430,11 @@ export default function DashboardPage() {
               <div className="h-44 flex flex-col justify-center space-y-3">
                 <div className="p-3.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
                   <span className="text-xs font-semibold text-indigo-800">Active Academic Session</span>
-                  <span className="text-sm font-bold text-indigo-900">{stats?.academicYear || 'Current'}</span>
+                  <span className="text-sm font-bold text-indigo-900">{stats?.academicYear ?? 'Not set'}</span>
                 </div>
                 <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between">
                   <span className="text-xs font-semibold text-emerald-800">Campus Attendance Rate</span>
-                  <span className="text-sm font-bold text-emerald-900">{stats?.attendanceRate ?? 94}%</span>
+                  <span className="text-sm font-bold text-emerald-900">{formatRate(stats?.attendanceRate)}</span>
                 </div>
                 <div className="p-3.5 bg-teal-50 rounded-xl border border-teal-100 flex items-center justify-between">
                   <span className="text-xs font-semibold text-teal-800">Total Enrolled Students</span>
@@ -456,12 +459,13 @@ export default function DashboardPage() {
             <LineChart data={attendanceTrend} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis domain={[70, 100]} tick={{ fontSize: 11, fill: '#64748b' }} unit="%" />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748b' }} unit="%" />
               <Tooltip content={<CustomTooltip />} formatter={(v) => [`${v}%`, 'Attendance']} />
               <Line
                 type="monotone"
                 dataKey="rate"
                 name="Attendance"
+                connectNulls={false}
                 stroke="#6366f1"
                 strokeWidth={2.5}
                 dot={{ fill: '#6366f1', r: 4 }}

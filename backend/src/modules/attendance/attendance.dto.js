@@ -20,7 +20,8 @@ const markStaffAttendanceSchema = z.object({
   body: z.object({
     staffId: z.string().min(1, 'Staff ID is required'),
     date: z.string().or(z.date()).optional(),
-    status: z.enum(['Present', 'Absent', 'Late', 'Leave', 'Half Day']),
+    // 'Leave' is the legacy spelling and is stored as 'On Leave' (LOW-13)
+    status: z.enum(['Present', 'Absent', 'Late', 'On Leave', 'Leave', 'Half Day']),
     remarks: z.string().optional(),
   }),
 })

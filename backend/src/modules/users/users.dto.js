@@ -11,7 +11,7 @@ const createUserSchema = z.object({
     username: z.string().trim().min(3, 'Username must be at least 3 characters').max(50),
     password: passwordSchema,
     roleName: z.enum(['super_admin', 'teacher', 'student', 'guardian', 'accountant', 'hr_manager'], {
-      errorMap: () => ({ message: 'Invalid role specified' }),
+      error: () => 'Invalid role specified',
     }),
   }),
 })

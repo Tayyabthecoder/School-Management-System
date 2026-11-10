@@ -4,6 +4,7 @@ const StudentFee = require('../../models/StudentFee.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
 const Grade = require('../../models/Grade.model')
 const { toRangeStart, toRangeEnd } = require('../../utils/date.util')
+const { limitExport } = require('./export-access')
 
 /**
  * Field configuration dictionary for Dynamic Custom Report Builder (FR-RP-03)
@@ -97,7 +98,7 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
       if (filters.to) query.joiningDate.$lte = toRangeEnd(filters.to)
     }
     const sortField = sortBy === 'fullName' ? 'fullName' : 'studentId'
-    rawDocs = await Student.find(query).populate('classId').sort({ [sortField]: sortOrder === -1 ? -1 : 1 })
+    rawDocs = await limitExport(Student.find(query).populate('classId').sort({ [sortField]: sortOrder === -1 ? -1 : 1 }))
 
   } else if (entity === 'staff') {
     const query = { deletedAt: null }
@@ -105,7 +106,7 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
     if (filters.status === 'Inactive') query.isActive = false
     if (filters.department && filters.department !== 'ALL') query.department = filters.department
     const sortField = sortBy === 'fullName' ? 'fullName' : 'staffId'
-    rawDocs = await Staff.find(query).sort({ [sortField]: sortOrder === -1 ? -1 : 1 })
+    rawDocs = await limitExport(Staff.find(query).sort({ [sortField]: sortOrder === -1 ? -1 : 1 }))
 
   } else if (entity === 'fees') {
     const query = {}
@@ -121,9 +122,9 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
       const studentIds = await Student.find(studentMatch).distinct('_id')
       query.studentId = { $in: studentIds }
     }
-    rawDocs = await StudentFee.find(query)
+    rawDocs = await limitExport(StudentFee.find(query)
       .populate({ path: 'studentId', populate: { path: 'classId' } })
-      .sort({ dueDate: -1 })
+      .sort({ dueDate: -1 }))
 
   } else if (entity === 'attendance') {
     const query = {}
@@ -134,10 +135,10 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
       if (filters.from) query.date.$gte = toRangeStart(filters.from)
       if (filters.to) query.date.$lte = toRangeEnd(filters.to)
     }
-    const attDocs = await StudentAttendance.find(query)
+    const attDocs = await limitExport(StudentAttendance.find(query)
       .populate('classId')
       .populate('records.studentId')
-      .sort({ date: -1 })
+      .sort({ date: -1 }))
 
     attDocs.forEach(att => {
       (att.records || []).forEach(r => {
@@ -165,10 +166,10 @@ const compileDynamicCustomReport = async ({ entity = 'students', fields = [], fi
       if (filters.to) gradesQuery.createdAt.$lte = toRangeEnd(filters.to)
     }
 
-    rawDocs = await Grade.find(gradesQuery)
+    rawDocs = await limitExport(Grade.find(gradesQuery)
       .populate('studentId')
       .populate({ path: 'examId', populate: [{ path: 'subjectId' }, { path: 'classId' }] })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }))
   }
 
   const rows = rawDocs.map(doc => {

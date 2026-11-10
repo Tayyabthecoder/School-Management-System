@@ -6,6 +6,7 @@ import Breadcrumb from '../../components/layout/Breadcrumb'
 import Badge from '../../components/ui/Badge'
 import api from '../../lib/axios'
 import { useAuthStore } from '../../store/authStore'
+import { logError } from '../../lib/logger'
 
 export default function ReportCardPage() {
   const { user } = useAuthStore()
@@ -33,7 +34,7 @@ export default function ReportCardPage() {
             setSelectedClassId(clsList[0]._id)
           }
         })
-        .catch(console.error)
+        .catch(logError)
     }
   }, [isStudent])
 
@@ -51,7 +52,7 @@ export default function ReportCardPage() {
             setReportData(null)
           }
         })
-        .catch(console.error)
+        .catch(logError)
     }
   }, [selectedClassId, isStudent])
 
@@ -68,7 +69,7 @@ export default function ReportCardPage() {
         }
       })
       .catch(err => {
-        console.error('Failed to load report card', err)
+        logError('Failed to load report card', err)
         setReportData(null)
       })
       .finally(() => setLoading(false))
@@ -92,7 +93,7 @@ export default function ReportCardPage() {
       link.click()
       link.remove()
     } catch (err) {
-      console.error('PDF download error', err)
+      logError('PDF download error', err)
     } finally {
       setDownloading(false)
     }
@@ -114,7 +115,7 @@ export default function ReportCardPage() {
       link.click()
       link.remove()
     } catch (err) {
-      console.error('Bulk PDF download error', err)
+      logError('Bulk PDF download error', err)
     } finally {
       setBulkDownloading(false)
     }
@@ -234,7 +235,7 @@ export default function ReportCardPage() {
                 </div>
                 <div className="h-10 w-px bg-indigo-500/50" />
                 <div>
-                  <div className="text-3xl font-extrabold text-white">{reportData.summary.overallPercentage}%</div>
+                  <div className="text-3xl font-extrabold text-white">{reportData.summary.overallPercentage === null || reportData.summary.overallPercentage === undefined ? '—' : `${reportData.summary.overallPercentage}%`}</div>
                   <div className="text-xs text-indigo-200 mt-0.5">Aggregate %</div>
                 </div>
               </div>
@@ -296,15 +297,19 @@ export default function ReportCardPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-sm">
                   {reportData.grades.map((g, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={g.examId || idx} className="hover:bg-gray-50/50 transition-colors">
                       <td className="p-4 font-semibold text-gray-900">{g.subjectName}</td>
                       <td className="p-4 text-gray-600">{g.maxMarks}</td>
                       <td className="p-4 text-gray-600">{g.passMarks}</td>
-                      <td className="p-4 font-bold text-gray-900">{g.marksObtained}</td>
-                      <td className="p-4 text-gray-600">{g.percentage}%</td>
+                      <td className="p-4 font-bold text-gray-900">{g.marksObtained ?? '—'}</td>
+                      <td className="p-4 text-gray-600">{g.percentage === null || g.percentage === undefined ? '—' : `${g.percentage}%`}</td>
                       <td className="p-4 font-bold text-indigo-600">{g.gradeLetter}</td>
                       <td className="p-4">
-                        {g.isPassed ? (
+                        {g.status === 'Pending' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                            Pending
+                          </span>
+                        ) : g.isPassed ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Passed
                           </span>

@@ -13,6 +13,7 @@ import {
   Settings,
   School,
   Clock,
+  CalendarPlus,
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useUIStore } from '../../store/uiStore'
@@ -42,6 +43,7 @@ const NAV_SECTIONS = [
       { label: 'Fees & Bank Challans', icon: CircleDollarSign, path: '/finance', roles: ['super_admin', 'accountant'] },
       { label: 'Staff Directory', icon: UserCheck, path: '/teachers', roles: ['super_admin', 'teacher', 'hr_manager'] },
       { label: 'HR & Monthly Payroll', icon: Briefcase, path: '/hr', roles: ['super_admin', 'hr_manager'] },
+      { label: 'My Leave', icon: CalendarPlus, path: '/my-leave', roles: ['teacher', 'accountant', 'hr_manager'] },
     ],
   },
   {

@@ -21,6 +21,7 @@ const GradesPage = lazy(() => import('../features/grades/GradesPage'))
 const ReportCardPage = lazy(() => import('../features/grades/ReportCardPage'))
 const FinancePage = lazy(() => import('../features/finance/FinancePage'))
 const HRPage = lazy(() => import('../features/hr/HRPage'))
+const MyLeavePage = lazy(() => import('../features/hr/MyLeavePage'))
 const ReportsPage = lazy(() => import('../features/reports/ReportsPage'))
 const SettingsPage = lazy(() => import('../features/settings/SettingsPage'))
 const GuardianLayout = lazy(() => import('../features/guardian/GuardianLayout'))
@@ -98,6 +99,11 @@ export default function AppRoutes() {
           {/* Human Resources & Payroll */}
           <Route element={<RoleRoute allowedRoles={['super_admin', 'hr_manager']} />}>
             <Route path="/hr" element={<HRPage />} />
+          </Route>
+
+          {/* Staff self-service leave (FUNC-03) */}
+          <Route element={<RoleRoute allowedRoles={['teacher', 'accountant', 'hr_manager']} />}>
+            <Route path="/my-leave" element={<MyLeavePage />} />
           </Route>
 
           {/* Reporting & Analytics */}

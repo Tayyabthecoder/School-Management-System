@@ -7,8 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  backend-tests:
-    name: Backend Test Suite
+  backend:
+    name: Backend Tests, Coverage & Audit
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -25,12 +25,16 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: Run Backend Tests
+      - name: Run Backend Tests with Coverage Gate
         working-directory: ./backend
-        run: npm test
+        run: npm run test:coverage -- --ci
 
-  frontend-build:
-    name: Frontend Build & Code-Splitting Check
+      - name: Audit Production Dependencies (high and critical)
+        working-directory: ./backend
+        run: npm audit --omit=dev --audit-level=high
+
+  frontend:
+    name: Frontend Lint, Tests, Build & Audit
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -47,6 +51,26 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
+      - name: Lint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Unit Tests
+        working-directory: ./frontend
+        run: npm test
+
       - name: Build Frontend Application
         working-directory: ./frontend
         run: npm run build
+
+      - name: Check the production bundle has no demo credentials
+        working-directory: ./frontend
+        run: |
+          if grep -rqE "Admin@1234|Staff@1234" dist; then
+            echo "Demo credentials found in dist/" >&2
+            exit 1
+          fi
+
+      - name: Audit Production Dependencies (high and critical)
+        working-directory: ./frontend
+        run: npm audit --omit=dev --audit-level=high

@@ -459,7 +459,7 @@ export default function TeacherWorkspacePage() {
             ) : (
               assignedClasses.map((cls, idx) => (
                 <div
-                  key={idx}
+                  key={`${cls.classId || cls.className}-${cls.sectionId}`}
                   className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl"
                 >
                   <div>

@@ -3,7 +3,8 @@ const env = require('../config/env')
 const { ApiError } = require('./error.middleware')
 const User = require('../models/User.model')
 const SchoolSettings = require('../models/SchoolSettings.model')
-const { DAYS_OF_WEEK, DEFAULT_ALLOWED_DAYS } = require('../config/constants')
+const { DEFAULT_ALLOWED_DAYS } = require('../config/constants')
+const { getSchoolDayName } = require('../utils/date.util')
 const { getOrSet } = require('../utils/cache.util')
 
 const mustChangePasswordGuard = (req, res, next) => {
@@ -62,7 +63,7 @@ const verifyToken = async (req, res, next) => {
     // Super Admin is always exempt so they can manage settings on any day
     const roleName = user.roleName || user.role?.name || ''
     if (roleName !== 'super_admin') {
-      const today = DAYS_OF_WEEK[new Date().getDay()]
+      const today = getSchoolDayName() // school's timezone, not the server clock (LOW-04)
       const settings = await getOrSet('ref:school-settings', 60, async () => {
         return SchoolSettings.findOne({ isActive: true }).sort({ updatedAt: -1 }).lean()
       })

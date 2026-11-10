@@ -3,10 +3,14 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 
 function Sparkline({ data, color = 'indigo' }) {
   const gradId = useId()
-  if (!data || data.length < 2) return null
+  const series = Array.isArray(data)
+    ? data.map((val, idx) => ({ val, idx })).filter((p) => typeof p.val === 'number' && Number.isFinite(p.val))
+    : []
+  if (series.length < 2) return null
 
-  const min = Math.min(...data)
-  const max = Math.max(...data)
+  const values = series.map((p) => p.val)
+  const min = Math.min(...values)
+  const max = Math.max(...values)
   const range = max === min ? 1 : max - min
   const width = 84
   const height = 30
@@ -21,7 +25,7 @@ function Sparkline({ data, color = 'indigo' }) {
   }
   const strokeColor = strokeMap[color] || strokeMap.indigo
 
-  const points = data.map((val, idx) => {
+  const points = series.map(({ val, idx }) => {
     const x = pad + (idx / (data.length - 1)) * (width - 2 * pad)
     const y = height - pad - ((val - min) / range) * (height - 2 * pad)
     return { x, y }

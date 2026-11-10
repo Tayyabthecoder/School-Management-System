@@ -17,5 +17,7 @@ module.exports = {
     'no-unused-vars': 'off',
     'react-hooks/exhaustive-deps': 'off',
     'react-refresh/only-export-components': 'off',
+    // Use src/lib/logger.js so production builds stay quiet (LOW-14)
+    'no-console': 'error',
   },
 }
