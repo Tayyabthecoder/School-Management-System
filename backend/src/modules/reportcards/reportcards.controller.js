@@ -1,12 +1,13 @@
 const Student = require('../../models/Student.model')
 const Exam = require('../../models/Exam.model')
+const TimetableEntry = require('../../models/TimetableEntry.model')
 const Grade = require('../../models/Grade.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
 const AcademicYear = require('../../models/AcademicYear.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF, buildTranscriptPDF } = require('../../utils/pdf.util')
 const { ApiError } = require('../../middleware/error.middleware')
-const { assertStudentAccess } = require('../../utils/guardian-auth.util')
+const { assertStudentAccess, assertTeacherStudentScope } = require('../../utils/guardian-auth.util')
 const { getOrSet } = require('../../utils/cache.util')
 const { calculateGradeLetter } = require('../grades/grades.service')
 
@@ -141,6 +142,7 @@ const getReportCard = async (req, res, next) => {
     const student = await Student.findOne({ _id: studentId, deletedAt: null })
     if (!student) throw new ApiError(404, 'Student not found')
     verifyStudentAccess(req.user, student)
+    await assertTeacherStudentScope(req.user, student)
 
     const { termName, academicYearId } = req.query
     const reportData = await compileStudentReportData(studentId, termName, academicYearId, {
@@ -158,6 +160,7 @@ const downloadReportCardPDF = async (req, res, next) => {
     const student = await Student.findOne({ _id: studentId, deletedAt: null })
     if (!student) throw new ApiError(404, 'Student not found')
     verifyStudentAccess(req.user, student)
+    await assertTeacherStudentScope(req.user, student)
 
     const { termName, academicYearId } = req.query
     const reportData = await compileStudentReportData(studentId, termName, academicYearId, {
@@ -188,6 +191,15 @@ const bulkDownloadClassReportCards = async (req, res, next) => {
 
     const filter = { classId, status: 'Active', deletedAt: null }
     if (sectionId) filter.sectionId = sectionId
+
+    if (req.user?.roleName === 'teacher') {
+      // Teachers may only bulk-export sections they teach.
+      const sections = sectionId ? [sectionId] : await TimetableEntry.distinct('sectionId', { teacherId: req.user.staffId, classId })
+      for (const sec of sections) {
+        await assertTeacherStudentScope(req.user, { classId, sectionId: sec })
+      }
+      if (!sectionId) filter.sectionId = { $in: sections }
+    }
 
     const students = await Student.find(filter).sort({ studentId: 1 })
     if (!students || students.length === 0) {
@@ -324,6 +336,7 @@ const getStudentTranscript = async (req, res, next) => {
     const student = await Student.findOne({ _id: studentId, deletedAt: null })
     if (!student) throw new ApiError(404, 'Student not found')
     verifyStudentAccess(req.user, student)
+    await assertTeacherStudentScope(req.user, student)
 
     const transcriptData = await compileStudentTranscriptData(studentId, {
       publishedOnly: !canSeeUnpublishedResults(req.user),
@@ -340,6 +353,7 @@ const downloadTranscriptPDF = async (req, res, next) => {
     const student = await Student.findOne({ _id: studentId, deletedAt: null })
     if (!student) throw new ApiError(404, 'Student not found')
     verifyStudentAccess(req.user, student)
+    await assertTeacherStudentScope(req.user, student)
 
     const transcriptData = await compileStudentTranscriptData(studentId, {
       publishedOnly: !canSeeUnpublishedResults(req.user),

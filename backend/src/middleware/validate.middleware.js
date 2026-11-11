@@ -17,6 +17,9 @@ const validate = (schema) => (req, res, next) => {
     }
 
     req.validatedData = result.data
+    // Controllers read req.body, so hand them the parsed copy: zod strips unknown keys (mass
+    // assignment) and applies coercion/defaults. Schemas must not be .passthrough().
+    if (result.data.body !== undefined) req.body = result.data.body
     next()
   } catch (error) {
     next(error)

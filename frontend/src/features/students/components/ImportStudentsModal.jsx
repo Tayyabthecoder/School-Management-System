@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react'
 import api from '../../../lib/axios'
+import { announceCredentials } from '../../../lib/credentials'
 import { useToast } from '../../../store/toastStore'
 import { logError } from '../../../lib/logger'
 
@@ -119,6 +120,7 @@ export default function ImportStudentsModal({
 
       if (res.data?.success) {
         setImportResult(res.data.data)
+        announceCredentials(res.data.data.initialCredentials)
         const { createdCount, updatedCount, errorCount } = res.data.data
         toast.success(
           `Import complete: ${createdCount} enrolled, ${updatedCount} updated${

@@ -1,3 +1,4 @@
+const { createInitialCredentials } = require('../../utils/password.util')
 const Staff = require('../../models/Staff.model')
 const User = require('../../models/User.model')
 const Role = require('../../models/Role.model')
@@ -117,12 +118,14 @@ const createStaff = async (req, res, next) => {
 
     const roleName = resolveStaffRoleName(department, designation)
 
+    let initialCredentials = null
     const targetRole = await Role.findOne({ name: roleName })
     if (targetRole) {
-      const defaultPassword = await bcrypt.hash('Staff@1234', BCRYPT_ROUNDS)
+      const creds = await createInitialCredentials()
+      initialCredentials = { username: staffId.toLowerCase(), password: creds.password }
       await User.create({
         username: staffId.toLowerCase(),
-        passwordHash: defaultPassword,
+        passwordHash: creds.passwordHash,
         role: targetRole._id,
         roleName: roleName,
         staffId: staff._id,
@@ -130,7 +133,7 @@ const createStaff = async (req, res, next) => {
       })
     }
 
-    res.status(201).json({ success: true, data: staff })
+    res.status(201).json({ success: true, data: staff, initialCredentials })
   } catch (error) {
     next(error)
   }

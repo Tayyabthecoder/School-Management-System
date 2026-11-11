@@ -7,6 +7,7 @@ import Breadcrumb from '../../components/layout/Breadcrumb'
 import Badge from '../../components/ui/Badge'
 import { SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
+import { announceCredentials } from '../../lib/credentials'
 import { formatPKR, formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import StaffAttendanceRegister from './components/StaffAttendanceRegister'
@@ -36,6 +37,7 @@ function AddStaffModal({ open, onClose, onAdded }) {
       const res = await api.post('/hr/staff', form)
       if (res.data?.success) {
         toast.success(`Staff member "${form.fullName}" added successfully!`)
+        announceCredentials(res.data.initialCredentials)
         onAdded(res.data.data)
         onClose()
       }

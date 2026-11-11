@@ -5,14 +5,26 @@ const StudentAttendance = require('../../models/StudentAttendance.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF } = require('../../utils/pdf.util')
 const { ApiError } = require('../../middleware/error.middleware')
-const { assertStudentAccess } = require('../../utils/guardian-auth.util')
+const { assertStudentAccess, assertTeacherStudentScope } = require('../../utils/guardian-auth.util')
+const TimetableEntry = require('../../models/TimetableEntry.model')
 const { validateObjectId } = require('../../utils/validation.util')
 const { getOrSet } = require('../../utils/cache.util')
 const { calculateGradeLetter, calculatePercentage } = require('./grades.service')
 
+// Teachers may only create/enter marks for classes they are timetabled to teach.
+const assertTeachesClass = async (user, classId) => {
+  if (user?.roleName !== 'teacher') return
+  const teaches = user.staffId && await TimetableEntry.exists({ teacherId: user.staffId, classId })
+  if (!teaches) {
+    throw new ApiError(403, 'Forbidden: You can only manage exams and marks for classes you are assigned to teach')
+  }
+}
+
 const getExams = async (req, res, next) => {
   try {
     const filter = {}
+    // Students and guardians must never see exams the school has not published.
+    if (['student', 'guardian'].includes(req.user?.roleName)) filter.isPublished = true
     if (req.query.classId) {
       validateObjectId(req.query.classId, 'classId')
       filter.classId = req.query.classId
@@ -41,6 +53,7 @@ const createExam = async (req, res, next) => {
     if (passMarks > maxMarks) {
       throw new ApiError(400, `Pass marks (${passMarks}) cannot exceed maximum marks (${maxMarks})`)
     }
+    await assertTeachesClass(req.user, req.body.classId)
     const exam = await Exam.create(req.body)
     res.status(201).json({ success: true, data: exam })
   } catch (error) {
@@ -53,6 +66,7 @@ const saveGrades = async (req, res, next) => {
     const { examId, grades } = req.body // grades: [{ studentId, marksObtained }]
     const exam = await Exam.findById(examId)
     if (!exam) throw new ApiError(404, 'Exam not found')
+    await assertTeachesClass(req.user, exam.classId)
 
     const settings = await getOrSet('ref:school-settings', 300, async () => {
       return SchoolSettings.findOne({ isActive: true }).lean()
@@ -91,6 +105,13 @@ const saveGrades = async (req, res, next) => {
 
 const getGradesByExam = async (req, res, next) => {
   try {
+    if (req.user?.roleName === 'teacher') {
+      const exam = await Exam.findById(req.params.examId).select('classId')
+      if (!exam) throw new ApiError(404, 'Exam not found')
+      const teaches = req.user.staffId && await TimetableEntry.exists({ teacherId: req.user.staffId, classId: exam.classId })
+      if (!teaches) throw new ApiError(403, 'Forbidden: You can only view grades for classes you are assigned to teach')
+    }
+
     const grades = await Grade.find({ examId: req.params.examId })
       .populate('studentId')
       .populate('enteredBy', 'username')
@@ -108,6 +129,7 @@ const generateReportCard = async (req, res, next) => {
     if (!student) throw new ApiError(404, 'Student not found')
 
     assertStudentAccess(req.user, studentId, 'report card')
+    await assertTeacherStudentScope(req.user, student)
     const userRole = req.user?.roleName || req.user?.role?.name
     const isPrivileged = ['super_admin', 'teacher'].includes(userRole)
 
@@ -178,6 +200,11 @@ const getGradesByStudent = async (req, res, next) => {
 
     // Students see only themselves; guardians see any linked child (studentId + studentIds).
     assertStudentAccess(req.user, req.params.studentId, 'grades')
+    if (userRole === 'teacher') {
+      const target = await Student.findOne({ _id: req.params.studentId, deletedAt: null }).select('classId sectionId')
+      if (!target) throw new ApiError(404, 'Student not found')
+      await assertTeacherStudentScope(req.user, target)
+    }
 
     let examFilter = {}
     if (!isPrivileged) {
@@ -202,6 +229,10 @@ const getGradesByStudent = async (req, res, next) => {
 
 const publishExam = async (req, res, next) => {
   try {
+    const existing = await Exam.findById(req.params.id).select('classId')
+    if (!existing) throw new ApiError(404, 'Exam not found')
+    await assertTeachesClass(req.user, existing.classId)
+
     const exam = await Exam.findByIdAndUpdate(
       req.params.id,
       { isPublished: true },

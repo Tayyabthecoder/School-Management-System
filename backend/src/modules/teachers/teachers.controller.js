@@ -1,3 +1,4 @@
+const { createInitialCredentials } = require('../../utils/password.util')
 const Staff = require('../../models/Staff.model')
 const User = require('../../models/User.model')
 const Role = require('../../models/Role.model')
@@ -211,12 +212,14 @@ const createTeacher = async (req, res, next) => {
       salary: Number(salary) || 50000,
     })
 
+    let initialCredentials = null
     const targetRole = await Role.findOne({ name: 'teacher' })
     if (targetRole) {
-      const defaultPassword = await bcrypt.hash('Teacher@1234', BCRYPT_ROUNDS)
+      const creds = await createInitialCredentials()
+      initialCredentials = { username: staffId.toLowerCase(), password: creds.password }
       await User.create({
         username: staffId.toLowerCase(),
-        passwordHash: defaultPassword,
+        passwordHash: creds.passwordHash,
         role: targetRole._id,
         roleName: 'teacher',
         staffId: teacher._id,
@@ -228,6 +231,7 @@ const createTeacher = async (req, res, next) => {
       success: true,
       message: 'Faculty member created successfully with portal credentials',
       data: teacher,
+      initialCredentials,
     })
   } catch (error) {
     next(error)
