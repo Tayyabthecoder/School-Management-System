@@ -485,6 +485,8 @@ npm run test:coverage
 npm run test:integration
 ```
 
+The `*.integration.test.js` suites run the real API against MongoDB. Each suite creates its own throwaway database (`sms_jest_*`), loads the demo seed into it and drops it afterwards, so your development database is never touched. They use `mongodb://127.0.0.1:27017` by default; set `TEST_MONGODB_URI` to point elsewhere. CI starts MongoDB as a service. `npm run test:coverage` fails if coverage drops below the thresholds in `jest.config.js` (84% statements, 86% lines, 80% functions, 62% branches).
+
 ### Test Coverage Highlights:
 - **Authentication & RBAC:** Verification of role barriers, forbidden actions, and expired token rejection.
 - **Security Tests:** Sanitization of NoSQL injections (`$gt`, `$ne`), rate limiter enforcement, and authenticated upload protections.
@@ -498,7 +500,10 @@ cd frontend
 # Run ESLint validation
 npm run lint
 
-# Verify production production bundle build
+# Run the unit tests
+npm test
+
+# Verify the production bundle build
 npm run build
 ```
 

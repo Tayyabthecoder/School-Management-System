@@ -2,7 +2,10 @@ const { z } = require('zod')
 
 const createFeeStructureSchema = z.object({
   body: z.object({
-    feeType: z.string().min(2, 'Fee type is required'),
+    // Must match FeeStructure.feeType; any other string used to fail later as a Mongoose error
+    feeType: z.enum(['Tuition', 'Admission', 'Exam', 'Other']),
+    // Optional: defaults to '<feeType> Fee'. The model requires a title but the DTO never asked for one.
+    title: z.string().trim().min(2).max(120).optional(),
     classId: z.string().min(1, 'Class is required'),
     academicYearId: z.string().optional(),
     amount: z.number().positive('Amount must be positive'),

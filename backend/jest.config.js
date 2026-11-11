@@ -6,9 +6,9 @@ module.exports = {
     'src/**/*.js',
     '!src/server.js',
   ],
-  // Ratchet gate for CI (LOW-11): fails if coverage drops below today's level. Raise these
-  // numbers as tests are added; the audit target is 80%.
+  // CI gate (LOW-11). Statements, lines and functions meet the audit's 80% target; branches
+  // are a ratchet at today's level. *.integration.test.js suites need MongoDB (TEST_MONGODB_URI).
   coverageThreshold: {
-    global: { statements: 65, branches: 43, functions: 54, lines: 67 },
+    global: { statements: 84, branches: 62, functions: 80, lines: 86 },
   },
 }

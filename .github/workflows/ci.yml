@@ -10,6 +10,19 @@ jobs:
   backend:
     name: Backend Tests, Coverage & Audit
     runs-on: ubuntu-latest
+    # The *.integration.test.js suites run the API against a real MongoDB
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_MONGODB_URI: mongodb://127.0.0.1:27017
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

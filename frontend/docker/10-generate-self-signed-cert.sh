@@ -14,10 +14,13 @@ if [ -s "$CERT_FILE" ] && [ -s "$KEY_FILE" ]; then
   exit 0
 fi
 
+SAN="DNS:localhost,IP:127.0.0.1"
+[ "$CN" != "localhost" ] && SAN="DNS:$CN,$SAN"
+
 mkdir -p "$CERT_DIR"
 echo "[tls] No certificate found; generating a self-signed certificate for CN=$CN"
 openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
   -subj "/CN=$CN" \
-  -addext "subjectAltName=DNS:$CN,DNS:localhost,IP:127.0.0.1" \
+  -addext "subjectAltName=$SAN" \
   -keyout "$KEY_FILE" -out "$CERT_FILE"
 chmod 600 "$KEY_FILE"

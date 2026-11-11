@@ -100,6 +100,7 @@ const getFeeStructures = async (req, res, next) => {
 const createFeeStructure = async (req, res, next) => {
   try {
     const payload = { ...req.body }
+    if (!payload.title) payload.title = `${payload.feeType} Fee`
     if (!payload.academicYearId) {
       const activeYear = await AcademicYear.findOne({ isActive: true })
       if (activeYear) payload.academicYearId = activeYear._id
