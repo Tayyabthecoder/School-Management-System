@@ -1,3 +1,4 @@
+const { createInitialCredentials } = require('../../utils/password.util')
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const fs = require('fs')
@@ -18,7 +19,7 @@ const bulkImportStudents = (generateUniqueStudentId) => async (req, res, next) =
     const errors = []
 
     const studentRole = await Role.findOne({ name: 'student' })
-    const defaultPasswordHash = await bcrypt.hash('Student@1234', BCRYPT_ROUNDS)
+    const credentials = []
     const activeClasses = await Class.find({ isActive: true })
     const classById = new Map(activeClasses.map(c => [c._id.toString(), c]))
 
@@ -54,9 +55,11 @@ const bulkImportStudents = (generateUniqueStudentId) => async (req, res, next) =
           const username = doc.studentId.toLowerCase()
           const existingUser = await User.findOne({ username })
           if (!existingUser) {
+            const creds = await createInitialCredentials()
+            credentials.push({ username, password: creds.password })
             await User.create({
               username,
-              passwordHash: defaultPasswordHash,
+              passwordHash: creds.passwordHash,
               role: studentRole._id,
               roleName: 'student',
               studentId: doc._id,
@@ -81,6 +84,7 @@ const bulkImportStudents = (generateUniqueStudentId) => async (req, res, next) =
         createdCount: created.length,
         errorCount: errors.length,
         errors,
+        initialCredentials: credentials,
       },
     })
   } catch (error) {
@@ -130,7 +134,7 @@ const importStudentsFromExcel = (generateUniqueStudentId) => async (req, res, ne
     const errors = [...parseErrors]
 
     const studentRole = await Role.findOne({ name: 'student' })
-    const defaultPasswordHash = await bcrypt.hash('Student@1234', BCRYPT_ROUNDS)
+    const credentials = []
 
     // Pre-cache classes to optimize lookups
     const allClasses = await Class.find({ isActive: true })
@@ -272,9 +276,11 @@ const importStudentsFromExcel = (generateUniqueStudentId) => async (req, res, ne
             const username = newDoc.studentId.toLowerCase()
             const existingUser = await User.findOne({ username })
             if (!existingUser) {
+              const creds = await createInitialCredentials()
+              credentials.push({ username, password: creds.password })
               await User.create({
                 username,
-                passwordHash: defaultPasswordHash,
+                passwordHash: creds.passwordHash,
                 role: studentRole._id,
                 roleName: 'student',
                 studentId: newDoc._id,
@@ -309,6 +315,7 @@ const importStudentsFromExcel = (generateUniqueStudentId) => async (req, res, ne
         updatedCount: updated.length,
         errorCount: errors.length,
         errors,
+        initialCredentials: credentials,
       },
     })
   } catch (error) {

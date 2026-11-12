@@ -12,6 +12,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import api from '../../../lib/axios'
+import { announceCredentials } from '../../../lib/credentials'
 import { useToast } from '../../../store/toastStore'
 import { formatPKR, toLocalDateInput } from '../../../lib/formatters'
 import Badge from '../../../components/ui/Badge'
@@ -360,6 +361,7 @@ export default function StudentRegistrationModal({
       const res = await api.post('/students', payload)
       if (res.data?.success) {
         toast.success(`Student ${res.data.data?.fullName || 'record'} successfully registered!`)
+        announceCredentials(res.data.initialCredentials)
         onClose()
         setRegistrationSuccessData(res.data)
         resetForm()

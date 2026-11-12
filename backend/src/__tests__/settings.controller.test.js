@@ -118,7 +118,7 @@ describe('Settings Controller Tests', () => {
       })
     })
 
-    it('should create default doc if none exists in database', async () => {
+    it('uses default days and never writes to the database when no settings exist (public endpoint)', async () => {
       SchoolSettings.findOne.mockReturnValue({
         sort: jest.fn().mockResolvedValue(null),
       })
@@ -129,8 +129,10 @@ describe('Settings Controller Tests', () => {
       req = {}
       await settingsController.getAllowedDays(req, res, next)
 
-      expect(SchoolSettings.create).toHaveBeenCalled()
-      expect(res.json).toHaveBeenCalled()
+      expect(SchoolSettings.create).not.toHaveBeenCalled()
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ allowedDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] }),
+      }))
     })
 
     it('should handle errors gracefully via next(error)', async () => {

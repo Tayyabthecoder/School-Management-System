@@ -29,14 +29,27 @@ const issueRefreshToken = async (user) => {
   return token
 }
 
+// One message for every failed sign-in (unknown user, wrong password, locked, deactivated) so the
+// response cannot be used to discover which usernames exist.
+const LOGIN_FAILED = 'Invalid username or password, or the account is temporarily locked.'
+// Valid bcrypt hash of a random string: compared when the user is unknown so response time
+// does not reveal whether the username exists.
+const DUMMY_HASH = bcrypt.hashSync(crypto.randomUUID(), BCRYPT_ROUNDS)
+
 const login = async (username, password) => {
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    throw new ApiError(401, LOGIN_FAILED)
+  }
   const user = await User.findOne({ username, deletedAt: null }).populate('role')
   if (!user) {
-    throw new ApiError(401, 'Invalid username or password')
+    await bcrypt.compare(password, DUMMY_HASH)
+    throw new ApiError(401, LOGIN_FAILED)
   }
 
   if (user.isLocked()) {
-    throw new ApiError(403, 'Account locked due to consecutive failed attempts. Try again in 15 minutes.')
+    // Still burn a comparison so a locked account is not distinguishable by timing.
+    await bcrypt.compare(password, DUMMY_HASH)
+    throw new ApiError(401, LOGIN_FAILED)
   }
 
   // An expired lock starts a fresh attempt window; otherwise the stale counter would
@@ -46,18 +59,18 @@ const login = async (username, password) => {
     user.lockUntil = null
   }
 
-  if (!user.isActive) {
+  const isMatch = await user.comparePassword(password)
+  if (isMatch && !user.isActive) {
+    // Only someone holding the correct password learns the account is deactivated.
     throw new ApiError(403, 'Account is deactivated. Contact Administrator.')
   }
-
-  const isMatch = await user.comparePassword(password)
   if (!isMatch) {
     user.failedLoginAttempts += 1
     if (user.failedLoginAttempts >= 5) {
       user.lockUntil = new Date(Date.now() + 15 * 60 * 1000)
     }
     await user.save()
-    throw new ApiError(401, 'Invalid username or password')
+    throw new ApiError(401, LOGIN_FAILED)
   }
 
   // Reset failed attempts on success

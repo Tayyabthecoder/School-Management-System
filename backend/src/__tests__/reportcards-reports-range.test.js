@@ -7,6 +7,7 @@ const Grade = require('../models/Grade.model')
 const StudentFee = require('../models/StudentFee.model')
 const StudentAttendance = require('../models/StudentAttendance.model')
 const cacheUtil = require('../utils/cache.util')
+const TimetableEntry = require('../models/TimetableEntry.model')
 
 jest.mock('../models/Student.model')
 jest.mock('../models/Exam.model')
@@ -16,6 +17,7 @@ jest.mock('../models/StudentAttendance.model')
 jest.mock('../models/AcademicYear.model')
 jest.mock('../models/SchoolSettings.model')
 jest.mock('../utils/cache.util')
+jest.mock('../models/TimetableEntry.model')
 
 const STUDENT = '64b000000000000000000001'
 
@@ -28,6 +30,7 @@ const mockRes = () => {
 beforeEach(() => {
   jest.clearAllMocks()
   cacheUtil.getOrSet.mockResolvedValue(null)
+  TimetableEntry.exists.mockResolvedValue({ _id: 't1' })
 })
 
 describe('report card result visibility', () => {
@@ -60,7 +63,7 @@ describe('report card result visibility', () => {
     arrangeStudent()
 
     await reportcardsController.getReportCard(
-      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher' } }, mockRes(), jest.fn()
+      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher', staffId: 'staff1' } }, mockRes(), jest.fn()
     )
 
     expect(Exam.find.mock.calls[0][0]).not.toHaveProperty('isPublished')
@@ -82,7 +85,7 @@ describe('report card result visibility', () => {
     const res = mockRes()
 
     await reportcardsController.getReportCard(
-      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher' } }, res, jest.fn()
+      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher', staffId: 'staff1' } }, res, jest.fn()
     )
 
     const { grades, summary } = res.json.mock.calls[0][0].data
@@ -103,7 +106,7 @@ describe('report card result visibility', () => {
     const res = mockRes()
 
     await reportcardsController.getReportCard(
-      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher' } }, res, jest.fn()
+      { params: { studentId: STUDENT }, query: {}, user: { roleName: 'teacher', staffId: 'staff1' } }, res, jest.fn()
     )
 
     expect(res.json.mock.calls[0][0].data.summary).toMatchObject({ overallPercentage: null, overallGradeLetter: 'Pending', failedSubjects: 0 })

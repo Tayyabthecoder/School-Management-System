@@ -34,7 +34,7 @@ const logAudit = async (...args) => {
 
     const userId = req && req.user ? (req.user._id || req.user.id || null) : null
     const username = req && req.user ? (req.user.username || 'System') : 'System'
-    const ipAddress = req ? (req.ip || req.socket?.remoteAddress || req.headers?.['x-forwarded-for'] || '') : ''
+    const ipAddress = req ? (req.ip || req.socket?.remoteAddress || '') : ''
 
     await AuditLog.create({
       userId,

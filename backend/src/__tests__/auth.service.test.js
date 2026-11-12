@@ -36,7 +36,7 @@ describe('auth.service login lockout', () => {
     const user = buildUser({ failedLoginAttempts: 5, lockUntil: new Date(Date.now() + 60_000) })
     mockFindOneWithUser(user)
 
-    await expect(authService.login('jdoe', 'wrong')).rejects.toMatchObject({ statusCode: 403 })
+    await expect(authService.login('jdoe', 'wrong')).rejects.toMatchObject({ statusCode: 401 })
     expect(user.comparePassword).not.toHaveBeenCalled()
   })
 

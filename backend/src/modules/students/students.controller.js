@@ -1,3 +1,4 @@
+const { createInitialCredentials } = require('../../utils/password.util')
 const Student = require('../../models/Student.model')
 const Class = require('../../models/Class.model')
 const User = require('../../models/User.model')
@@ -14,7 +15,7 @@ const bcrypt = require('bcryptjs')
 const { getPagination, formatPaginatedResponse } = require('../../utils/pagination.util')
 const { logAudit } = require('../../utils/audit-log.util')
 const { ApiError } = require('../../middleware/error.middleware')
-const { assertStudentAccess } = require('../../utils/guardian-auth.util')
+const { assertStudentAccess, assertTeacherStudentScope, teacherStudentScopeFilter } = require('../../utils/guardian-auth.util')
 const { escapeRegex } = require('../../utils/regex.util')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 const { invalidateCache } = require('../../utils/cache.util')
@@ -44,6 +45,10 @@ const getStudents = async (req, res, next) => {
     if (req.query.classId) filter.classId = req.query.classId
     if (req.query.sectionId) filter.sectionId = req.query.sectionId
     if (req.query.status) filter.status = req.query.status
+    if (req.user?.roleName === 'teacher') {
+      // Teachers only see the sections they are timetabled for (AND-ed with any search $or).
+      filter.$and = [await teacherStudentScopeFilter(req.user)]
+    }
 
     const [students, total] = await Promise.all([
       Student.find(filter).populate('classId').skip(skip).limit(limit).sort({ createdAt: -1 }),
@@ -68,7 +73,14 @@ const getStudentById = async (req, res, next) => {
       populate: { path: 'subjects' },
     })
     if (!student) throw new ApiError(404, 'Student not found')
-    res.json({ success: true, data: student })
+    await assertTeacherStudentScope(req.user, student)
+
+    const data = typeof student.toObject === 'function' ? student.toObject() : { ...student }
+    if (req.user?.roleName === 'accountant') {
+      // Finance staff need identity and guardian contact, not medical or personal documents.
+      for (const field of ['medicalNotes', 'bloodGroup', 'emergencyContact', 'bFormNumber', 'documents']) delete data[field]
+    }
+    res.json({ success: true, data })
   } catch (error) {
     next(error)
   }
@@ -168,15 +180,17 @@ const createStudent = async (req, res, next) => {
     })
 
     // Create user login account for the student
+    let initialCredentials = null
     const studentRole = await Role.findOne({ name: 'student' })
     if (studentRole) {
-      const defaultPassword = await bcrypt.hash('Student@1234', BCRYPT_ROUNDS)
+      const creds = await createInitialCredentials()
+      initialCredentials = { username: studentId.toLowerCase(), password: creds.password }
       const username = studentId.toLowerCase()
       const existingUser = await User.findOne({ username })
       if (!existingUser) {
         await User.create({
           username,
-          passwordHash: defaultPassword,
+          passwordHash: creds.passwordHash,
           role: studentRole._id,
           roleName: 'student',
           studentId: student._id,
@@ -267,6 +281,8 @@ const createStudent = async (req, res, next) => {
     res.status(201).json({
       success: true,
       data: student,
+      // One-time login for the new student account; never stored or retrievable again.
+      initialCredentials,
       fees: createdFees,
       payment: primaryPayment,
       payments: createdPayments,

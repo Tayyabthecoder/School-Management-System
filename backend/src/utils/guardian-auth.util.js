@@ -1,4 +1,5 @@
 const { ApiError } = require('../middleware/error.middleware')
+const TimetableEntry = require('../models/TimetableEntry.model')
 
 /**
  * Extracts all valid student IDs associated with a guardian user account.
@@ -110,7 +111,43 @@ const resolveGuardianStudentId = (req) => {
   return allowedIds[0] || null
 }
 
+const roleOf = (user) => user?.roleName || (typeof user?.role === 'object' ? user.role?.name : user?.role)
+
+/**
+ * Teachers may only reach students of the class sections they are timetabled for.
+ * Non-teacher roles are unaffected (their scope is enforced by route RBAC / assertStudentAccess).
+ *
+ * @param {object} user - req.user
+ * @param {{ classId?: any, sectionId?: string }|null} student - student document (classId may be populated)
+ */
+const assertTeacherStudentScope = async (user, student) => {
+  if (roleOf(user) !== 'teacher') return
+  if (!user.staffId) {
+    throw new ApiError(403, 'Forbidden: No linked staff record found for this user')
+  }
+  const classId = student?.classId?._id || student?.classId
+  const assigned = classId && await TimetableEntry.exists({
+    teacherId: user.staffId,
+    classId,
+    sectionId: student.sectionId,
+  })
+  if (!assigned) {
+    throw new ApiError(403, 'Forbidden: You can only access students of classes you are assigned to teach')
+  }
+}
+
+/** Query fragment limiting a student search to a teacher's timetabled class sections. */
+const teacherStudentScopeFilter = async (user) => {
+  if (!user.staffId) throw new ApiError(403, 'Forbidden: No linked staff record found for this user')
+  const entries = await TimetableEntry.find({ teacherId: user.staffId }).select('classId sectionId').lean()
+  const pairs = new Map()
+  for (const e of entries) pairs.set(`${e.classId}_${e.sectionId}`, { classId: e.classId, sectionId: e.sectionId })
+  return { $or: pairs.size ? [...pairs.values()] : [{ _id: null }] }
+}
+
 module.exports = {
+  assertTeacherStudentScope,
+  teacherStudentScopeFilter,
   getGuardianStudentIds,
   isStudentAccessibleByGuardian,
   assertStudentAccess,

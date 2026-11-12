@@ -389,19 +389,29 @@ const downloadChallanPDF = async (req, res, next) => {
     assertOwnFeeDocument(req.user, feeRecord.studentId, 'fee challan')
 
     const downloadDate = new Date()
-    const { dueDate: nextDueDate, extended } = resolveChallanDueDate(feeRecord, downloadDate)
-    if (extended) {
-      feeRecord.dueDate = nextDueDate
-      feeRecord.effectiveDueDate = nextDueDate
-    }
-    if (!feeRecord.effectiveDueDate) {
-      feeRecord.effectiveDueDate = feeRecord.dueDate || nextDueDate
+    // Issuing a challan (first-issue due-date grace, download counters) changes fee records, so only
+    // finance staff do it. Students/guardians downloading a copy get a read-only render, which also
+    // stops a GET from being replayed or prefetched to move a deadline.
+    const issuesChallan = ['super_admin', 'accountant'].includes(req.user?.roleName)
+    let nextDueDate
+    if (issuesChallan) {
+      const resolved = resolveChallanDueDate(feeRecord, downloadDate)
+      nextDueDate = resolved.dueDate
+      if (resolved.extended) {
+        feeRecord.dueDate = nextDueDate
+        feeRecord.effectiveDueDate = nextDueDate
+      }
+      if (!feeRecord.effectiveDueDate) {
+        feeRecord.effectiveDueDate = feeRecord.dueDate || nextDueDate
+      }
+      feeRecord.challanDownloadedAt = downloadDate
+      feeRecord.challanDownloadCount = (feeRecord.challanDownloadCount || 0) + 1
+      await feeRecord.save()
+      await invalidateCache('dashboard:stats')
+    } else {
+      nextDueDate = feeRecord.effectiveDueDate || feeRecord.dueDate || downloadDate
     }
     const dynamicDueDate = nextDueDate
-    feeRecord.challanDownloadedAt = downloadDate
-    feeRecord.challanDownloadCount = (feeRecord.challanDownloadCount || 0) + 1
-    await feeRecord.save()
-    await invalidateCache('dashboard:stats')
 
     // Read active customizable settings
     const challanSettings = (await ChallanSettings.findOne({ isActive: true }).sort({ updatedAt: -1 })) || DEFAULT_CHALLAN_SETTINGS

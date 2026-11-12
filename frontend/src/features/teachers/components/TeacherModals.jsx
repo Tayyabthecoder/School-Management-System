@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { GraduationCap, Calendar, Clock, BookOpen, Layers } from 'lucide-react'
 import api from '../../../lib/axios'
+import { announceCredentials } from '../../../lib/credentials'
 import { useToast } from '../../../store/toastStore'
 import { SkeletonTable } from '../../../components/ui/Skeleton'
 
@@ -38,6 +39,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
       const res = await api.post('/teachers', form)
       if (res.data?.success) {
         toast.success(`Faculty member "${form.fullName}" onboarded successfully!`)
+        announceCredentials(res.data.initialCredentials)
         onCreated(res.data.data)
         onClose()
         setForm({
@@ -155,7 +157,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
           </div>
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-800">
-            <strong>System Notice:</strong> Login credentials will be automatically generated with temporary password <code className="font-mono font-bold bg-amber-100 px-1 rounded">Teacher@1234</code>. Password rotation is enforced on first login.
+            <strong>System Notice:</strong> Login credentials will be automatically generated with a random one-time temporary password, shown once after saving. Password rotation is enforced on first login.
           </div>
           <div className="flex justify-end gap-2.5 pt-2 border-t border-gray-100">
             <button

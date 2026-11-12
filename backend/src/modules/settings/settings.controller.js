@@ -32,17 +32,11 @@ const getAllowedDays = async (req, res, next) => {
     const dayNames = ALL_DAYS
     const today = getSchoolDayName() // e.g. "Thursday", in the school's timezone
 
-    let doc = await SchoolSettings.findOne({ isActive: true }).sort({ updatedAt: -1 })
-    if (!doc) {
-      doc = await SchoolSettings.create({
-        attendanceAlertThreshold: 75,
-        autoFeeOverdueAlerts: true,
-        allowedDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        isActive: true,
-      })
-    }
+    // Unauthenticated: read-only. It must never create a settings document (that is done by the
+    // authenticated getSettings), otherwise an anonymous caller could write to the database.
+    const doc = await SchoolSettings.findOne({ isActive: true }).sort({ updatedAt: -1 })
 
-    const allowedDays = doc.allowedDays || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    const allowedDays = doc?.allowedDays || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     const isAllowedToday = allowedDays.includes(today)
 
     res.json({
