@@ -21,7 +21,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --from=deps /app/node_modules ./node_modules
 COPY package*.json ./
 COPY src ./src
-COPY seed ./seed
+# seed/ is deliberately not copied: it creates demo accounts with known passwords.
 COPY scripts ./scripts
 
 # Create logs and uploads directory and assign ownership to appuser

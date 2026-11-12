@@ -286,12 +286,17 @@ Run the full stack (MongoDB, Redis, Backend, and Frontend reverse-proxied by Ngi
    cd School-Management-System
    ```
 
-2. **Launch all services:**
+2. **Configure secrets** — copy `.env.example` to `.env` and fill in every value (MongoDB and Redis now require passwords; use letters/digits only, or URL-encode them). If you already have a MongoDB volume created without authentication, the root user is not created automatically: recreate the volume or add the user manually.
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Launch all services:**
    ```bash
    docker-compose up -d --build
    ```
 
-3. **Create the first super admin** (the container runs with `NODE_ENV=production`, where the demo seed is blocked):
+4. **Create the first super admin** (the container runs with `NODE_ENV=production`, where the demo seed is blocked):
    ```bash
    docker exec -it -e ADMIN_PASSWORD='choose-a-long-secret-2026' sms-backend npm run admin:create
    ```
@@ -300,7 +305,7 @@ Run the full stack (MongoDB, Redis, Backend, and Frontend reverse-proxied by Ngi
 
    *Demo data only (never on a real school's database):* `docker exec -it -e ALLOW_PRODUCTION_SEED=true sms-backend npm run db:seed`
 
-4. **Access the application:**
+5. **Access the application:**
    - **Frontend Application:** [https://localhost](https://localhost) (port 443, with HTTP on port 80 redirecting to it). A self-signed certificate is generated on first start. Mount real certificates at `./certs/fullchain.pem` and `./certs/privkey.pem` for a public hostname.
    - **Backend REST API:** [https://localhost/api/v1/health](https://localhost/api/v1/health)
 
