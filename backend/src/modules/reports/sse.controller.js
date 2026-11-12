@@ -13,9 +13,25 @@ const EVENT_AUDIENCE = {
   'challans:generated': FINANCE_ROLES,
 }
 
+// Each open stream holds a socket; bound them per user and overall so one account (or a script)
+// cannot exhaust the server. The oldest stream of a user is dropped for a new one.
+const MAX_STREAMS_PER_USER = 3
+const MAX_STREAMS_TOTAL = 500
+
 const roleOf = (user) => user?.roleName || (typeof user?.role === 'object' ? user.role?.name : user?.role) || null
 
 const subscribe = (req, res) => {
+  const userId = String(req.user?._id || req.user?.id || '')
+  if (clients.size >= MAX_STREAMS_TOTAL) {
+    return res.status(503).json({ success: false, error: { message: 'Too many live connections. Please try again shortly.' } })
+  }
+  const own = [...clients].filter((c) => c.userId === userId)
+  while (userId && own.length >= MAX_STREAMS_PER_USER) {
+    const oldest = own.shift()
+    clients.delete(oldest)
+    try { oldest.res.end() } catch (_) { /* already closed */ }
+  }
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
@@ -24,7 +40,7 @@ const subscribe = (req, res) => {
   })
 
   const clientId = crypto.randomUUID()
-  const client = { id: clientId, res, role: roleOf(req.user) }
+  const client = { id: clientId, res, role: roleOf(req.user), userId }
   clients.add(client)
 
   // Send initial handshake
@@ -61,6 +77,8 @@ const broadcast = (event, data = {}) => {
 
 module.exports = {
   EVENT_AUDIENCE,
+  MAX_STREAMS_PER_USER,
+  MAX_STREAMS_TOTAL,
   subscribe,
   broadcast,
   _clients: clients,

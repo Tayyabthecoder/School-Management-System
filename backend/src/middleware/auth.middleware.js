@@ -38,9 +38,9 @@ const verifyToken = async (req, res, next) => {
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.split(' ')[1]
-    } else if (req.cookies && req.cookies.accessToken) {
-      token = req.cookies.accessToken
     }
+    // Only the Authorization header is accepted. A cookie-borne access token would be sent
+    // automatically by the browser and open a CSRF path that the SameSite refresh cookie avoids.
 
     if (!token) {
       throw new ApiError(401, 'Authentication token missing')
