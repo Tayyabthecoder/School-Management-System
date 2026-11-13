@@ -14,11 +14,9 @@ const connectSharedClient = () => {
       maxRetriesPerRequest: null,
       enableReadyCheck: false,
       retryStrategy: (times) => {
-        if (times > 2) {
-          isRedisAvailable = false
-          return null // Stop retrying after 2 attempts
-        }
-        return Math.min(times * 100, 500)
+        // Keep retrying with capped backoff so a Redis that starts late (or restarts) is picked up.
+        isRedisAvailable = false
+        return Math.min(times * 500, 10000)
       },
       lazyConnect: true,
     })

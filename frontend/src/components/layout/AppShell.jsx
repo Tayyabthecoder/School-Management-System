@@ -93,6 +93,7 @@ export default function AppShell() {
         <div
           className="fixed inset-0 bg-slate-950/40 z-30 lg:hidden backdrop-blur-xs"
           onClick={closeSidebar}
+          aria-hidden="true"
         />
       )}
 

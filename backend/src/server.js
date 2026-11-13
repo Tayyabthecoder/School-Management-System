@@ -27,6 +27,14 @@ const startServer = async () => {
 
   const PORT = env.PORT || 5000
 
+  // Give the async Redis connection a moment so BullMQ is chosen over the cron fallback.
+  {
+    const { checkRedisAvailable } = require('./config/redis')
+    for (let i = 0; i < 20 && !checkRedisAvailable(); i++) {
+      await new Promise((resolve) => setTimeout(resolve, 150))
+    }
+  }
+
   // Start background queue workers & cron schedules
   const { initQueues } = require('./jobs/queues')
   initQueues()

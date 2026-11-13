@@ -64,7 +64,7 @@ export default function Sidebar() {
   return (
     <aside
       className={`fixed top-0 left-0 z-40 h-screen bg-slate-950 text-slate-300 border-r border-slate-800/80 transition-all duration-300 ${
-        isSidebarOpen ? 'w-64' : 'w-20'
+        isSidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full lg:translate-x-0'
       } flex flex-col font-sans select-none`}
     >
       {/* Institution Brand Header */}

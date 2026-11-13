@@ -11,7 +11,13 @@ const PERIOD_TIMES = [
   { start: '12:15', end: '13:00' },
   { start: '13:00', end: '13:45' },
   { start: '13:45', end: '14:30' },
+  { start: '14:30', end: '15:15' },
+  { start: '15:15', end: '16:00' },
+  { start: '16:00', end: '16:45' },
+  { start: '16:45', end: '17:30' },
 ]
+
+const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const getTimetable = async (req, res, next) => {
   try {
@@ -26,6 +32,11 @@ const getTimetable = async (req, res, next) => {
       .populate('subjectId')
       .populate('teacherId', TEACHER_PUBLIC_FIELDS)
       .sort({ dayOfWeek: 1, periodNumber: 1 })
+
+    // Weekday order, not alphabetical (Friday would otherwise precede Monday).
+    if (Array.isArray(entries)) {
+      entries.sort((a, b) => (DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek)) || (a.periodNumber - b.periodNumber))
+    }
 
     res.json({ success: true, data: entries })
   } catch (error) {
@@ -43,6 +54,10 @@ const createTimetableEntry = async (req, res, next) => {
 
     await assertTeacherAvailable({ teacherId, dayOfWeek, periodNumber, classId, sectionId })
 
+    const existed = typeof TimetableEntry.exists === 'function'
+      ? await TimetableEntry.exists({ classId, sectionId, dayOfWeek, periodNumber })
+      : null
+
     const entry = await TimetableEntry.findOneAndUpdate(
       { classId, sectionId, dayOfWeek, periodNumber },
       {
@@ -58,7 +73,7 @@ const createTimetableEntry = async (req, res, next) => {
       .populate('subjectId')
       .populate('teacherId', TEACHER_PUBLIC_FIELDS)
 
-    res.status(201).json({ success: true, data: entry })
+    res.status(existed ? 200 : 201).json({ success: true, data: entry })
   } catch (error) {
     next(error)
   }

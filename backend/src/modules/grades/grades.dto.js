@@ -9,7 +9,8 @@ const createExamSchema = z.object({
     subjectId: z.string().min(1, 'Subject is required'),
     examDate: z.string().or(z.date()),
     maxMarks: z.number().positive().default(100),
-    passMarks: z.number().positive().default(40),
+    // Optional: the controller defaults it to min(40, maxMarks) so small exams stay valid.
+    passMarks: z.number().nonnegative().optional(),
     isPublished: z.boolean().optional(),
   }),
 })

@@ -33,14 +33,24 @@ const markStudentAttendance = async (req, res, next) => {
       existing.markedBy = req.user._id
       doc = await existing.save()
     } else {
-      doc = await StudentAttendance.create({
-        classId,
-        sectionId,
-        date: attendanceDate,
-        periodNumber: periodNumber || 0,
-        records,
-        markedBy: req.user._id,
-      })
+      try {
+        doc = await StudentAttendance.create({
+          classId,
+          sectionId,
+          date: attendanceDate,
+          periodNumber: periodNumber || 0,
+          records,
+          markedBy: req.user._id,
+        })
+      } catch (createErr) {
+        // A concurrent request created the register first: update it instead of failing with 409.
+        if (createErr?.code !== 11000) throw createErr
+        const raced = await StudentAttendance.findOne({ classId, sectionId, date: attendanceDate, periodNumber: periodNumber || 0 })
+        if (!raced) throw createErr
+        raced.records = records
+        raced.markedBy = req.user._id
+        doc = await raced.save()
+      }
     }
 
     // Check low-attendance threshold for absent students

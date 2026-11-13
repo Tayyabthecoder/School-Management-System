@@ -5,9 +5,9 @@ import RoleRoute from './RoleRoute'
 import AppShell from '../components/layout/AppShell'
 
 import LoginPage from '../features/auth/LoginPage'
-import DashboardPage from '../features/dashboard/DashboardPage'
 import PageLoader from '../components/ui/PageLoader'
 
+const DashboardPage = lazy(() => import('../features/dashboard/DashboardPage'))
 const ChangePasswordPage = lazy(() => import('../features/auth/ChangePasswordPage'))
 const StudentListPage = lazy(() => import('../features/students/StudentListPage'))
 const StudentProfilePage = lazy(() => import('../features/students/StudentProfilePage'))

@@ -123,7 +123,7 @@ describe('Grades Controller Tests', () => {
 
       await gradesController.createExam(req, res, next)
 
-      expect(Exam.create).toHaveBeenCalledWith(req.body)
+      expect(Exam.create).toHaveBeenCalledWith({ ...req.body, passMarks: 40 })
       expect(res.status).toHaveBeenCalledWith(201)
     })
   })

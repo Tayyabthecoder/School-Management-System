@@ -50,12 +50,12 @@ const getExams = async (req, res, next) => {
 const createExam = async (req, res, next) => {
   try {
     const maxMarks = req.body.maxMarks ?? 100
-    const passMarks = req.body.passMarks ?? 40
+    const passMarks = req.body.passMarks ?? Math.min(40, maxMarks)
     if (passMarks > maxMarks) {
       throw new ApiError(400, `Pass marks (${passMarks}) cannot exceed maximum marks (${maxMarks})`)
     }
     await assertTeachesClass(req.user, req.body.classId)
-    const exam = await Exam.create(req.body)
+    const exam = await Exam.create({ ...req.body, maxMarks, passMarks })
     res.status(201).json({ success: true, data: exam })
   } catch (error) {
     next(error)
