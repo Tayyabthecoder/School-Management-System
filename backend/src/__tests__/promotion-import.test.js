@@ -153,3 +153,80 @@ describe('JSON bulk import', () => {
     expect(res.json.mock.calls[0][0].data).toMatchObject({ createdCount: 0, errorCount: 1 })
   })
 })
+
+describe('graduating the final class', () => {
+  const topClass = { _id: 'class-10', name: 'Grade 10', level: 10, sections: ['A'] }
+  const grade9 = { _id: 'class-9', name: 'Grade 9', level: 9, sections: ['A'] }
+  const grade10Student = { _id: 'stu-top', studentId: 'STU-TOP', fullName: 'Omar', sectionId: 'A' }
+
+  beforeEach(() => {
+    Class.find.mockResolvedValue([grade9, topClass])
+    Student.find.mockImplementation(async (filter) => (filter.classId === 'class-10' ? [grade10Student] : []))
+    Grade.find.mockReturnValue({ lean: jest.fn().mockResolvedValue([{ studentId: 'stu-top', examId: 'exam-1', marksObtained: 80 }]) })
+  })
+
+  const config = () => buildConfig({ mappings: [{ fromClassId: grade9, toClassId: topClass }] })
+
+  test('a passing student of the unmapped top class is marked as graduating', async () => {
+    const { promote } = await promotionController.evaluatePromotion(config())
+
+    expect(promote).toHaveLength(1)
+    expect(promote[0]).toMatchObject({ studentId: 'stu-top', graduating: true, targetClass: 'Graduated', decision: 'promote' })
+  })
+
+  test('a failing student of the top class is retained, not graduated', async () => {
+    Grade.find.mockReturnValue({ lean: jest.fn().mockResolvedValue([{ studentId: 'stu-top', examId: 'exam-1', marksObtained: 10 }]) })
+
+    const { promote, retain } = await promotionController.evaluatePromotion(config())
+
+    expect(promote).toHaveLength(0)
+    expect(retain[0]).toMatchObject({ studentId: 'stu-top', reason: 'Failed Final Exam' })
+  })
+
+  test('execute sets status Graduated instead of moving the student to another class', async () => {
+    PromotionConfig.findById.mockReturnValue(mockConfigLookup(config()))
+    PromotionConfig.findOneAndUpdate.mockResolvedValue({ _id: 'cfg-1' })
+    Student.bulkWrite.mockResolvedValue({})
+    const res = mockRes()
+
+    await promotionController.executePromotion({ body: { configId: 'cfg-1' }, user: { _id: 'admin' } }, res, jest.fn())
+
+    const [ops] = Student.bulkWrite.mock.calls[0]
+    expect(ops[0].updateOne.update.$set).toEqual({ status: 'Graduated' })
+    expect(ops[0].updateOne.filter).toMatchObject({ _id: 'stu-top', classId: 'class-10', status: 'Active' })
+    expect(res.json.mock.calls[0][0].data).toMatchObject({ graduatedCount: 1, promotedCount: 0 })
+  })
+})
+
+describe('imports reject rows with missing required data', () => {
+  test('JSON bulk import reports missing DOB, gender and guardian phone', async () => {
+    Class.find.mockResolvedValue([{ _id: 'class-1', name: 'Grade 1', sections: ['A'] }])
+    Role.findOne.mockResolvedValue(null)
+    const res = mockRes()
+    const handler = importController.bulkImportStudents(jest.fn().mockResolvedValue('STU-2026-0003'))
+
+    await handler({ body: { students: [{ fullName: 'Ali', classId: 'class-1' }] } }, res, jest.fn())
+
+    expect(Student.create).not.toHaveBeenCalled()
+    const data = res.json.mock.calls[0][0].data
+    expect(data).toMatchObject({ createdCount: 0, errorCount: 1 })
+    expect(data.errors[0].error).toMatch(/date of birth.*gender.*guardian phone/)
+  })
+
+  test('JSON bulk import accepts a complete row', async () => {
+    Class.find.mockResolvedValue([{ _id: 'class-1', name: 'Grade 1', sections: ['A'] }])
+    Role.findOne.mockResolvedValue(null)
+    Student.create.mockResolvedValue({ _id: 's1', studentId: 'STU-2026-0004' })
+    const res = mockRes()
+    const handler = importController.bulkImportStudents(jest.fn().mockResolvedValue('STU-2026-0004'))
+
+    await handler({
+      body: { students: [{ fullName: 'Ali', classId: 'class-1', dob: '2015-03-02', gender: 'Male', guardianPhone: '+923001112233' }] },
+    }, res, jest.fn())
+
+    expect(Student.create).toHaveBeenCalledWith(expect.objectContaining({
+      dob: '2015-03-02', gender: 'Male', guardian: expect.objectContaining({ phone: '+923001112233' }),
+    }))
+    expect(res.json.mock.calls[0][0].data).toMatchObject({ createdCount: 1, errorCount: 0 })
+  })
+})

@@ -87,10 +87,24 @@ const evaluatePromotion = async (config) => {
   const finalTermName = config.finalExamTermName || 'Final Term'
   const academicYearId = config.academicYearId?._id || config.academicYearId
 
-  for (const mapping of config.mappings) {
-    const fromClass = mapping.fromClassId
-    const toClass = mapping.toClassId
-    if (!fromClass || !toClass) continue
+  // The highest-level active class with no mapping is the school's final class: its students
+  // have nowhere to be promoted to, so those who pass are graduated instead.
+  const mappedFromIds = new Set(
+    config.mappings.map(m => String(m.fromClassId?._id || m.fromClassId || ''))
+  )
+  const activeClasses = (await Class.find({ isActive: true })) || []
+  const topLevel = activeClasses.reduce((max, c) => Math.max(max, Number(c.level) || 0), 0)
+  const graduatingClasses = topLevel > 0
+    ? activeClasses.filter(c => Number(c.level) === topLevel && !mappedFromIds.has(String(c._id)))
+    : []
+
+  const targets = [
+    ...config.mappings.map(m => ({ fromClass: m.fromClassId, toClass: m.toClassId, graduating: false })),
+    ...graduatingClasses.map(c => ({ fromClass: c, toClass: null, graduating: true })),
+  ]
+
+  for (const { fromClass, toClass, graduating } of targets) {
+    if (!fromClass || (!toClass && !graduating)) continue
 
     const students = await Student.find({ classId: fromClass._id, status: 'Active', deletedAt: null })
 
@@ -118,11 +132,12 @@ const evaluatePromotion = async (config) => {
         rollNo: student.studentId,
         fullName: student.fullName,
         currentClass: fromClass.name,
-        targetClass: toClass.name,
+        targetClass: graduating ? 'Graduated' : toClass.name,
         fromClassId: fromClass._id,
-        toClassId: toClass._id,
+        toClassId: graduating ? null : toClass._id,
+        graduating,
         sectionId: student.sectionId,
-        targetSections: Array.isArray(toClass.sections) ? toClass.sections : [],
+        targetSections: !graduating && Array.isArray(toClass.sections) ? toClass.sections : [],
       }
 
       if (exams.length === 0) {
@@ -159,7 +174,11 @@ const evaluatePromotion = async (config) => {
       } else if (hasFailedExam) {
         retain.push({ ...studentData, reason: 'Failed Final Exam', decision: 'retain' })
       } else {
-        promote.push({ ...studentData, reason: 'Passed All Final Exams', decision: 'promote' })
+        promote.push({
+          ...studentData,
+          reason: graduating ? 'Passed All Final Exams (graduating)' : 'Passed All Final Exams',
+          decision: 'promote',
+        })
       }
     }
   }
@@ -234,6 +253,7 @@ const executePromotion = async (req, res, next) => {
 
     let promotedCount = 0
     let retainedCount = 0
+    let graduatedCount = 0
     try {
       const { promote, retain, unresolved } = await evaluatePromotion(config)
 
@@ -245,7 +265,17 @@ const executePromotion = async (req, res, next) => {
       const bulkOps = []
       for (const item of [...promote, ...retain, ...unresolved]) {
         const finalDecision = overrideMap.get(item.studentId.toString()) || item.decision
-        if (finalDecision === 'promote') {
+        if (finalDecision === 'promote' && item.graduating) {
+          // Final class: the student leaves the school roll as Graduated (admins can still
+          // change any student's status by hand afterwards).
+          bulkOps.push({
+            updateOne: {
+              filter: { _id: item.studentId, classId: item.fromClassId, status: 'Active' },
+              update: { $set: { status: 'Graduated' } },
+            },
+          })
+          graduatedCount++
+        } else if (finalDecision === 'promote') {
           bulkOps.push({
             updateOne: {
               filter: { _id: item.studentId, classId: item.fromClassId },
@@ -279,14 +309,15 @@ const executePromotion = async (req, res, next) => {
         academicYearId: config.academicYearId,
         targetAcademicYearId: config.targetAcademicYearId,
         promotedCount,
+        graduatedCount,
         retainedCount,
       },
     })
 
     res.json({
       success: true,
-      message: `Promotion completed: ${promotedCount} students promoted, ${retainedCount} students retained`,
-      data: { promotedCount, retainedCount },
+      message: `Promotion completed: ${promotedCount} students promoted, ${graduatedCount} graduated, ${retainedCount} retained`,
+      data: { promotedCount, graduatedCount, retainedCount },
     })
   } catch (error) {
     next(error)

@@ -363,6 +363,9 @@ const downloadPayslipPDF = async (req, res, next) => {
     // Non-admin roles can only download their own payslip
     const elevatedRoles = ['super_admin', 'hr_manager', 'accountant']
     if (!elevatedRoles.includes(req.user.roleName)) {
+      if (record.status !== 'Finalized') {
+        throw new ApiError(403, 'Forbidden: This payslip has not been finalized yet')
+      }
       if (!req.user.staffId || record.staffId?._id?.toString() !== req.user.staffId.toString()) {
         throw new ApiError(403, 'Forbidden: You can only download your own payslip')
       }

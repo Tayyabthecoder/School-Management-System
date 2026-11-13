@@ -130,13 +130,16 @@ describe('HR and payroll', () => {
 
     const teacherRecord = list.data.find((r) => id(r.staffId) === id(ctx.fixtures.teacherStaff))
     const teacher = await ctx.as('teacher1')
-    const slip = await teacher.get(`/api/v1/hr/payroll/payslip/${id(teacherRecord)}`)
-    expectStatus(slip)
-    expect(slip.headers['content-type']).toBe('application/pdf')
+    // Staff can only open their own payslip once payroll is finalized; HR can always open drafts.
+    expectStatus(await teacher.get(`/api/v1/hr/payroll/payslip/${id(teacherRecord)}`), 403)
+    expectStatus(await hr.get(`/api/v1/hr/payroll/payslip/${id(teacherRecord)}`))
     const other = list.data.find((r) => id(r.staffId) !== id(ctx.fixtures.teacherStaff))
     expectStatus(await teacher.get(`/api/v1/hr/payroll/payslip/${id(other)}`), 403)
 
     expectStatus(await hr.put('/api/v1/hr/payroll/finalize').send({ month: 1, year: 2026 }))
+    const slip = await teacher.get(`/api/v1/hr/payroll/payslip/${id(teacherRecord)}`)
+    expectStatus(slip)
+    expect(slip.headers['content-type']).toBe('application/pdf')
     const rerun = expectStatus(await hr.post('/api/v1/hr/payroll/run').send({ month: 1, year: 2026 }))
     expect(rerun.data.every((r) => r.status === 'Finalized')).toBe(true)
   })

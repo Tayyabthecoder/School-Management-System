@@ -36,18 +36,27 @@ const bulkImportStudents = (generateUniqueStudentId) => async (req, res, next) =
           throw new Error(`Section "${sectionId}" does not exist in class "${targetClass.name}"`)
         }
 
+        const missing = [
+          !item.dob && 'date of birth',
+          !item.gender && 'gender',
+          !item.guardianPhone && 'guardian phone',
+        ].filter(Boolean)
+        if (missing.length > 0) {
+          throw new Error(`Missing required data: ${missing.join(', ')}`)
+        }
+
         const studentId = await generateUniqueStudentId()
 
         const doc = await Student.create({
           studentId,
           fullName: item.fullName,
-          dob: item.dob || new Date('2010-01-01'),
-          gender: item.gender || 'Male',
+          dob: item.dob,
+          gender: item.gender,
           classId: targetClass._id,
           sectionId,
           guardian: {
             name: item.guardianName || 'Guardian',
-            phone: item.guardianPhone || '+923000000000',
+            phone: item.guardianPhone,
           },
         })
 
@@ -238,27 +247,36 @@ const importStudentsFromExcel = (generateUniqueStudentId) => async (req, res, ne
           await existingStudent.save()
           updated.push(existingStudent)
         } else {
-          // Create new student
+          // Create new student: required data is rejected, never invented.
+          const missing = [
+            !item.dob && 'date of birth',
+            !item.gender && 'gender',
+            !item.guardian?.phone && 'guardian phone',
+          ].filter(Boolean)
+          if (missing.length > 0) {
+            throw new Error(`Missing required data: ${missing.join(', ')}`)
+          }
+
           const studentId = item.studentId?.trim() || (await generateUniqueStudentId())
 
           const newDoc = await Student.create({
             studentId,
             fullName: item.fullName.trim(),
-            dob: item.dob || new Date('2010-01-01'),
-            gender: item.gender || 'Male',
+            dob: item.dob,
+            gender: item.gender,
             classId: targetClass._id,
             sectionId: targetSection,
             fatherName: item.fatherName || '',
             guardian: {
               name: item.guardian?.name || item.fatherName || 'Guardian',
-              phone: item.guardian?.phone || '+923000000000',
+              phone: item.guardian.phone,
               email: item.guardian?.email || '',
               cnic: item.guardian?.cnic || '',
               relationship: item.guardian?.relationship || 'Parent',
             },
             emergencyContact: item.emergencyContact || {
               name: item.guardian?.name || 'Guardian',
-              phone: item.guardian?.phone || '+923000000000',
+              phone: item.guardian.phone,
               relationship: 'Guardian',
             },
             address: item.address || '',
