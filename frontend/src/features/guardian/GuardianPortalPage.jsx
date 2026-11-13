@@ -156,7 +156,7 @@ export default function GuardianPortalPage() {
       link.remove()
       window.URL.revokeObjectURL(url)
     } catch (err) {
-      alert('Unable to generate Challan PDF. Please contact school administration.')
+      toast.error('Unable to generate Challan PDF. Please contact school administration.')
     }
   }
 

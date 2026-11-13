@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
@@ -11,6 +11,9 @@ const SIZE_CLASSES = {
   '2xl': 'max-w-6xl',
   fullscreen: 'w-[calc(100vw-2rem)] max-w-none h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)]',
 }
+
+// Open modals, innermost last: only the top one reacts to Escape/Tab.
+const openModalStack = []
 
 export default function Modal({
   isOpen,
@@ -28,12 +31,17 @@ export default function Modal({
   bodyClassName = '',
 }) {
   const modalRef = useRef(null)
+  const titleId = useId()
   const isModalOpen = Boolean(isOpen ?? open)
 
   useEffect(() => {
     if (!isModalOpen) return
 
+    openModalStack.push(titleId)
+    const previouslyFocused = document.activeElement
+
     const handleKeyDown = (e) => {
+      if (openModalStack[openModalStack.length - 1] !== titleId) return
       if (e.key === 'Escape' && closeOnEscape) {
         onClose?.()
         return
@@ -72,10 +80,14 @@ export default function Modal({
 
     return () => {
       clearTimeout(timer)
-      document.body.style.overflow = originalOverflow
+      const at = openModalStack.lastIndexOf(titleId)
+      if (at !== -1) openModalStack.splice(at, 1)
+      // Only the outermost modal owns the scroll lock; restore focus to what opened the dialog.
+      document.body.style.overflow = openModalStack.length === 0 ? originalOverflow : 'hidden'
       window.removeEventListener('keydown', handleKeyDown)
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') previouslyFocused.focus()
     }
-  }, [isModalOpen, closeOnEscape, onClose])
+  }, [isModalOpen, closeOnEscape, onClose, titleId])
 
   if (!isModalOpen) return null
 
@@ -85,6 +97,7 @@ export default function Modal({
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby={title ? titleId : undefined}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
     >
       {/* Backdrop */}
@@ -103,7 +116,7 @@ export default function Modal({
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="pr-6">
               {title && (
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 tracking-tight">
+                <h3 id={titleId} className="text-base font-semibold text-slate-900 dark:text-slate-100 tracking-tight">
                   {title}
                 </h3>
               )}

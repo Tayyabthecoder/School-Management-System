@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { confirmAction } from '../../../store/confirmStore'
 import {
   GraduationCap,
   Save,
@@ -72,8 +73,8 @@ export default function GradingScaleTab({
     toast.success(`Grade bracket "${newGrade.label}" added!`)
   }
 
-  const handleResetDefaults = () => {
-    if (window.confirm('Reset grading scale to system defaults (A+ to F)?')) {
+  const handleResetDefaults = async () => {
+    if (await confirmAction({ title: 'Reset grading scale', message: 'Reset grading scale to system defaults (A+ to F)?', confirmLabel: 'Reset', danger: true })) {
       setGradingScale(DEFAULT_SCALE)
       toast.info('Grading scale reset to standard defaults.')
     }

@@ -9,6 +9,9 @@ const refreshTokenSchema = new mongoose.Schema({
   jti: { type: String, required: true, unique: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   expiresAt: { type: Date, required: true },
+  // Set when the token is exchanged for a new one. The record is kept (until it expires) so a
+  // later replay of the same token can be recognised as theft rather than a plain expiry.
+  rotatedAt: { type: Date, default: null },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })

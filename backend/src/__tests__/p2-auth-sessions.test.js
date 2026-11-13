@@ -41,24 +41,46 @@ describe('refresh-token tracking in MongoDB', () => {
     expect(RefreshToken.create).toHaveBeenCalledWith({ jti, userId: 'user-1', expiresAt: new Date(exp * 1000) })
   })
 
-  test('refresh consumes the old jti atomically and records a new one', async () => {
-    RefreshToken.findOneAndDelete.mockResolvedValue({ jti: 'old-jti' })
+  test('refresh marks the old jti as rotated atomically and records a new one', async () => {
+    RefreshToken.findOneAndUpdate.mockResolvedValue({ jti: 'old-jti' })
     User.findById.mockReturnValue({ populate: jest.fn().mockResolvedValue(activeUser()) })
 
     const result = await authService.refreshToken(signRefresh({ id: 'user-1', jti: 'old-jti', tokenVersion: 0 }))
 
-    expect(RefreshToken.findOneAndDelete).toHaveBeenCalledWith({ jti: 'old-jti', userId: 'user-1' })
+    expect(RefreshToken.findOneAndUpdate).toHaveBeenCalledWith(
+      { jti: 'old-jti', userId: 'user-1', rotatedAt: null },
+      { $set: { rotatedAt: expect.any(Date) } }
+    )
     const newJti = jwt.decode(result.refreshToken).jti
     expect(newJti).not.toBe('old-jti')
     expect(RefreshToken.create).toHaveBeenCalledWith(expect.objectContaining({ jti: newJti, userId: 'user-1' }))
   })
 
-  test('a revoked or already-rotated token is rejected even without Redis', async () => {
-    RefreshToken.findOneAndDelete.mockResolvedValue(null)
+  test('a revoked or unknown token is rejected even without Redis', async () => {
+    RefreshToken.findOneAndUpdate.mockResolvedValue(null)
+    RefreshToken.findOne.mockResolvedValue(null)
 
     await expect(authService.refreshToken(signRefresh({ id: 'user-1', jti: 'gone', tokenVersion: 0 })))
       .rejects.toMatchObject({ statusCode: 401 })
     expect(User.findById).not.toHaveBeenCalled()
+  })
+
+  test('replaying a token rotated long ago revokes every session of the user', async () => {
+    RefreshToken.findOneAndUpdate.mockResolvedValue(null)
+    RefreshToken.findOne.mockResolvedValue({ jti: 'stolen', rotatedAt: new Date(Date.now() - 60 * 1000) })
+
+    await expect(authService.refreshToken(signRefresh({ id: 'user-1', jti: 'stolen', tokenVersion: 0 })))
+      .rejects.toMatchObject({ statusCode: 401 })
+    expect(RefreshToken.deleteMany).toHaveBeenCalledWith({ userId: 'user-1' })
+  })
+
+  test('a near-simultaneous replay (second tab) is rejected without wiping sessions', async () => {
+    RefreshToken.findOneAndUpdate.mockResolvedValue(null)
+    RefreshToken.findOne.mockResolvedValue({ jti: 'fresh', rotatedAt: new Date(Date.now() - 2000) })
+
+    await expect(authService.refreshToken(signRefresh({ id: 'user-1', jti: 'fresh', tokenVersion: 0 })))
+      .rejects.toMatchObject({ statusCode: 401 })
+    expect(RefreshToken.deleteMany).not.toHaveBeenCalled()
   })
 
   test('a token without a jti is rejected', async () => {

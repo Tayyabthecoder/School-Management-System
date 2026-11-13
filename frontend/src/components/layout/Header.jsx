@@ -7,6 +7,7 @@ import {
   Moon,
   Keyboard,
 } from 'lucide-react'
+import { useRole } from '../../hooks/useRole'
 import { useAuthStore } from '../../store/authStore'
 import { useUIStore } from '../../store/uiStore'
 
@@ -14,7 +15,7 @@ export default function Header() {
   const { user, logout } = useAuthStore()
   const { toggleSidebar, theme, toggleTheme, openCommandPalette, openShortcutsModal } = useUIStore()
 
-  const userRole = user?.roleName || user?.role || 'student'
+  const userRole = useRole() || 'student'
 
   return (
     <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xs transition-colors duration-200">

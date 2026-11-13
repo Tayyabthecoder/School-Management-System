@@ -43,6 +43,7 @@ function ToastItem({ toast }) {
       <p className={`text-sm font-medium flex-1 leading-snug ${TEXT[toast.type]}`}>{toast.message}</p>
       <button
         onClick={() => removeToast(toast.id)}
+        aria-label="Dismiss notification"
         className="ml-1 text-gray-400 hover:text-gray-600 flex-shrink-0"
       >
         <X className="w-4 h-4" />
@@ -55,7 +56,7 @@ export default function ToastContainer() {
   const { toasts } = useToastStore()
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end pointer-events-none">
+    <div role="status" aria-live="polite" className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end pointer-events-none">
       {toasts.map((toast) => (
         <div key={toast.id} className="pointer-events-auto">
           <ToastItem toast={toast} />

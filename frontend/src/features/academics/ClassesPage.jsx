@@ -6,6 +6,7 @@ import {
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import Badge from '../../components/ui/Badge'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
+import { confirmAction } from '../../store/confirmStore'
 import api from '../../lib/axios'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
@@ -129,7 +130,7 @@ export default function ClassesPage() {
   }, [])
 
   const handleDeleteSubject = async (subjectId, subjectName) => {
-    if (!window.confirm(`Are you sure you want to deactivate subject "${subjectName}"?`)) return
+    if (!(await confirmAction({ title: 'Deactivate subject', message: `Are you sure you want to deactivate subject "${subjectName}"?`, confirmLabel: 'Deactivate', danger: true }))) return
     try {
       const res = await api.delete(`/subjects/${subjectId}`)
       if (res.data?.success) {

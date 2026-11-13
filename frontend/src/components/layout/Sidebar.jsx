@@ -15,6 +15,7 @@ import {
   Clock,
   CalendarPlus,
 } from 'lucide-react'
+import { useRole } from '../../hooks/useRole'
 import { useAuthStore } from '../../store/authStore'
 import { useUIStore } from '../../store/uiStore'
 
@@ -59,7 +60,7 @@ export default function Sidebar() {
   const { user } = useAuthStore()
   const { isSidebarOpen } = useUIStore()
 
-  const userRole = user?.roleName || user?.role || 'student'
+  const userRole = useRole() || 'student'
 
   return (
     <aside

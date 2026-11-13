@@ -10,6 +10,9 @@ const { BCRYPT_ROUNDS } = require('../../config/constants')
 const RefreshToken = require('../../models/RefreshToken.model')
 
 const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60 // 7 days
+// A just-rotated token may legitimately be presented again by a second tab or a retried request.
+// Replays after this window mean the token was copied, so every session of the user is revoked.
+const REFRESH_REUSE_GRACE_MS = 15 * 1000
 
 /**
  * Refresh tokens are tracked in MongoDB (SEC-04). Previously they were tracked only in
@@ -108,11 +111,22 @@ const refreshToken = async (token) => {
   }
   const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET)
 
-  // ROTATION: consume the token atomically, so a revoked, rotated or replayed token is rejected.
+  // ROTATION: mark the token as used atomically, so a revoked, rotated or replayed token is rejected.
   const consumed = decoded.jti
-    ? await RefreshToken.findOneAndDelete({ jti: decoded.jti, userId: decoded.id })
+    ? await RefreshToken.findOneAndUpdate(
+        { jti: decoded.jti, userId: decoded.id, rotatedAt: null },
+        { $set: { rotatedAt: new Date() } }
+      )
     : null
   if (!consumed) {
+    // Reuse detection: a token that was already rotated, and presented again after the grace
+    // window, indicates theft. Revoke all of the user's sessions.
+    const previous = decoded.jti
+      ? await RefreshToken.findOne({ jti: decoded.jti, userId: decoded.id })
+      : null
+    if (previous && previous.rotatedAt && Date.now() - new Date(previous.rotatedAt).getTime() > REFRESH_REUSE_GRACE_MS) {
+      await invalidateUserSessions(decoded.id)
+    }
     throw new ApiError(401, 'Refresh token has expired or been revoked')
   }
 

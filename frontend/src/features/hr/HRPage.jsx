@@ -6,6 +6,7 @@ import {
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import Badge from '../../components/ui/Badge'
 import { SkeletonTable } from '../../components/ui/Skeleton'
+import { confirmAction } from '../../store/confirmStore'
 import api from '../../lib/axios'
 import { announceCredentials } from '../../lib/credentials'
 import { formatPKR, formatDate } from '../../lib/formatters'
@@ -263,7 +264,7 @@ export default function HRPage() {
 
   const handleFinalizePayroll = async () => {
     const period = `${MONTHS[payMonth - 1]} ${payYear}`
-    if (!window.confirm(`Finalize ${draftCount} draft payroll record(s) for ${period}? Finalized records are locked and are not recalculated by later runs.`)) return
+    if (!(await confirmAction({ title: 'Finalize payroll', message: `Finalize ${draftCount} draft payroll record(s) for ${period}? Finalized records are locked and are not recalculated by later runs.`, confirmLabel: 'Finalize' }))) return
     setFinalizing(true)
     try {
       const res = await api.put('/hr/payroll/finalize', { month: payMonth, year: payYear })

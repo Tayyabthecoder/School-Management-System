@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { confirmAction } from '../../../store/confirmStore'
 import {
   Receipt,
   Save,
@@ -172,8 +173,8 @@ export default function ChallanBuilderTab({
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                if (window.confirm('Reset all challan settings to standard 3-part defaults?')) {
+              onClick={async () => {
+                if (await confirmAction({ title: 'Reset challan settings', message: 'Reset all challan settings to standard 3-part defaults?', confirmLabel: 'Reset', danger: true })) {
                   setChallanConfig(DEFAULT_CHALLAN_CONFIG)
                   toast.info('Challan settings reset to standard defaults.')
                 }

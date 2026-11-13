@@ -10,6 +10,7 @@ import {
 import Button from '../../../components/ui/Button'
 import { SkeletonTable } from '../../../components/ui/Skeleton'
 import { formatDate } from '../../../lib/formatters'
+import { confirmAction } from '../../../store/confirmStore'
 import api from '../../../lib/axios'
 import { useToast } from '../../../store/toastStore'
 
@@ -45,7 +46,7 @@ export default function AcademicSessionsTab({
   const [activatingId, setActivatingId] = useState(null)
 
   const handleActivateYear = async (ay) => {
-    if (!window.confirm(`Make Academic Session ${ay.year} the active year? Fees, challans, dashboards and promotion will use it from now on.`)) return
+    if (!(await confirmAction({ title: 'Change active session', message: `Make Academic Session ${ay.year} the active year? Fees, challans, dashboards and promotion will use it from now on.`, confirmLabel: 'Make active' }))) return
     setActivatingId(ay._id)
     try {
       const res = await api.patch(`/classes/academic-years/${ay._id}/activate`)

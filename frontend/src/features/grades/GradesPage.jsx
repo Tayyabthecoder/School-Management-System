@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { Award, ChevronRight, Download, Save, Search, BookOpen, FileText, Send, CheckCircle2 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonGradeCards } from '../../components/ui/Skeleton'
+import { confirmAction } from '../../store/confirmStore'
 import api from '../../lib/axios'
 import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
@@ -198,9 +199,11 @@ function GradeEntryTable({ students, exam, onExamUpdated }) {
   // results stay invisible to families until a teacher/admin publishes them here.
   const handlePublish = async () => {
     if (!exam || exam.isPublished) return
-    const confirmed = window.confirm(
-      `Publish "${exam.title}" results? Students and guardians will be able to see these marks.`
-    )
+    const confirmed = await confirmAction({
+      title: 'Publish results',
+      message: `Publish "${exam.title}" results? Students and guardians will be able to see these marks.`,
+      confirmLabel: 'Publish',
+    })
     if (!confirmed) return
     setPublishing(true)
     try {

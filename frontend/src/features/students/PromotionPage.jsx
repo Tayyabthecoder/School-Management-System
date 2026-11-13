@@ -3,10 +3,13 @@ import {
   GraduationCap, Settings, CheckCircle2, XCircle, AlertTriangle, Play, RefreshCw, Layers
 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
+import { confirmAction } from '../../store/confirmStore'
+import { useToast } from '../../store/toastStore'
 import api from '../../lib/axios'
 import { logError } from '../../lib/logger'
 
 export default function PromotionPage() {
+  const toast = useToast()
   const [config, setConfig] = useState(null)
   const [classes, setClasses] = useState([])
   const [loadingConfig, setLoadingConfig] = useState(true)
@@ -60,10 +63,10 @@ export default function PromotionPage() {
       })
       if (res.data?.success) {
         setConfig(res.data.data)
-        alert('Promotion mapping configuration saved!')
+        toast.success('Promotion mapping configuration saved!')
       }
     } catch (err) {
-      alert('Failed to save configuration: ' + (err.response?.data?.error?.message || err.message))
+      toast.error('Failed to save configuration: ' + (err.response?.data?.error?.message || err.message))
     }
   }
 
@@ -79,7 +82,7 @@ export default function PromotionPage() {
         setOverrides({})
       }
     } catch (err) {
-      alert('Preview failed: ' + (err.response?.data?.error?.message || err.message))
+      toast.error('Preview failed: ' + (err.response?.data?.error?.message || err.message))
     } finally {
       setPreviewLoading(false)
     }
@@ -93,7 +96,7 @@ export default function PromotionPage() {
   }
 
   const handleExecute = async () => {
-    if (!window.confirm('Are you sure you want to execute annual student promotions? This will update student class enrollments.')) {
+    if (!(await confirmAction({ title: 'Execute promotions', message: 'Are you sure you want to execute annual student promotions? This will update student class enrollments.', confirmLabel: 'Execute' }))) {
       return
     }
 
@@ -114,7 +117,7 @@ export default function PromotionPage() {
         setPreviewData(null)
       }
     } catch (err) {
-      alert('Execution failed: ' + (err.response?.data?.error?.message || err.message))
+      toast.error('Execution failed: ' + (err.response?.data?.error?.message || err.message))
     } finally {
       setExecuting(false)
     }

@@ -207,6 +207,14 @@ export default function DataTable({
                       <th
                         key={sortKey || col.header || index}
                         onClick={() => isSortable && handleSort(sortKey)}
+                        onKeyDown={(e) => {
+                          if (isSortable && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault()
+                            handleSort(sortKey)
+                          }
+                        }}
+                        tabIndex={isSortable ? 0 : undefined}
+                        aria-sort={isSortable ? (isSorted ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : 'none') : undefined}
                         className={`px-5 py-3 select-none ${
                           isSortable ? 'cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition-colors' : ''
                         }`}

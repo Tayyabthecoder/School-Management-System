@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react'
 import { useUIStore } from '../../store/uiStore'
+import { useRole } from '../../hooks/useRole'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../lib/axios'
 
@@ -46,7 +47,7 @@ const STATIC_COMMANDS = [
 export default function CommandPalette() {
   const { isCommandPaletteOpen, closeCommandPalette } = useUIStore()
   const { user } = useAuthStore()
-  const userRole = user?.roleName || user?.role || 'student'
+  const userRole = useRole() || 'student'
   const navigate = useNavigate()
 
   const [query, setQuery] = useState('')
