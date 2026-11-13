@@ -47,7 +47,7 @@ export default function UserManagementTab({
             <button
               onClick={onRefreshUsers}
               className="p-2 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-300"
-              title="Refresh Users"
+              aria-label="Refresh Users" title="Refresh Users"
             >
               <RefreshCw className="w-4 h-4" />
             </button>

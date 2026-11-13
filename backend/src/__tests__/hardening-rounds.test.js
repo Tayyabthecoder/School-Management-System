@@ -96,3 +96,25 @@ describe('payroll DTO', () => {
     expect(parsed.data.body).toMatchObject({ applyIncomeTax: true, applyEobi: false, applySessi: true })
   })
 })
+
+describe('request logging', () => {
+  test('logs the path without the query string', () => {
+    const logger = require('../utils/logger')
+    const spy = jest.spyOn(logger, 'http').mockImplementation(() => {})
+    const previousEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'development'
+    try {
+      const loggerMiddleware = require('../middleware/logger.middleware')
+      let onFinish
+      const res = { on: (_event, cb) => { onFinish = cb }, getHeader: () => '5', statusCode: 200 }
+      loggerMiddleware({ method: 'GET', originalUrl: '/api/v1/students?search=Ali+Khan&classId=42' }, res, () => {})
+      onFinish()
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy.mock.calls[0][0]).toContain('GET /api/v1/students 200')
+      expect(spy.mock.calls[0][0]).not.toContain('Ali')
+    } finally {
+      process.env.NODE_ENV = previousEnv
+      spy.mockRestore()
+    }
+  })
+})

@@ -24,7 +24,7 @@ export default function Header() {
         <button
           onClick={toggleSidebar}
           className="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Toggle Sidebar Navigation"
+          aria-label="Toggle Sidebar Navigation" title="Toggle Sidebar Navigation"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -57,7 +57,7 @@ export default function Header() {
         <button
           onClick={openCommandPalette}
           className="md:hidden p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Search"
+          aria-label="Search" title="Search"
         >
           <Search className="w-5 h-5" />
         </button>
@@ -75,7 +75,7 @@ export default function Header() {
         <button
           onClick={openShortcutsModal}
           className="hidden sm:flex p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Keyboard Shortcuts (?)"
+          aria-label="Keyboard Shortcuts (?)" title="Keyboard Shortcuts (?)"
         >
           <Keyboard className="w-4 h-4" />
         </button>
@@ -94,7 +94,7 @@ export default function Header() {
           <button
             onClick={logout}
             className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors"
-            title="Sign Out"
+            aria-label="Sign Out" title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
           </button>

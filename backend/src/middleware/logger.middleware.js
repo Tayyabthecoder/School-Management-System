@@ -8,7 +8,9 @@ const loggerMiddleware = (req, res, next) => {
   res.on('finish', () => {
     const elapsed = Date.now() - start
     const len = res.getHeader('content-length') || '-'
-    logger.http(`${req.method} ${req.originalUrl || req.url} ${res.statusCode} ${len} - ${elapsed} ms`)
+    // Log the path only: query strings carry search terms and student identifiers (PII).
+    const urlPath = String(req.originalUrl || req.url || '').split('?')[0]
+    logger.http(`${req.method} ${urlPath} ${res.statusCode} ${len} - ${elapsed} ms`)
   })
   next()
 }

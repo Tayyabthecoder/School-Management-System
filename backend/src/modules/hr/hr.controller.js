@@ -183,6 +183,17 @@ const submitLeaveRequest = async (req, res, next) => {
       throw new ApiError(400, 'Leave end date cannot be before the start date')
     }
 
+    // Reject a request that overlaps one that is still pending or already approved.
+    const overlapping = await LeaveRequest.exists({
+      staffId,
+      status: { $in: ['Pending', 'Approved'] },
+      fromDate: { $lte: toDate },
+      toDate: { $gte: fromDate },
+    })
+    if (overlapping) {
+      throw new ApiError(409, 'This staff member already has a pending or approved leave overlapping these dates')
+    }
+
     const leave = await LeaveRequest.create({
       ...payload,
       staffId,

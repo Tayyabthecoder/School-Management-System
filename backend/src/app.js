@@ -99,6 +99,16 @@ const heavyLimiter = rateLimit({
   store: createRateLimiterStore('heavy'),
   message: { success: false, error: { message: 'Too many requests. Please wait a moment.' } },
 })
+// The login page reads allowed-days without authentication, so cap it per IP.
+const publicSettingsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: createRateLimiterStore('public-settings'),
+  message: { success: false, error: { message: 'Too many requests. Please wait a moment.' } },
+})
+app.use('/api/v1/settings/allowed-days', publicSettingsLimiter)
 app.use('/api/v1/students/import', heavyLimiter)
 app.use('/api/v1/students/import-excel', heavyLimiter)
 app.use('/api/v1/students/bulk-import', heavyLimiter)

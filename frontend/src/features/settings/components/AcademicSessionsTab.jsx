@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { logError } from '../../../lib/logger'
 import {
   Calendar,
   Plus,
@@ -68,7 +69,7 @@ export default function AcademicSessionsTab({
           setAllowedDays(res.data.data.allowedDays)
         }
       })
-      .catch(() => {})
+      .catch((err) => logError('Failed to load allowed days:', err))
   }, [])
 
   const handleToggleDay = (day) => {

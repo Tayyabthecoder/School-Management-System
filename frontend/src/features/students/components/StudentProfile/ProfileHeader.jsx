@@ -125,7 +125,7 @@ export default function ProfileHeader({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-xl shadow-xs transition-colors"
-              title="Open WhatsApp chat with Guardian"
+              aria-label="Open WhatsApp chat with Guardian" title="Open WhatsApp chat with Guardian"
             >
               <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
             </a>
@@ -204,7 +204,7 @@ export default function ProfileHeader({
                     <button
                       type="button"
                       onClick={onOpenChangeSection}
-                      title="Change Student Section"
+                      aria-label="Change Student Section" title="Change Student Section"
                       className="p-1 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-lg transition-colors"
                     >
                       <ArrowRightLeft className="w-3.5 h-3.5" />

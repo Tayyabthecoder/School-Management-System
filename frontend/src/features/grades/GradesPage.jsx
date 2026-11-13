@@ -49,7 +49,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
         if (sRes.data?.success) setSubjects(sRes.data.data)
         if (aRes.data?.success) setAcademicYears(aRes.data.data)
       })
-      .catch(() => {})
+      .catch((err) => logError('Failed to load lookups for the exam form:', err))
   }, [open])
 
   const handle = async (e) => {
@@ -246,7 +246,7 @@ function GradeEntryTable({ students, exam, onExamUpdated }) {
           setMarks((prev) => ({ ...prev, ...marksMap }))
         }
       })
-      .catch(() => {})
+      .catch((err) => logError('Failed to load existing marks:', err))
   }, [examId, students])
 
   const filtered = students.filter((s) =>

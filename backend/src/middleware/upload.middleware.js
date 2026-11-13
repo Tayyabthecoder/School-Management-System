@@ -134,6 +134,8 @@ const contentMatchesExtension = (buf, ext) => {
     return buf.length >= 12 && buf.toString('latin1', 0, 4) === 'RIFF' && buf.toString('latin1', 8, 12) === 'WEBP'
   }
   if (ext === '.txt' || ext === '.csv') return !buf.includes(0) // plain text has no NUL bytes
+  // A bare ZIP is not an Office file: .docx/.xlsx must contain the OOXML content-types part.
+  if ((ext === '.docx' || ext === '.xlsx') && !buf.includes('[Content_Types].xml')) return false
   const sigs = SIGNATURES[ext]
   return !!sigs && sigs.some((sig) => startsWith(buf, sig))
 }

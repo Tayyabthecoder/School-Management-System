@@ -6,7 +6,9 @@ describe('upload magic-byte check', () => {
   test('accepts real signatures', () => {
     expect(contentMatchesExtension(Buffer.from([0xFF, 0xD8, 0xFF, 0xE0]), '.jpg')).toBe(true)
     expect(contentMatchesExtension(Buffer.from('%PDF-1.7 ...'), '.pdf')).toBe(true)
-    expect(contentMatchesExtension(Buffer.from([0x50, 0x4B, 0x03, 0x04, 0]), '.xlsx')).toBe(true)
+    const ooxml = Buffer.concat([Buffer.from([0x50, 0x4B, 0x03, 0x04]), Buffer.from('....[Content_Types].xml...')])
+    expect(contentMatchesExtension(ooxml, '.xlsx')).toBe(true)
+    expect(contentMatchesExtension(ooxml, '.docx')).toBe(true)
     expect(contentMatchesExtension(Buffer.from('RIFF\0\0\0\0WEBPVP8 '), '.webp')).toBe(true)
     expect(contentMatchesExtension(Buffer.from('a,b\n1,2\n'), '.csv')).toBe(true)
   })

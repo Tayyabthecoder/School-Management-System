@@ -131,7 +131,7 @@ export default function AttendanceHistoryTab({
               type="button"
               onClick={handlePrevMonth}
               className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
-              title="Previous Month"
+              aria-label="Previous Month" title="Previous Month"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -146,7 +146,7 @@ export default function AttendanceHistoryTab({
               type="button"
               onClick={handleNextMonth}
               className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
-              title="Next Month"
+              aria-label="Next Month" title="Next Month"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

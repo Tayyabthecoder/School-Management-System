@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { logError } from '../../lib/logger'
 import { FileSpreadsheet, Sparkles, BarChart3 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import api from '../../lib/axios'
@@ -15,7 +16,7 @@ export default function ReportsPage() {
       .then(res => {
         if (res.data?.success) setClassesList(res.data.data || [])
       })
-      .catch(() => {})
+      .catch((err) => logError('Failed to load classes list:', err))
   }, [])
 
   return (

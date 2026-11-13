@@ -1,4 +1,6 @@
 const Class = require('../../models/Class.model')
+const Exam = require('../../models/Exam.model')
+const FeeStructure = require('../../models/FeeStructure.model')
 const Subject = require('../../models/Subject.model')
 const AcademicYear = require('../../models/AcademicYear.model')
 const Student = require('../../models/Student.model')
@@ -49,6 +51,18 @@ const deleteClass = async (req, res, next) => {
       throw new ApiError(
         400,
         `Cannot delete class "${cls.name}" because it has ${activeStudents} active enrolled student(s). Reassign students first or pass force=true to proceed.`
+      )
+    }
+
+    // Exams and fee structures hold history that would be orphaned, so they block deletion.
+    const [examCount, feeStructureCount] = await Promise.all([
+      Exam.countDocuments({ classId: cls._id }),
+      FeeStructure.countDocuments({ classId: cls._id }),
+    ])
+    if (examCount || feeStructureCount) {
+      throw new ApiError(
+        400,
+        `Cannot delete class "${cls.name}" because it still has ${examCount || 0} exam(s) and ${feeStructureCount || 0} fee structure(s). Remove them first to keep academic and financial history intact.`
       )
     }
 

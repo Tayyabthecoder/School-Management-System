@@ -49,7 +49,7 @@ export default function StudentLayout() {
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-800/80 hover:bg-red-600/80 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm"
-              title="Sign Out"
+              aria-label="Sign Out" title="Sign Out"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign Out</span>

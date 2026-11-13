@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { logError } from '../../../lib/logger'
 import { GraduationCap, Calendar, Clock, BookOpen, Layers } from 'lucide-react'
 import api from '../../../lib/axios'
 import { announceCredentials } from '../../../lib/credentials'
@@ -358,7 +359,7 @@ export function TeacherScheduleModal({ open, teacher, onClose }) {
         .then((res) => {
           if (res.data?.success) setSchedule(res.data.schedule || [])
         })
-        .catch(() => {})
+        .catch((err) => logError('Failed to load teacher schedule:', err))
         .finally(() => setLoading(false))
     }
   }, [open, teacher])
