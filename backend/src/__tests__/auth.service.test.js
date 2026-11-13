@@ -50,13 +50,13 @@ describe('auth.service login lockout', () => {
     expect(user.lockUntil).toBeNull()
   })
 
-  test('locks the account after five consecutive failures', async () => {
-    const user = buildUser({ failedLoginAttempts: 4 })
+  test('locks the account after twenty consecutive failures', async () => {
+    const user = buildUser({ failedLoginAttempts: 19 })
     mockFindOneWithUser(user)
 
     await expect(authService.login('jdoe', 'wrong')).rejects.toMatchObject({ statusCode: 401 })
 
-    expect(user.failedLoginAttempts).toBe(5)
+    expect(user.failedLoginAttempts).toBe(20)
     expect(user.lockUntil).toBeInstanceOf(Date)
     expect(user.lockUntil.getTime()).toBeGreaterThan(Date.now())
   })

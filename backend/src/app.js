@@ -68,6 +68,21 @@ const loginLimiter = rateLimit({
 })
 app.use('/api/v1/auth/login', loginLimiter)
 
+// Guessing is throttled per (IP, username): one client can't burn through guesses for an account,
+// and, because the account-level lock below is much higher, a single attacker can no longer
+// lock a victim out by hammering their username.
+const loginUserLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  store: createRateLimiterStore('login-user'),
+  keyGenerator: (req) => `${req.ip}|${String(req.body?.username || '').toLowerCase().slice(0, 64)}`,
+  message: { success: false, error: { message: 'Too many failed attempts for this account. Please try again in 15 minutes.' } },
+})
+app.use('/api/v1/auth/login', loginUserLimiter)
+
 // Rate Limiter for Refresh Endpoint (30 requests per 15 mins)
 const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

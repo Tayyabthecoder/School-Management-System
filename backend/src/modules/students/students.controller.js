@@ -154,6 +154,14 @@ const createStudent = async (req, res, next) => {
       feeSetup,
     } = req.body
 
+    // Validate the class and section up front so a bad request can't leave a half-created student.
+    const targetClass = await Class.findById(classId)
+    if (!targetClass) throw new ApiError(400, 'Selected class does not exist')
+    const targetSection = String(sectionId || 'A').trim().toUpperCase()
+    if (Array.isArray(targetClass.sections) && targetClass.sections.length > 0 && !targetClass.sections.includes(targetSection)) {
+      throw new ApiError(400, `Section "${targetSection}" does not exist in class "${targetClass.name}". Available sections: ${targetClass.sections.join(', ')}`)
+    }
+
     // Generate guaranteed unique Student ID
     const studentId = await generateUniqueStudentId()
 
@@ -163,7 +171,7 @@ const createStudent = async (req, res, next) => {
       dob,
       gender,
       classId,
-      sectionId: sectionId || 'A',
+      sectionId: targetSection,
       guardian,
       bloodGroup: bloodGroup || '',
       bFormNumber: bFormNumber || '',

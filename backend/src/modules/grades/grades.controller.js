@@ -148,6 +148,7 @@ const generateReportCard = async (req, res, next) => {
     const formattedGrades = grades
       .filter(g => {
         if (!g.examId) return false
+        if (termName && g.examId.termName !== termName) return false
         if (isPrivileged) return true
         return g.examId.isPublished === true
       })

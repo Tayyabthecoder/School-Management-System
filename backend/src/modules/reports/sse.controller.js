@@ -2,6 +2,7 @@
  * Server-Sent Events (SSE) Controller for Real-Time Dashboard Updates (Gap 1)
  */
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 
 const clients = new Set()
 
@@ -19,6 +20,28 @@ const MAX_STREAMS_PER_USER = 3
 const MAX_STREAMS_TOTAL = 500
 
 const roleOf = (user) => user?.roleName || (typeof user?.role === 'object' ? user.role?.name : user?.role) || null
+
+// The access token is only checked when the stream opens, so a stream would otherwise outlive
+// its token (and the user's deactivation or role change). Streams are closed once the token
+// expires; the client reconnects with a fresh token, which is re-validated by verifyToken.
+const tokenExpiryMs = (req) => {
+  const header = req.headers?.authorization
+  if (typeof header !== 'string' || !header.startsWith('Bearer ')) return null
+  const exp = jwt.decode(header.slice(7))?.exp
+  return exp ? exp * 1000 : null
+}
+
+const closeExpiredClients = (now = Date.now()) => {
+  for (const client of [...clients]) {
+    if (client.expiresAt && now > client.expiresAt) {
+      try {
+        client.res.write('event: auth:expired\ndata: {}\n\n')
+        client.res.end()
+      } catch (_) { /* already closed */ }
+      clients.delete(client)
+    }
+  }
+}
 
 const subscribe = (req, res) => {
   const userId = String(req.user?._id || req.user?.id || '')
@@ -40,7 +63,7 @@ const subscribe = (req, res) => {
   })
 
   const clientId = crypto.randomUUID()
-  const client = { id: clientId, res, role: roleOf(req.user), userId }
+  const client = { id: clientId, res, role: roleOf(req.user), userId, expiresAt: tokenExpiryMs(req) }
   clients.add(client)
 
   // Send initial handshake
@@ -48,6 +71,7 @@ const subscribe = (req, res) => {
 
   // Periodic heartbeat to prevent proxy timeout
   const heartbeat = setInterval(() => {
+    closeExpiredClients()
     try {
       res.write(': heartbeat\n\n')
     } catch (_) {
@@ -81,5 +105,6 @@ module.exports = {
   MAX_STREAMS_TOTAL,
   subscribe,
   broadcast,
+  closeExpiredClients,
   _clients: clients,
 }

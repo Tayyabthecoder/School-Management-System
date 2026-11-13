@@ -9,6 +9,11 @@ const crypto = require('crypto')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 const RefreshToken = require('../../models/RefreshToken.model')
 
+// Account-level lock threshold. It is deliberately high: the per-(IP, username) limiter in app.js
+// stops a single client long before this, so reaching it means many sources are guessing
+// (a distributed attack), not one attacker locking a victim out.
+const MAX_FAILED_LOGINS = 20
+
 const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60 // 7 days
 // A just-rotated token may legitimately be presented again by a second tab or a retried request.
 // Replays after this window mean the token was copied, so every session of the user is revoked.
@@ -71,7 +76,7 @@ const login = async (username, password) => {
     user.failedLoginAttempts += 1
     // super_admin is never hard-locked: otherwise anyone could keep the admin locked out
     // with wrong passwords. The per-IP login rate limiter still throttles guessing.
-    if (user.failedLoginAttempts >= 5 && user.roleName !== 'super_admin') {
+    if (user.failedLoginAttempts >= MAX_FAILED_LOGINS && user.roleName !== 'super_admin') {
       user.lockUntil = new Date(Date.now() + 15 * 60 * 1000)
     }
     await user.save()

@@ -118,3 +118,24 @@ describe('request logging', () => {
     }
   })
 })
+
+describe('SSE stream expiry', () => {
+  const sse = require('../modules/reports/sse.controller')
+  afterEach(() => sse._clients.clear())
+
+  test('closes streams whose access token has expired and keeps valid ones', () => {
+    const expired = { res: { write: jest.fn(), end: jest.fn() }, expiresAt: Date.now() - 1000 }
+    const valid = { res: { write: jest.fn(), end: jest.fn() }, expiresAt: Date.now() + 60_000 }
+    const unknown = { res: { write: jest.fn(), end: jest.fn() }, expiresAt: null }
+    ;[expired, valid, unknown].forEach((c) => sse._clients.add(c))
+
+    sse.closeExpiredClients()
+
+    expect(expired.res.end).toHaveBeenCalled()
+    expect(expired.res.write).toHaveBeenCalledWith(expect.stringContaining('auth:expired'))
+    expect(valid.res.end).not.toHaveBeenCalled()
+    expect(unknown.res.end).not.toHaveBeenCalled()
+    expect(sse._clients.has(expired)).toBe(false)
+    expect(sse._clients.size).toBe(2)
+  })
+})

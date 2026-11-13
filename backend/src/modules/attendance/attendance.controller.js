@@ -74,6 +74,7 @@ const markStudentAttendance = async (req, res, next) => {
         date: { $gte: monthStart, $lte: monthEnd },
       })
 
+      const alertWrites = []
       for (const st of students) {
         let totalDays = 0
         let presentDays = 0
@@ -91,7 +92,7 @@ const markStudentAttendance = async (req, res, next) => {
         if (totalDays >= 3) {
           const monthlyRate = Math.round((presentDays / totalDays) * 100)
           if (monthlyRate < threshold) {
-            await logAudit({
+            alertWrites.push(logAudit({
               req,
               action: 'LOW_ATTENDANCE_ALERT',
               module: 'attendance',
@@ -103,10 +104,12 @@ const markStudentAttendance = async (req, res, next) => {
                 totalDays,
                 presentDays,
               },
-            })
+            }))
           }
         }
       }
+      // One round of parallel writes instead of one awaited write per student.
+      await Promise.all(alertWrites)
     }
 
     await invalidateCache('dashboard:stats')
