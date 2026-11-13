@@ -6,7 +6,7 @@ services:
     container_name: sms-mongodb
     restart: unless-stopped
     ports:
-      - '127.0.0.1:27017:27017'
+      - '127.0.0.1:${MONGO_HOST_PORT:-27017}:27017'
     environment:
       MONGO_INITDB_DATABASE: sms
       # Authentication is enforced as soon as a root user exists. These only take effect when the
@@ -18,7 +18,7 @@ services:
     networks:
       - sms-network
     healthcheck:
-      test: ['CMD-SHELL', 'mongosh --quiet -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand('ping')"']
+      test: ['CMD-SHELL', 'mongosh --quiet -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand({ping:1})"']
       interval: 10s
       timeout: 5s
       retries: 5
