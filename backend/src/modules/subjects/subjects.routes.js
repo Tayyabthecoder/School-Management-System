@@ -10,8 +10,8 @@ router.use(verifyToken)
 
 router.get('/', subjectsController.getSubjects)
 router.get('/:id', subjectsController.getSubjectById)
-router.post('/', checkPermission(['super_admin', 'teacher'], 'classes', 'create'), validate(createSubjectSchema), subjectsController.createSubject)
-router.patch('/:id', checkPermission(['super_admin', 'teacher'], 'classes', 'update'), validate(updateSubjectSchema), subjectsController.updateSubject)
+router.post('/', checkPermission(['super_admin'], 'classes', 'create'), validate(createSubjectSchema), subjectsController.createSubject)
+router.patch('/:id', checkPermission(['super_admin'], 'classes', 'update'), validate(updateSubjectSchema), subjectsController.updateSubject)
 router.delete('/:id', checkPermission(['super_admin'], 'classes', 'delete'), subjectsController.deleteSubject)
 
 module.exports = router

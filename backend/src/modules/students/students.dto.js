@@ -86,6 +86,11 @@ const updateStudentSchema = z.object({
     fatherName: z.string().optional(),
     photoUrl: z.string().optional().or(z.literal('')),
     joiningDate: z.string().or(z.date()).optional(),
+    status: z.enum(['Active', 'Transferred', 'Withdrawn', 'Graduated']).optional(),
+    transferReason: z.string().optional(),
+    transferDate: z.string().or(z.date()).nullable().optional(),
+    rollNumber: z.string().optional(),
+    transportOption: z.string().optional(),
   }),
 })
 

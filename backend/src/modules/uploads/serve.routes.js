@@ -10,7 +10,18 @@ const ALLOWED_SUBFOLDERS = new Set(['photos', 'documents', 'general'])
 const FULL_ACCESS_ROLES = new Set(['super_admin', 'hr_manager'])
 const SELF_SERVICE_ROLES = new Set(['student', 'guardian'])
 
-const roleOf = (user) => user?.roleName || (typeof user?.role === 'object' ? user.role?.name : user?.role)
+const INLINE_IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif'])
+
+// Images may render inline (profile photos); everything else downloads, and no served file can run script.
+const setSafeHeaders = (res, filePath) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('Content-Security-Policy', "sandbox; default-src 'none'; img-src 'self' data:")
+  if (!INLINE_IMAGE_EXT.has(path.extname(filePath).toLowerCase())) {
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(filePath).replace(/"/g, '')}"`)
+  }
+}
+
+const roleOf =(user) => user?.roleName || (typeof user?.role === 'object' ? user.role?.name : user?.role)
 
 /**
  * SEC-05: any authenticated user could previously fetch any upload by name.
@@ -57,7 +68,7 @@ router.get('/:subfolder/:filename', async (req, res, next) => {
     }
 
     // Set secure response headers for served files
-    res.setHeader('X-Content-Type-Options', 'nosniff')
+    setSafeHeaders(res, filePath)
     res.sendFile(filePath, (err) => {
       if (err) {
         next(err)
@@ -80,14 +91,14 @@ router.get('/:filename', async (req, res, next) => {
       if (subfolder === 'documents' && !FULL_ACCESS_ROLES.has(role)) continue
       const candidatePath = path.join(UPLOADS_DIR, subfolder, safeFilename)
       if (fs.existsSync(candidatePath)) {
-        res.setHeader('X-Content-Type-Options', 'nosniff')
+        setSafeHeaders(res, candidatePath)
         return res.sendFile(candidatePath)
       }
     }
 
     const rootPath = path.join(UPLOADS_DIR, safeFilename)
     if (fs.existsSync(rootPath)) {
-      res.setHeader('X-Content-Type-Options', 'nosniff')
+      setSafeHeaders(res, rootPath)
       return res.sendFile(rootPath)
     }
 

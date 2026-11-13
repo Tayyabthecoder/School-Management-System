@@ -23,7 +23,7 @@ router.patch('/leave-requests/:id/review', checkPermission(['super_admin', 'teac
 // General directory & schedule endpoints
 router.get('/', checkPermission(['super_admin', 'hr_manager', 'accountant', 'teacher'], 'staff', 'read'), teachersController.getTeachers)
 router.get('/:id/schedule', checkPermission(['super_admin', 'teacher'], 'timetable', 'read'), teachersController.getTeacherSchedule)
-router.post('/assign', checkPermission(['super_admin', 'teacher'], 'classes', 'update'), validate(assignTeacherPeriodSchema), teachersController.assignTeacherPeriod)
+router.post('/assign', checkPermission(['super_admin'], 'classes', 'update'), validate(assignTeacherPeriodSchema), teachersController.assignTeacherPeriod)
 router.post('/', checkPermission(['super_admin', 'hr_manager'], 'hr', 'create'), validate(createTeacherSchema), teachersController.createTeacher)
 
 module.exports = router
