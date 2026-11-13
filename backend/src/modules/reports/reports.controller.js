@@ -368,7 +368,7 @@ const exportCustomReport = async (req, res, next) => {
 
     // ── Staff ─────────────────────────────────────────────────────
     } else if (entity === 'staff') {
-      const staff = await limitExport(Staff.find({ isActive: true }))
+      const staff = await limitExport(Staff.find({ isActive: true, deletedAt: null }))
       columns = [
         { header: 'Staff ID', key: 'staffId', width: 15 },
         { header: 'Full Name', key: 'fullName', width: 25 },
@@ -895,7 +895,7 @@ const getDefaulterAging = async (req, res, next) => {
  */
 const previewCustomReport = async (req, res, next) => {
   try {
-    const { entity = 'students', fields, filters, sortBy, sortOrder } = req.body || req.query
+    const { entity = 'students', fields, filters, sortBy, sortOrder } = (req.body && Object.keys(req.body).length ? req.body : req.query)
     assertCanExport(req.user, entity)
     const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder })
 
@@ -917,7 +917,7 @@ const previewCustomReport = async (req, res, next) => {
  */
 const exportCustomReportWithFields = async (req, res, next) => {
   try {
-    const { entity = 'students', fields, filters, format = 'excel', title = 'Custom Report', sortBy, sortOrder } = req.body || req.query
+    const { entity = 'students', fields, filters, format = 'excel', title = 'Custom Report', sortBy, sortOrder } = (req.body && Object.keys(req.body).length ? req.body : req.query)
     assertCanExport(req.user, entity)
     const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder })
     assertExportSize(rows.length)

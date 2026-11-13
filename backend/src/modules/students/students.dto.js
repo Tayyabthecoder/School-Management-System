@@ -1,5 +1,11 @@
 const { z } = require('zod')
 
+// Photos are either an uploaded file path or an inline image data URL; reject any other scheme
+// (javascript:, external URLs) so the value is safe to render as <img src>.
+const photoUrlSchema = z.string()
+  .regex(/^(\/uploads\/(photos|general)\/[\w.-]+|data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+)?$/, 'Invalid photo')
+  .optional()
+
 const createStudentSchema = z.object({
   body: z.object({
     fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -29,7 +35,7 @@ const createStudentSchema = z.object({
     address: z.string().optional(),
     city: z.string().optional(),
     fatherName: z.string().optional(),
-    photoUrl: z.string().optional().or(z.literal('')),
+    photoUrl: photoUrlSchema,
     joiningDate: z.string().or(z.date()).optional(),
     feeSetup: z.object({
       selectedFeeStructureIds: z.array(z.string()).optional(),
@@ -84,7 +90,7 @@ const updateStudentSchema = z.object({
     address: z.string().optional(),
     city: z.string().optional(),
     fatherName: z.string().optional(),
-    photoUrl: z.string().optional().or(z.literal('')),
+    photoUrl: photoUrlSchema,
     joiningDate: z.string().or(z.date()).optional(),
     status: z.enum(['Active', 'Transferred', 'Withdrawn', 'Graduated']).optional(),
     transferReason: z.string().optional(),

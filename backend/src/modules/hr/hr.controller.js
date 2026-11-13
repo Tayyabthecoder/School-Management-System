@@ -202,6 +202,10 @@ const reviewLeaveRequest = async (req, res, next) => {
     const existing = await LeaveRequest.findById(leaveId)
     if (!existing) throw new ApiError(404, 'Leave request not found')
 
+    if (existing.status && existing.status !== 'Pending') {
+      throw new ApiError(409, `Leave request was already ${existing.status.toLowerCase()}`)
+    }
+
     // Segregation of duties: an HR manager must not approve or reject their own leave.
     const isOwnRequest = req.user.staffId && existing.staffId?.toString() === req.user.staffId.toString()
     if (isOwnRequest && req.user.roleName !== 'super_admin') {

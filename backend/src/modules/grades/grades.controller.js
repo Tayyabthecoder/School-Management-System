@@ -9,6 +9,7 @@ const { assertStudentAccess, assertTeacherStudentScope } = require('../../utils/
 const TimetableEntry = require('../../models/TimetableEntry.model')
 const { validateObjectId } = require('../../utils/validation.util')
 const { getOrSet } = require('../../utils/cache.util')
+const { logAudit } = require('../../utils/audit-log.util')
 const { calculateGradeLetter, calculatePercentage } = require('./grades.service')
 
 // Teachers may only create/enter marks for classes they are timetabled to teach.
@@ -96,6 +97,14 @@ const saveGrades = async (req, res, next) => {
       )
       saved.push(doc)
     }
+
+    await logAudit({
+      req,
+      action: 'GRADES_SAVED',
+      module: 'grades',
+      documentId: String(examId),
+      newValues: { examId, published: !!exam.isPublished, count: saved.length },
+    })
 
     res.json({ success: true, data: saved })
   } catch (error) {

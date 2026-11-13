@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# Least privilege for the default GITHUB_TOKEN; cancel superseded runs on the same ref.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend:
     name: Backend Tests, Coverage & Audit
