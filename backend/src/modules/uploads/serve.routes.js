@@ -5,6 +5,7 @@ const router = express.Router()
 const { UPLOADS_DIR } = require('../../middleware/upload.middleware')
 const { ApiError } = require('../../middleware/error.middleware')
 const Student = require('../../models/Student.model')
+const { assertTeacherStudentScope } = require('../../utils/guardian-auth.util')
 
 const ALLOWED_SUBFOLDERS = new Set(['photos', 'documents', 'general'])
 const FULL_ACCESS_ROLES = new Set(['super_admin', 'hr_manager'])
@@ -43,6 +44,13 @@ const authorizeUploadAccess = async (req, subfolder, safeFilename) => {
   const candidates = url ? [url] : [...ALLOWED_SUBFOLDERS].map((s) => `/uploads/${s}/${safeFilename}`)
   if (await Student.exists({ 'documents.url': { $in: candidates } })) {
     throw new ApiError(403, 'You are not allowed to open student documents')
+  }
+
+  // A student's profile photo follows the same access rule as the student record: a teacher
+  // may only open photos of students in their own classes. Unattached files stay open to staff.
+  if (role === 'teacher') {
+    const owner = await Student.findOne({ photoUrl: { $in: candidates }, deletedAt: null })
+    if (owner) await assertTeacherStudentScope(req.user, owner)
   }
 }
 

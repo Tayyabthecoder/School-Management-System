@@ -187,93 +187,104 @@ const createStudent = async (req, res, next) => {
       joiningDate: joiningDate || Date.now(),
     })
 
-    // Create user login account for the student
     let initialCredentials = null
-    const studentRole = await Role.findOne({ name: 'student' })
-    if (studentRole) {
-      const creds = await createInitialCredentials()
-      initialCredentials = { username: studentId.toLowerCase(), password: creds.password }
-      const username = studentId.toLowerCase()
-      const existingUser = await User.findOne({ username })
-      if (!existingUser) {
-        await User.create({
-          username,
-          passwordHash: creds.passwordHash,
-          role: studentRole._id,
-          roleName: 'student',
-          studentId: student._id,
-          mustChangePassword: true,
-        })
-      }
-    }
-
-    // Process Fee & Concession Setup if provided or active fee structures exist
     const createdFees = []
     const createdPayments = []
-
-    if (feeSetup) {
-      let structuresToAssign = []
-      if (feeSetup.selectedFeeStructureIds && feeSetup.selectedFeeStructureIds.length > 0) {
-        structuresToAssign = await FeeStructure.find({
-          _id: { $in: feeSetup.selectedFeeStructureIds },
-        })
-      } else {
-        structuresToAssign = await FeeStructure.find({
-          classId: student.classId,
-          isActive: true,
-        })
-      }
-
-      for (const structure of structuresToAssign) {
-        let discount = 0
-        if (feeSetup.discountType === 'percentage' && Number(feeSetup.discountValue) > 0) {
-          discount = Math.round((structure.amount * Math.min(Number(feeSetup.discountValue), 100)) / 100)
-        } else if (feeSetup.discountType === 'fixed' && Number(feeSetup.discountValue) > 0) {
-          discount = Math.min(Number(feeSetup.discountValue), structure.amount)
-        } else if (Number(feeSetup.discountAmount) > 0) {
-          discount = Math.min(Number(feeSetup.discountAmount), structure.amount)
-        }
-
-        const netAmount = Math.max(0, structure.amount - discount)
-        const isFree = netAmount === 0
-        const isPaidUpfront = feeSetup.initialPaymentStatus === 'Paid' || isFree
-        const amountPaid = isPaidUpfront ? netAmount : 0
-        const outstandingAmount = isPaidUpfront ? 0 : netAmount
-        const status = isPaidUpfront ? 'Paid' : 'Pending'
-
-        const studentFee = await StudentFee.create({
-          studentId: student._id,
-          feeStructureId: structure._id,
-          amountDue: structure.amount,
-          discount,
-          concessionType: discount === 0 ? 'None' : (feeSetup.concessionType || 'Special Management Discount'),
-          concessionReason: discount === 0 ? '' : (feeSetup.concessionReason || ''),
-          netAmount,
-          amountPaid,
-          outstandingAmount,
-          dueDate: structure.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          status,
-        })
-        createdFees.push(studentFee)
-
-        if (isPaidUpfront && netAmount > 0) {
-          const seq = await Counter.getNextSequence('payment')
-          const paymentYear = new Date().getFullYear()
-          const receiptNo = `REC-${paymentYear}-${String(seq).padStart(5, '0')}`
-
-          const payment = await Payment.create({
-            receiptNo,
-            studentFeeId: studentFee._id,
+    try {
+      // Create user login account for the student
+      const studentRole = await Role.findOne({ name: 'student' })
+      if (studentRole) {
+        const creds = await createInitialCredentials()
+        initialCredentials = { username: studentId.toLowerCase(), password: creds.password }
+        const username = studentId.toLowerCase()
+        const existingUser = await User.findOne({ username })
+        if (!existingUser) {
+          await User.create({
+            username,
+            passwordHash: creds.passwordHash,
+            role: studentRole._id,
+            roleName: 'student',
             studentId: student._id,
-            amountPaid: netAmount,
-            paymentMode: feeSetup.paymentMode || 'Cash',
-            referenceNo: feeSetup.referenceNo || '',
-            remarks: feeSetup.paymentRemarks || `Upfront admission fee payment (${structure.title})`,
-            recordedBy: req.user?._id || studentRole?._id,
+            mustChangePassword: true,
           })
-          createdPayments.push(payment)
         }
       }
+
+      // Process Fee & Concession Setup if provided or active fee structures exist
+      if (feeSetup) {
+        let structuresToAssign = []
+        if (feeSetup.selectedFeeStructureIds && feeSetup.selectedFeeStructureIds.length > 0) {
+          structuresToAssign = await FeeStructure.find({
+            _id: { $in: feeSetup.selectedFeeStructureIds },
+          })
+        } else {
+          structuresToAssign = await FeeStructure.find({
+            classId: student.classId,
+            isActive: true,
+          })
+        }
+
+        for (const structure of structuresToAssign) {
+          let discount = 0
+          if (feeSetup.discountType === 'percentage' && Number(feeSetup.discountValue) > 0) {
+            discount = Math.round((structure.amount * Math.min(Number(feeSetup.discountValue), 100)) / 100)
+          } else if (feeSetup.discountType === 'fixed' && Number(feeSetup.discountValue) > 0) {
+            discount = Math.min(Number(feeSetup.discountValue), structure.amount)
+          } else if (Number(feeSetup.discountAmount) > 0) {
+            discount = Math.min(Number(feeSetup.discountAmount), structure.amount)
+          }
+
+          const netAmount = Math.max(0, structure.amount - discount)
+          const isFree = netAmount === 0
+          const isPaidUpfront = feeSetup.initialPaymentStatus === 'Paid' || isFree
+          const amountPaid = isPaidUpfront ? netAmount : 0
+          const outstandingAmount = isPaidUpfront ? 0 : netAmount
+          const status = isPaidUpfront ? 'Paid' : 'Pending'
+
+          const studentFee = await StudentFee.create({
+            studentId: student._id,
+            feeStructureId: structure._id,
+            amountDue: structure.amount,
+            discount,
+            concessionType: discount === 0 ? 'None' : (feeSetup.concessionType || 'Special Management Discount'),
+            concessionReason: discount === 0 ? '' : (feeSetup.concessionReason || ''),
+            netAmount,
+            amountPaid,
+            outstandingAmount,
+            dueDate: structure.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            status,
+          })
+          createdFees.push(studentFee)
+
+          if (isPaidUpfront && netAmount > 0) {
+            const seq = await Counter.getNextSequence('payment')
+            const paymentYear = new Date().getFullYear()
+            const receiptNo = `REC-${paymentYear}-${String(seq).padStart(5, '0')}`
+
+            const payment = await Payment.create({
+              receiptNo,
+              studentFeeId: studentFee._id,
+              studentId: student._id,
+              amountPaid: netAmount,
+              paymentMode: feeSetup.paymentMode || 'Cash',
+              referenceNo: feeSetup.referenceNo || '',
+              remarks: feeSetup.paymentRemarks || `Upfront admission fee payment (${structure.title})`,
+              recordedBy: req.user?._id || studentRole?._id,
+            })
+            createdPayments.push(payment)
+          }
+        }
+      }
+
+    } catch (setupError) {
+      // Roll back what was created so a failed registration can be retried cleanly.
+      await Promise.allSettled([
+        Payment.deleteMany({ studentId: student._id }),
+        StudentFee.deleteMany({ studentId: student._id }),
+        User.deleteMany({ studentId: student._id }),
+        Student.deleteOne({ _id: student._id }),
+      ])
+      throw setupError
     }
 
     await logAudit(req, 'STUDENT_CREATED', {

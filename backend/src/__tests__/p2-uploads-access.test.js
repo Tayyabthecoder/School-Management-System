@@ -3,12 +3,14 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const Student = require('../models/Student.model')
+const TimetableEntry = require('../models/TimetableEntry.model')
 const { UPLOADS_DIR } = require('../middleware/upload.middleware')
 const { downloadStudentDocument, resolveStoredFile } = require('../modules/uploads/uploads.controller')
 const { authorizeUploadAccess } = require('../modules/uploads/serve.routes')
 const { parseStudentExcel } = require('../utils/excel.util')
 
 jest.mock('../models/Student.model')
+jest.mock('../models/TimetableEntry.model')
 
 const asUser = (roleName, extra = {}) => ({ user: { roleName, ...extra } })
 
@@ -108,5 +110,42 @@ describe('LOW-03: legacy .xls import', () => {
     } finally {
       fs.rmSync(xls, { force: true })
     }
+  })
+})
+
+describe('authorizeUploadAccess (student profile photos)', () => {
+  const photoOwner = { _id: 's1', classId: 'class-5', sectionId: 'A' }
+  const teacher = (staffId = 'staff-1') => asUser('teacher', { staffId })
+
+  beforeEach(() => {
+    Student.exists.mockResolvedValue(null)
+  })
+
+  test('a teacher may open the photo of a student they teach', async () => {
+    Student.findOne.mockResolvedValue(photoOwner)
+    TimetableEntry.exists.mockResolvedValue({ _id: 't1' })
+
+    await expect(authorizeUploadAccess(teacher(), 'photos', 'face.png')).resolves.toBeUndefined()
+    expect(Student.findOne).toHaveBeenCalledWith({ photoUrl: { $in: ['/uploads/photos/face.png'] }, deletedAt: null })
+  })
+
+  test('a teacher cannot open the photo of a student in another class', async () => {
+    Student.findOne.mockResolvedValue(photoOwner)
+    TimetableEntry.exists.mockResolvedValue(null)
+
+    await expect(authorizeUploadAccess(teacher(), 'photos', 'face.png')).rejects.toMatchObject({ statusCode: 403 })
+  })
+
+  test('a file that is not attached to any student stays open to staff', async () => {
+    Student.findOne.mockResolvedValue(null)
+
+    await expect(authorizeUploadAccess(teacher(), 'general', 'notice.txt')).resolves.toBeUndefined()
+    expect(TimetableEntry.exists).not.toHaveBeenCalled()
+  })
+
+  test('an accountant may still open student photos', async () => {
+    Student.findOne.mockResolvedValue(photoOwner)
+
+    await expect(authorizeUploadAccess(asUser('accountant'), 'photos', 'face.png')).resolves.toBeUndefined()
   })
 })

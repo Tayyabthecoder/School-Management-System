@@ -17,6 +17,15 @@ describe('upload magic-byte check', () => {
     expect(contentMatchesExtension(Buffer.from('MZ\x90\0\x03'), '.pdf')).toBe(false)
     expect(contentMatchesExtension(Buffer.from([0x50, 0x4B, 0x03, 0x04]), '.pdf')).toBe(false)
     expect(contentMatchesExtension(Buffer.from('bin\0ary'), '.txt')).toBe(false)
+    // A bare ZIP is not an Office document
+    expect(contentMatchesExtension(Buffer.from([0x50, 0x4B, 0x03, 0x04, 0]), '.xlsx')).toBe(false)
+    expect(contentMatchesExtension(Buffer.from([0x50, 0x4B, 0x03, 0x04, 0]), '.docx')).toBe(false)
+    // Text uploads must not carry markup
+    expect(contentMatchesExtension(Buffer.from('name,notes\nAli,<script>alert(1)</script>'), '.csv')).toBe(false)
+    expect(contentMatchesExtension(Buffer.from('<HTML><body>hi</body></HTML>'), '.txt')).toBe(false)
+  })
+  test('plain text containing angle brackets is still accepted', () => {
+    expect(contentMatchesExtension(Buffer.from('a < b and b > c'), '.txt')).toBe(true)
   })
 })
 
