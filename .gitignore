@@ -49,3 +49,6 @@ docs/
 certs/
 # Test coverage output
 coverage/
+
+# Local audit report
+PROJECT_REPORT.md
