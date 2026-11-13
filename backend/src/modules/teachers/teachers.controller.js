@@ -105,6 +105,11 @@ const getTeachers = async (req, res, next) => {
  */
 const getTeacherSchedule = async (req, res, next) => {
   try {
+    // Teachers may only view their own schedule; admins can view anyone's.
+    if (req.user.roleName === 'teacher' && String(req.user.staffId || '') !== String(req.params.id)) {
+      throw new ApiError(403, 'Forbidden: You can only view your own schedule')
+    }
+
     const teacher = await Staff.findById(req.params.id)
     if (!teacher) throw new ApiError(404, 'Teacher not found')
 

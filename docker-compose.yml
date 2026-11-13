@@ -83,7 +83,8 @@ services:
       # self-signed pair is generated into this folder on first start.
       - ./certs:/etc/nginx/certs
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - sms-network
 

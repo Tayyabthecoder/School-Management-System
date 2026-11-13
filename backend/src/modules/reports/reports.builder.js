@@ -72,11 +72,12 @@ const Exam = require('../../models/Exam.model')
 /**
  * Compile Dynamic Custom Report dataset with database-level filtering (FR-RP-03)
  */
-const compileDynamicCustomReport = async ({ entity = 'students', fields = [], filters = {}, sortBy, sortOrder = 1 }) => {
+const compileDynamicCustomReport = async ({ entity = 'students', fields = [], filters = {}, sortBy, sortOrder = 1, excludeFields = [] }) => {
   const entityConfig = ENTITY_FIELD_CONFIG[entity] || ENTITY_FIELD_CONFIG.students
-  const selectedKeys = Array.isArray(fields) && fields.length > 0
+  const requestedKeys = Array.isArray(fields) && fields.length > 0
     ? fields.filter(k => entityConfig[k])
     : Object.keys(entityConfig)
+  const selectedKeys = requestedKeys.filter(k => !excludeFields.includes(k))
 
   const columns = selectedKeys.map(k => ({
     header: entityConfig[k].header,

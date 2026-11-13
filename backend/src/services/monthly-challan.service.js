@@ -46,7 +46,7 @@ const getDefaultTuitionForClass = (className, level = 1) => {
  * @param {boolean} [options.force=false] - If true, re-generates even if already generated
  * @returns {Promise<Object>} Summary of generated challans
  */
-const generateMonthlyFeeChallans = async ({
+const generateMonthlyFeeChallansUnlocked = async ({
   targetDate = new Date(),
   academicYearId = null,
   executedBy = 'CRON_SYSTEM',
@@ -73,8 +73,9 @@ const generateMonthlyFeeChallans = async ({
   // Initial cycle due date is set 10 days from generation.
   // When the student/guardian/admin downloads the fee challan, the due date automatically
   // updates to fall exactly 10 days after the download date.
-  const targetDueDate = new Date(refDate.getTime() + 10 * 24 * 60 * 60 * 1000)
-  targetDueDate.setHours(23, 59, 59, 999)
+  // Anchored to the billing month (not the run date) so a late manual run can't push the
+  // structure's due date into the next month and make that month look already billed.
+  const targetDueDate = new Date(targetYear, targetMonthIndex, 10, 23, 59, 59, 999)
 
   // 1. Resolve Academic Year
   let activeYear = null
@@ -380,6 +381,21 @@ const getMonthlyChallansStatus = async () => {
     currentMonthChallansCount,
     status,
     lastGeneratedAt: latestFee ? latestFee.createdAt : null,
+  }
+}
+
+// Only one generation may run at a time in this process, so the cron and a manual trigger
+// can't both read "no challan yet" and bill the same students twice.
+let generationInFlight = null
+const generateMonthlyFeeChallans = async (options = {}) => {
+  if (generationInFlight) {
+    throw new Error('Monthly challan generation is already running. Try again in a moment.')
+  }
+  generationInFlight = generateMonthlyFeeChallansUnlocked(options)
+  try {
+    return await generationInFlight
+  } finally {
+    generationInFlight = null
   }
 }
 

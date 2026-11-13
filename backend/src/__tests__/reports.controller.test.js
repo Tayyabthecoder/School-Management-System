@@ -388,6 +388,7 @@ describe('Reports Controller Unit Tests', () => {
         filters: { classId: 'cls1' },
         sortBy: undefined,
         sortOrder: undefined,
+        excludeFields: [],
       })
       expect(res.json).toHaveBeenCalledWith({
         success: true,

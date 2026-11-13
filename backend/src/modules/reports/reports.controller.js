@@ -893,11 +893,15 @@ const getDefaulterAging = async (req, res, next) => {
 /**
  * Preview dynamic custom report data (FR-RP-03)
  */
+// Identity numbers and medical data stay hidden from accountants, matching the student profile.
+const sensitiveFieldsFor = (user, entity) =>
+  entity === 'students' && user?.roleName === 'accountant' ? ['cnic', 'bloodGroup'] : []
+
 const previewCustomReport = async (req, res, next) => {
   try {
     const { entity = 'students', fields, filters, sortBy, sortOrder } = (req.body && Object.keys(req.body).length ? req.body : req.query)
     assertCanExport(req.user, entity)
-    const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder })
+    const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder, excludeFields: sensitiveFieldsFor(req.user, entity) })
 
     res.json({
       success: true,
@@ -919,7 +923,7 @@ const exportCustomReportWithFields = async (req, res, next) => {
   try {
     const { entity = 'students', fields, filters, format = 'excel', title = 'Custom Report', sortBy, sortOrder } = (req.body && Object.keys(req.body).length ? req.body : req.query)
     assertCanExport(req.user, entity)
-    const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder })
+    const { columns, rows } = await compileDynamicCustomReport({ entity, fields, filters, sortBy, sortOrder, excludeFields: sensitiveFieldsFor(req.user, entity) })
     assertExportSize(rows.length)
 
     if (format === 'pdf') {
