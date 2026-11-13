@@ -66,7 +66,9 @@ const login = async (username, password) => {
   }
   if (!isMatch) {
     user.failedLoginAttempts += 1
-    if (user.failedLoginAttempts >= 5) {
+    // super_admin is never hard-locked: otherwise anyone could keep the admin locked out
+    // with wrong passwords. The per-IP login rate limiter still throttles guessing.
+    if (user.failedLoginAttempts >= 5 && user.roleName !== 'super_admin') {
       user.lockUntil = new Date(Date.now() + 15 * 60 * 1000)
     }
     await user.save()

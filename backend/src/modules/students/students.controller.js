@@ -324,6 +324,15 @@ const updateStudent = async (req, res, next) => {
       }
     }
 
+    // Partial guardian/emergencyContact updates must merge, not replace the whole subdocument.
+    for (const key of ['guardian', 'emergencyContact']) {
+      const sub = sanitized[key]
+      if (sub && typeof sub === 'object' && !Array.isArray(sub)) {
+        delete sanitized[key]
+        for (const [k, v] of Object.entries(sub)) sanitized[`${key}.${k}`] = v
+      }
+    }
+
     const student = await Student.findOneAndUpdate(
       { _id: req.params.id, deletedAt: null },
       { $set: sanitized },

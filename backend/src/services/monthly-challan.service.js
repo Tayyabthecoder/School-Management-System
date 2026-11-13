@@ -57,9 +57,13 @@ const generateMonthlyFeeChallans = async ({
     throw new Error('Invalid target date provided for monthly fee generation')
   }
 
-  const targetYear = refDate.getFullYear()
-  const targetMonthIndex = refDate.getMonth()
-  const monthName = refDate.toLocaleString('en-US', { month: 'long' })
+  // Resolve the billing month in the school's timezone (the cron fires at 00:00 PKT, which is
+  // still the previous month on a UTC host).
+  const pkt = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Karachi', year: 'numeric', month: 'numeric' })
+    .formatToParts(refDate)
+  const targetYear = Number(pkt.find((p) => p.type === 'year').value)
+  const targetMonthIndex = Number(pkt.find((p) => p.type === 'month').value) - 1
+  const monthName = new Date(Date.UTC(targetYear, targetMonthIndex, 1)).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })
 
   // Standard monthly cycle dates:
   // Month start: 1st of month at 00:00:00

@@ -29,8 +29,9 @@ const checkPermission = (requiredRoles = [], module = null, action = null) => {
 
       // Check granular module permissions if defined on role document
       const permissions = req.user.role && req.user.role.permissions
-      if (module && action && Array.isArray(permissions) && permissions.length > 0) {
-        const modulePerm = permissions.find(p => p.module === module)
+      // Fail closed: a role with no permission entries gets no module access.
+      if (module && action) {
+        const modulePerm = Array.isArray(permissions) ? permissions.find(p => p.module === module) : null
         if (!modulePerm || !modulePerm.actions.includes(action)) {
           throw new ApiError(403, `Forbidden: Missing '${action}' permission for module '${module}'`)
         }

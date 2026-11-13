@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
+import { useAuthStore } from '../../store/authStore'
 import {
   GraduationCap,
   Users,
@@ -44,6 +45,9 @@ const SUBJECT_COLORS = [
 
 // ─── Main Teachers Page ───────────────────────────────────────────────────────
 export default function TeachersPage() {
+  const authUser = useAuthStore((s) => s.user)
+  // Only super_admin may assign teachers to periods (the API rejects teachers).
+  const isAdmin = (authUser?.roleName || (typeof authUser?.role === 'object' ? authUser?.role?.name : authUser?.role)) === 'super_admin'
   const toast = useToast()
 
   // State
@@ -351,12 +355,14 @@ export default function TeachersPage() {
                       >
                         Timetable
                       </button>
-                      <button
-                        onClick={() => setSelectedTeacherForAssign(teacher)}
-                        className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition-colors"
-                      >
-                        + Assign
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => setSelectedTeacherForAssign(teacher)}
+                          className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition-colors"
+                        >
+                          + Assign
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -404,12 +410,14 @@ export default function TeachersPage() {
                       >
                         Schedule
                       </button>
-                      <button
-                        onClick={() => setSelectedTeacherForAssign(teacher)}
-                        className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold"
-                      >
-                        Assign
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => setSelectedTeacherForAssign(teacher)}
+                          className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold"
+                        >
+                          Assign
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -472,6 +480,8 @@ export default function TeachersPage() {
                                     <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                                     {assignedTeacher}
                                   </span>
+                                ) : !isAdmin ? (
+                                  <span className="text-xs text-gray-400">Unassigned</span>
                                 ) : (
                                   <button
                                     onClick={() => setSelectedTeacherForAssign({ _id: teachers[0]?._id, fullName: 'Teacher' })}

@@ -36,7 +36,8 @@ const withOptionalTransaction = async (workFn) => {
     }
     const result = await workFn(session)
     if (session && typeof session.inTransaction === 'function' && session.inTransaction()) {
-      await session.commitTransaction().catch(() => {})
+      // A failed commit means nothing was persisted: surface it instead of returning success.
+      await session.commitTransaction()
     }
     return result
   } catch (err) {
@@ -462,16 +463,25 @@ const downloadChallanPDF = async (req, res, next) => {
 const applyConcession = async (req, res, next) => {
   try {
     const { studentFeeId, discountAmount, concessionType, concessionReason } = req.body
-    const feeRecord = await StudentFee.findById(studentFeeId).populate({
-      path: 'studentId',
-      populate: { path: 'classId' },
-    })
+    // Optimistic retry: save only if amountPaid is unchanged since we read it, so a payment
+    // recorded concurrently is never overwritten by a stale outstanding amount.
+    let feeRecord = null
+    for (let attempt = 0; attempt < 3; attempt++) {
+      feeRecord = await StudentFee.findById(studentFeeId).populate({
+        path: 'studentId',
+        populate: { path: 'classId' },
+      })
+      if (!feeRecord) throw new ApiError(404, 'Student fee record not found')
 
-    if (!feeRecord) throw new ApiError(404, 'Student fee record not found')
-
-    applyDiscountToFeeRecord(feeRecord, discountAmount, concessionType, concessionReason)
-
-    await feeRecord.save()
+      applyDiscountToFeeRecord(feeRecord, discountAmount, concessionType, concessionReason)
+      feeRecord.$where = { amountPaid: feeRecord.amountPaid }
+      try {
+        await feeRecord.save()
+        break
+      } catch (saveErr) {
+        if (saveErr.name !== 'DocumentNotFoundError' || attempt === 2) throw saveErr
+      }
+    }
 
     await logAudit({
       req,
@@ -531,7 +541,11 @@ const updateChallanSettings = async (req, res, next) => {
       settings.markModified('copies')
       await settings.save()
     } else {
-      settings = await ChallanSettings.create({ ...payload, isActive: true })
+      const allowed = ['paymentMethods', 'instructions', 'particulars', 'copies', 'instituteName',
+        'subHeader', 'layout', 'lateFeeSurcharge', 'signatories']
+      const data = {}
+      for (const key of allowed) if (payload[key] !== undefined) data[key] = payload[key]
+      settings = await ChallanSettings.create({ ...data, isActive: true })
     }
 
     await invalidateCache('ref:challan-settings')

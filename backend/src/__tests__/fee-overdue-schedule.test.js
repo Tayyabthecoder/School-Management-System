@@ -31,7 +31,7 @@ describe('fee overdue schedule without Redis', () => {
     const result = await executeFeeOverdueCheck()
 
     expect(result).toEqual({ processedCount: 2 })
-    expect(StudentFee.updateMany).toHaveBeenCalledWith({ _id: { $in: ['fee-1', 'fee-2'] } }, { $set: { status: 'Overdue' } })
+    expect(StudentFee.updateMany).toHaveBeenCalledWith({ _id: { $in: ['fee-1', 'fee-2'] }, status: { $in: ['Pending', 'Partial'] } }, { $set: { status: 'Overdue' } })
   })
 })
 

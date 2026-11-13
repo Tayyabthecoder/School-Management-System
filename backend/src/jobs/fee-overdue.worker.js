@@ -19,7 +19,8 @@ const executeFeeOverdueCheck = async () => {
 
     const overdueIds = overdueFees.map((f) => f._id)
     await StudentFee.updateMany(
-      { _id: { $in: overdueIds } },
+      // Re-check status so a fee paid since the find above is not flipped back to Overdue.
+      { _id: { $in: overdueIds }, status: { $in: ['Pending', 'Partial'] } },
       { $set: { status: 'Overdue' } }
     )
 

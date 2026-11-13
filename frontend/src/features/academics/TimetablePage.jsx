@@ -8,6 +8,7 @@ import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { useToast } from '../../store/toastStore'
+import { useAuthStore } from '../../store/authStore'
 import { logError } from '../../lib/logger'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -24,6 +25,9 @@ const PERIOD_TIMES = [
 ]
 
 export default function TimetablePage() {
+  const authUser = useAuthStore((s) => s.user)
+  // Only super_admin may edit the timetable (the API rejects teachers).
+  const isAdmin = (authUser?.roleName || (typeof authUser?.role === 'object' ? authUser?.role?.name : authUser?.role)) === 'super_admin'
   const toast = useToast()
 
   const [classes, setClasses] = useState([])
@@ -214,13 +218,15 @@ export default function TimetablePage() {
                                 <p className="font-bold text-indigo-950 text-xs leading-tight">
                                   {entry.subjectId?.name || 'Subject'}
                                 </p>
-                                <button
-                                  onClick={() => handleDeletePeriod(entry._id)}
-                                  className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-opacity p-0.5"
-                                  title="Clear slot"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
+                                {isAdmin && (
+                                  <button
+                                    onClick={() => handleDeletePeriod(entry._id)}
+                                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-opacity p-0.5"
+                                    title="Clear slot"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                )}
                               </div>
                               <p className="text-[11px] text-indigo-700 font-semibold mt-1 truncate">
                                 {entry.teacherId?.fullName || 'Faculty'}

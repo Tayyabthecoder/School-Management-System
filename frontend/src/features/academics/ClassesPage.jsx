@@ -472,12 +472,14 @@ export default function ClassesPage() {
                   Manage active subjects, syllabus codes, and faculty assignments for this grade level.
                 </p>
               </div>
-              <button
-                onClick={() => setShowAddSubjectModal(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-colors self-start sm:self-auto"
-              >
-                <Plus className="w-4 h-4" /> Add Subject to Class
-              </button>
+              {userRole === 'super_admin' && (
+                <button
+                  onClick={() => setShowAddSubjectModal(true)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-colors self-start sm:self-auto"
+                >
+                  <Plus className="w-4 h-4" /> Add Subject to Class
+                </button>
+              )}
             </div>
 
             {loadingDetails ? (
