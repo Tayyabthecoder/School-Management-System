@@ -243,8 +243,10 @@ export default function HRPage() {
   const [runningPayroll, setRunningPayroll] = useState(false)
   const [payrollRecords, setPayrollRecords] = useState([])
   const [finalizing, setFinalizing] = useState(false)
+  const [markingPaid, setMarkingPaid] = useState(false)
   const payrollRun = payrollRecords.length > 0
   const draftCount = payrollRecords.filter((r) => r.status !== 'Finalized').length
+  const unpaidFinalizedCount = payrollRecords.filter((r) => r.status === 'Finalized' && r.paymentStatus !== 'Paid').length
 
   useEffect(() => {
     api.get('/hr/staff')
@@ -274,6 +276,21 @@ export default function HRPage() {
       toast.error(err.response?.data?.error?.message || 'Failed to finalize payroll')
     } finally {
       setFinalizing(false)
+    }
+  }
+
+  const handleMarkPayrollPaid = async () => {
+    const period = `${MONTHS[payMonth - 1]} ${payYear}`
+    if (!(await confirmAction({ title: 'Mark payroll as paid', message: `Mark ${unpaidFinalizedCount} finalized payslip(s) for ${period} as paid? Do this after the salaries have actually been transferred.`, confirmLabel: 'Mark as paid' }))) return
+    setMarkingPaid(true)
+    try {
+      const res = await api.put('/hr/payroll/mark-paid', { month: payMonth, year: payYear })
+      toast.success(res.data?.message || `Payroll marked as paid for ${period}`)
+      setPayrollRecords((prev) => prev.map((r) => (r.status === 'Finalized' ? { ...r, paymentStatus: 'Paid' } : r)))
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to mark payroll as paid')
+    } finally {
+      setMarkingPaid(false)
     }
   }
 
@@ -380,6 +397,15 @@ export default function HRPage() {
                 {finalizing ? 'Finalizing…' : `Finalize ${draftCount} Draft${draftCount === 1 ? '' : 's'}`}
               </button>
             )}
+            {payrollRun && draftCount === 0 && unpaidFinalizedCount > 0 && (
+              <button
+                onClick={handleMarkPayrollPaid}
+                disabled={markingPaid}
+                className="px-5 py-2 bg-sky-500 text-white hover:bg-sky-600 font-bold text-sm rounded-lg shadow-sm disabled:opacity-60 transition-colors"
+              >
+                {markingPaid ? 'Saving…' : `Mark ${unpaidFinalizedCount} as Paid`}
+              </button>
+            )}
           </div>
         </div>
 
@@ -399,7 +425,7 @@ export default function HRPage() {
                     <span className="text-sm text-white font-medium">{name}</span>
                     <div className="flex items-center gap-3">
                       <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${rec.status === 'Finalized' ? 'bg-emerald-400/30 text-emerald-100' : 'bg-amber-400/30 text-amber-100'}`}>
-                        {rec.status || 'Draft'}
+                        {rec.status === 'Finalized' && rec.paymentStatus === 'Paid' ? 'Paid' : (rec.status || 'Draft')}
                       </span>
                       <span className="text-sm font-bold text-emerald-300">{formatPKR(rec.netPay)}</span>
                       <button

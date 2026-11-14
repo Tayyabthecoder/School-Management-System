@@ -22,6 +22,7 @@ router.put('/leave/review', checkPermission(['super_admin', 'hr_manager'], 'hr',
 
 router.post('/payroll/run', checkPermission(['super_admin', 'hr_manager'], 'payroll', 'create'), validate(runPayrollSchema), hrController.runPayroll)
 router.put('/payroll/finalize', checkPermission(['super_admin', 'hr_manager'], 'payroll', 'update'), validate(runPayrollSchema), hrController.finalizePayroll)
+router.put('/payroll/mark-paid', checkPermission(['super_admin', 'hr_manager'], 'payroll', 'update'), validate(runPayrollSchema), hrController.markPayrollPaid)
 router.get('/payroll', checkPermission(['super_admin', 'hr_manager', 'accountant'], 'payroll', 'read'), hrController.getPayrollRecords)
 router.get('/payroll/payslip/:id', checkPermission(['super_admin', 'hr_manager', 'accountant', 'teacher'], 'payroll', 'read'), hrController.downloadPayslipPDF)
 

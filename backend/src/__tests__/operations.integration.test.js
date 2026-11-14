@@ -140,6 +140,15 @@ describe('HR and payroll', () => {
     const slip = await teacher.get(`/api/v1/hr/payroll/payslip/${id(teacherRecord)}`)
     expectStatus(slip)
     expect(slip.headers['content-type']).toBe('application/pdf')
+    // Only finalized payslips can be paid; the accountant (read-only) cannot mark them
+    expectStatus(await accountant.put('/api/v1/hr/payroll/mark-paid').send({ month: 1, year: 2026 }), 403)
+    const paid = expectStatus(await hr.put('/api/v1/hr/payroll/mark-paid').send({ month: 1, year: 2026 }))
+    expect(paid.data.paidCount).toBe(run.data.length)
+    const afterPay = expectStatus(await accountant.get('/api/v1/hr/payroll?month=1&year=2026'))
+    expect(afterPay.data.every((r) => r.paymentStatus === 'Paid')).toBe(true)
+    // Paying twice is a no-op
+    expect(expectStatus(await hr.put('/api/v1/hr/payroll/mark-paid').send({ month: 1, year: 2026 })).data.paidCount).toBe(0)
+
     const rerun = expectStatus(await hr.post('/api/v1/hr/payroll/run').send({ month: 1, year: 2026 }))
     expect(rerun.data.every((r) => r.status === 'Finalized')).toBe(true)
   })

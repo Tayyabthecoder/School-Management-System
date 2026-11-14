@@ -341,6 +341,28 @@ const finalizePayroll = async (req, res, next) => {
   }
 }
 
+/** Marks a month's finalized payslips as paid (Draft records cannot be paid). */
+const markPayrollPaid = async (req, res, next) => {
+  try {
+    const { month, year } = req.body
+    const result = await PayrollRecord.updateMany(
+      { month, year, status: 'Finalized', paymentStatus: { $ne: 'Paid' } },
+      { $set: { paymentStatus: 'Paid' } }
+    )
+
+    await logAudit({
+      req,
+      action: 'PAYROLL_MARKED_PAID',
+      module: 'hr',
+      newValues: { month, year, paidCount: result.modifiedCount },
+    })
+
+    res.json({ success: true, message: `${result.modifiedCount} payroll records marked as paid`, data: { paidCount: result.modifiedCount } })
+  } catch (error) {
+    next(error)
+  }
+}
+
 const getPayrollRecords = async (req, res, next) => {
   try {
     const filter = {}
@@ -412,6 +434,7 @@ module.exports = {
   reviewLeaveRequest,
   runPayroll,
   finalizePayroll,
+  markPayrollPaid,
   getPayrollRecords,
   downloadPayslipPDF,
   resolveStaffRoleName,

@@ -59,6 +59,41 @@ describe('Attendance Controller Tests', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }))
     })
 
+    it('keeps an approved leave (Excused) when the register is re-submitted as Absent', async () => {
+      const existing = {
+        records: [
+          { studentId: 'student1', status: 'Excused', remarks: 'Approved Leave: Medical - Fever' },
+          { studentId: 'student2', status: 'Present' },
+        ],
+        save: jest.fn().mockImplementation(function save() { return Promise.resolve(this) }),
+      }
+      StudentAttendance.findOne.mockResolvedValue(existing)
+
+      await attendanceController.markStudentAttendance(baseReq({
+        records: [
+          { studentId: 'student1', status: 'Absent' }, // form re-submitted unchanged
+          { studentId: 'student2', status: 'Absent' }, // genuinely changed
+        ],
+      }), res, next)
+
+      expect(existing.records).toEqual([
+        { studentId: 'student1', status: 'Excused', remarks: 'Approved Leave: Medical - Fever' },
+        { studentId: 'student2', status: 'Absent' },
+      ])
+    })
+
+    it('lets a teacher change an Excused student to Present', async () => {
+      const existing = {
+        records: [{ studentId: 'student1', status: 'Excused' }],
+        save: jest.fn().mockImplementation(function save() { return Promise.resolve(this) }),
+      }
+      StudentAttendance.findOne.mockResolvedValue(existing)
+
+      await attendanceController.markStudentAttendance(baseReq({ records: [{ studentId: 'student1', status: 'Present' }] }), res, next)
+
+      expect(existing.records).toEqual([{ studentId: 'student1', status: 'Present' }])
+    })
+
     it('passes other create errors through instead of swallowing them', async () => {
       StudentAttendance.findOne.mockResolvedValue(null)
       StudentAttendance.create.mockRejectedValue(new Error('disk full'))

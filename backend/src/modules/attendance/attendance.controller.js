@@ -15,6 +15,23 @@ const requireDay = (value) => {
   return day
 }
 
+/**
+ * Re-saving a register must not undo an approved leave: a student whose row is already Excused
+ * stays Excused when the teacher's new submission says Absent (e.g. a form re-submitted unchanged).
+ * Any other status the teacher sets still wins.
+ */
+const keepApprovedLeave = (previous = [], incoming = []) => {
+  const excused = new Map(
+    (previous || [])
+      .filter((r) => r && r.studentId && r.status === 'Excused')
+      .map((r) => [String(r.studentId), r])
+  )
+  return incoming.map((r) => {
+    const prior = excused.get(String(r.studentId))
+    return prior && r.status === 'Absent' ? { ...r, status: 'Excused', remarks: r.remarks || prior.remarks || '' } : r
+  })
+}
+
 const markStudentAttendance = async (req, res, next) => {
   try {
     const { classId, sectionId, date, periodNumber, records } = req.body
@@ -28,8 +45,10 @@ const markStudentAttendance = async (req, res, next) => {
     })
 
     let doc
+    let finalRecords = records
     if (existing) {
-      existing.records = records
+      finalRecords = keepApprovedLeave(existing.records, records)
+      existing.records = finalRecords
       existing.markedBy = req.user._id
       doc = await existing.save()
     } else {
@@ -47,14 +66,15 @@ const markStudentAttendance = async (req, res, next) => {
         if (createErr?.code !== 11000) throw createErr
         const raced = await StudentAttendance.findOne({ classId, sectionId, date: attendanceDate, periodNumber: periodNumber || 0 })
         if (!raced) throw createErr
-        raced.records = records
+        finalRecords = keepApprovedLeave(raced.records, records)
+        raced.records = finalRecords
         raced.markedBy = req.user._id
         doc = await raced.save()
       }
     }
 
     // Check low-attendance threshold for absent students
-    const absentRecords = records.filter(r => r.status === 'Absent')
+    const absentRecords = finalRecords.filter(r => r.status === 'Absent')
     if (absentRecords.length > 0) {
       const absentStudentIds = absentRecords.map(r => r.studentId)
       const students = await Student.find({ _id: { $in: absentStudentIds } })
