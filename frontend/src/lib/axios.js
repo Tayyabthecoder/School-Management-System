@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { navigateTo } from './navigation'
 import { useAuthStore } from '../store/authStore'
 import { useToastStore } from '../store/toastStore'
 import { createSingleFlight } from './singleFlight'
@@ -38,7 +39,7 @@ api.interceptors.response.use(
 
     if (error.response?.status === 403 && error.response?.data?.error?.code === 'MUST_CHANGE_PASSWORD') {
       if (window.location.pathname !== '/change-password') {
-        window.location.href = '/change-password'
+        navigateTo('/change-password')
       }
       return Promise.reject(error)
     }
@@ -61,7 +62,7 @@ api.interceptors.response.use(
           useAuthStore.getState().logout()
         }
         if (window.location.pathname !== '/login') {
-          window.location.href = '/login'
+          navigateTo('/login')
         }
         return Promise.reject(refreshErr)
       }

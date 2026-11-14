@@ -23,4 +23,7 @@ RUN sed -i 's/\r$//' /docker-entrypoint.d/10-generate-self-signed-cert.sh \
 
 EXPOSE 80 443
 
+# Probes the HTTPS listener (self-signed in dev, hence --no-check-certificate); busybox wget ships with alpine.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD wget -q --spider --no-check-certificate https://127.0.0.1/ || exit 1
+
 CMD ["nginx", "-g", "daemon off;"]

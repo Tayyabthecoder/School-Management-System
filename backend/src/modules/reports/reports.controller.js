@@ -206,7 +206,7 @@ const getDashboardStats = async (req, res, next) => {
     // Role-based payload sanitization (SEC-02)
     const userRole = req.user?.roleName || req.user?.role
     const sanitized = { ...data }
-    if (['teacher', 'student', 'guardian'].includes(userRole)) {
+    if (['teacher', 'student', 'guardian', 'hr_manager'].includes(userRole)) {
       delete sanitized.totalOutstandingFees
       delete sanitized.totalCollections
       delete sanitized.feeCollectionRate
