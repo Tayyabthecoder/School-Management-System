@@ -186,6 +186,10 @@ describe('Reports Controller Unit Tests', () => {
         .mockResolvedValueOnce([
           { _id: null, avgPct: 78.5 },
         ])
+        // pass rate is computed against each exam's own pass marks: 30 of 32 marks reached them
+        .mockResolvedValueOnce([
+          { _id: null, total: 32, passed: 30 },
+        ])
 
       await reportsController.getAcademicPerformanceAnalytics(req, res, next)
 
@@ -201,10 +205,28 @@ describe('Reports Controller Unit Tests', () => {
             { grade: 'F', count: 2 },
           ],
           totalGraded: 32,
-          passRate: 94,
+          passRate: 94, // 30 / 32 reached their exam pass marks
           averageScore: 79,
         },
       })
+    })
+  })
+
+  describe('getAcademicPerformanceAnalytics pass rule', () => {
+    it('uses exam pass marks, not the letter grade, and reports 100% when nothing is graded', async () => {
+      req = { query: {} }
+      Grade.aggregate
+        .mockResolvedValueOnce([{ _id: 'D', count: 4 }]) // D is not F, but...
+        .mockResolvedValueOnce([{ _id: null, avgPct: 45 }])
+        .mockResolvedValueOnce([{ _id: null, total: 4, passed: 1 }]) // ...only one reached the exam pass marks
+
+      await reportsController.getAcademicPerformanceAnalytics(req, res, next)
+      expect(res.json.mock.calls[0][0].data.passRate).toBe(25)
+
+      res.json.mockClear()
+      Grade.aggregate.mockResolvedValueOnce([]).mockResolvedValueOnce([]).mockResolvedValueOnce([])
+      await reportsController.getAcademicPerformanceAnalytics(req, res, next)
+      expect(res.json.mock.calls[0][0].data).toMatchObject({ totalGraded: 0, passRate: 100 })
     })
   })
 

@@ -528,6 +528,10 @@ const reviewLeaveRequest = async (req, res, next) => {
       }
     }
 
+    if (leave.status && leave.status !== 'Pending') {
+      throw new ApiError(409, `This leave request was already ${String(leave.status).toLowerCase()}`)
+    }
+
     leave.status = status
     leave.reviewedBy = req.user._id
     leave.reviewedAt = new Date()
@@ -539,20 +543,22 @@ const reviewLeaveRequest = async (req, res, next) => {
       const curDate = new Date(leave.startDate)
       const endDate = new Date(leave.endDate)
 
-      while (curDate <= endDate) {
+      // Bounded so a malformed multi-year range cannot loop for ages.
+      let guard = 0
+      while (curDate <= endDate && guard++ < 366) {
         const startOfDay = new Date(curDate)
         startOfDay.setHours(0, 0, 0, 0)
         const endOfDay = new Date(curDate)
         endOfDay.setHours(23, 59, 59, 999)
 
-        // Find existing attendance for the class & date
-        const att = await StudentAttendance.findOne({
+        // Every register of that day (a school may take attendance per period), not just the first
+        const registers = await StudentAttendance.find({
           classId: leave.classId,
           sectionId: leave.sectionId,
           date: { $gte: startOfDay, $lte: endOfDay },
         })
 
-        if (att) {
+        for (const att of (registers || [])) {
           const rec = att.records.find(r => r.studentId && r.studentId.toString() === leave.studentId._id.toString())
           if (rec) {
             rec.status = 'Excused'

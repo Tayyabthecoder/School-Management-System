@@ -974,12 +974,24 @@ const getAcademicPerformanceAnalytics = async (req, res, next) => {
     }))
 
     const totalRecords = grades.reduce((acc, g) => acc + g.count, 0)
-    const passCount = grades.filter(g => g._id !== 'F').reduce((acc, g) => acc + g.count, 0)
-    const passRate = totalRecords > 0 ? Math.round((passCount / totalRecords) * 100) : 100
-
     const overallAvgAgg = await Grade.aggregate([
       { $group: { _id: null, avgPct: { $avg: '$percentage' } } },
     ])
+
+    // A mark is a pass when it reaches that exam's own pass marks: the same rule promotion and
+    // report cards use. (The letter scale fails below 50%, which disagreed with the 40-mark default.)
+    const passAgg = await Grade.aggregate([
+      { $lookup: { from: 'exams', localField: 'examId', foreignField: '_id', as: 'exam' } },
+      { $unwind: '$exam' },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          passed: { $sum: { $cond: [{ $gte: ['$marksObtained', '$exam.passMarks'] }, 1, 0] } },
+        },
+      },
+    ])
+    const passRate = passAgg[0]?.total > 0 ? Math.round((passAgg[0].passed / passAgg[0].total) * 100) : 100
     const averageScore = Math.round(overallAvgAgg[0]?.avgPct || 0)
 
     res.json({
