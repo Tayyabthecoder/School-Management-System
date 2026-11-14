@@ -12,7 +12,6 @@ const getSettings = async (req, res, next) => {
       if (!doc) {
         doc = await SchoolSettings.create({
           attendanceAlertThreshold: 75,
-          autoFeeOverdueAlerts: true,
           allowedDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
           isActive: true,
         })
@@ -57,7 +56,6 @@ const updateSettings = async (req, res, next) => {
     const payload = req.validatedData?.body || req.body
     const {
       attendanceAlertThreshold,
-      autoFeeOverdueAlerts,
       allowedDays,
       schoolName,
       schoolTagline,
@@ -72,9 +70,6 @@ const updateSettings = async (req, res, next) => {
       timezone,
       dateFormat,
       activeTerm,
-      passingPercentage,
-      minAttendancePercentage,
-      maxStudentsPerSection,
       gradingScale,
     } = payload
 
@@ -108,7 +103,6 @@ const updateSettings = async (req, res, next) => {
     if (!doc) {
       doc = await SchoolSettings.create({
         attendanceAlertThreshold: attendanceAlertThreshold ?? 75,
-        autoFeeOverdueAlerts: autoFeeOverdueAlerts ?? true,
         allowedDays: allowedDays ?? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         schoolName: schoolName ? schoolName.trim() : 'School Management System',
         schoolTagline: schoolTagline ? schoolTagline.trim() : '',
@@ -123,15 +117,11 @@ const updateSettings = async (req, res, next) => {
         timezone: timezone ? timezone.trim() : 'Asia/Karachi (GMT+5)',
         dateFormat: dateFormat ? dateFormat.trim() : 'DD/MM/YYYY',
         activeTerm: activeTerm ? activeTerm.trim() : 'Term 1',
-        passingPercentage: passingPercentage ?? 40,
-        minAttendancePercentage: minAttendancePercentage ?? 75,
-        maxStudentsPerSection: maxStudentsPerSection ?? 35,
         gradingScale: gradingScale,
         isActive: true,
       })
     } else {
       if (attendanceAlertThreshold !== undefined) doc.attendanceAlertThreshold = attendanceAlertThreshold
-      if (autoFeeOverdueAlerts !== undefined) doc.autoFeeOverdueAlerts = autoFeeOverdueAlerts
       if (allowedDays !== undefined) doc.allowedDays = allowedDays
       if (schoolName !== undefined) doc.schoolName = schoolName.trim()
       if (schoolTagline !== undefined) doc.schoolTagline = schoolTagline.trim()
@@ -146,9 +136,6 @@ const updateSettings = async (req, res, next) => {
       if (timezone !== undefined) doc.timezone = timezone.trim()
       if (dateFormat !== undefined) doc.dateFormat = dateFormat.trim()
       if (activeTerm !== undefined) doc.activeTerm = activeTerm.trim()
-      if (passingPercentage !== undefined) doc.passingPercentage = passingPercentage
-      if (minAttendancePercentage !== undefined) doc.minAttendancePercentage = minAttendancePercentage
-      if (maxStudentsPerSection !== undefined) doc.maxStudentsPerSection = maxStudentsPerSection
       if (gradingScale !== undefined) doc.gradingScale = gradingScale
       await doc.save()
     }
@@ -162,16 +149,12 @@ const updateSettings = async (req, res, next) => {
       documentId: doc._id,
       newValues: {
         attendanceAlertThreshold: doc.attendanceAlertThreshold,
-        autoFeeOverdueAlerts: doc.autoFeeOverdueAlerts,
         allowedDays: doc.allowedDays,
         schoolName: doc.schoolName,
         regNo: doc.regNo,
         primaryColor: doc.primaryColor,
         currency: doc.currency,
         activeTerm: doc.activeTerm,
-        passingPercentage: doc.passingPercentage,
-        minAttendancePercentage: doc.minAttendancePercentage,
-        maxStudentsPerSection: doc.maxStudentsPerSection,
         gradingScale: doc.gradingScale,
       },
     })

@@ -42,7 +42,7 @@ The **School Management System (SMS)** eliminates fragmented spreadsheets and pa
 
 - **Complete Student Lifecycle:** Admissions, enrollment, section assignment, document repository, automated annual grade promotion, and exit management.
 - **Academic Administration:** Curriculum planning, grade-wise subject assignments, timetable scheduling, and term-based academic year definitions.
-- **Attendance & Communication:** Daily student attendance with instant notification hooks (SMS/WhatsApp) and biometric/manual staff attendance logging.
+- **Attendance & Communication:** Daily student attendance with audit-logged low-attendance alerts, a one-click WhatsApp chat link to a student's guardian, and manual staff attendance logging. (There is no automated SMS or WhatsApp sending.)
 - **Exams & Report Cards:** Comprehensive grading engines supporting marks, percentages, GPA calculations, and one-click printable PDF report cards.
 - **Financial Accounting:** Fee structure definition, batch monthly fee challan generation, partial payment reconciliation, arrears tracking, and overdue penalties.
 - **Human Resources & Payroll:** Faculty and administrative staff directory, leave request workflows with approvals, and monthly net salary slip generation.
@@ -527,13 +527,9 @@ npm run build
 
 ## 📚 System Documentation
 
-Comprehensive architecture, requirement, and developer documents are available in the [`docs/`](./docs) folder:
+- **[Deployment & Operations Runbook](./DEPLOYMENT.md):** first deployment, TLS certificates and renewal, backups and restores, secret rotation, upgrades and rollback.
 
-- **[Architecture Document](./docs/Architecture_Document.md):** In-depth technical specification, data flow diagrams, schema design, and deployment topology.
-- **[Development Document](./docs/Development_Document.md):** Developer guide, coding conventions, Git branching strategy, and contribution workflows.
-- **[Product Requirements Document (PRD)](./docs/PRD.md):** Stakeholder requirements, user personas, and target outcomes.
-- **[Software Requirements Specification (SRS)](./docs/SRS.md):** Detailed functional and non-functional requirements.
-- **[UI/UX Design Document](./docs/UIUX_Document.md):** Design systems, color palettes, responsive layouts, and user flows.
+The longer design documents (architecture, development guide, PRD, SRS, UI/UX) live in a local `docs/` folder that is excluded from version control (see `.gitignore`), so they are not part of a fresh clone.
 
 ---
 

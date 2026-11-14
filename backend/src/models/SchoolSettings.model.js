@@ -8,10 +8,6 @@ const schoolSettingsSchema = new mongoose.Schema({
     min: 50,
     max: 100,
   },
-  autoFeeOverdueAlerts: {
-    type: Boolean,
-    default: true,
-  },
   allowedDays: {
     type: [String],
     enum: DAYS_OF_WEEK,
@@ -90,18 +86,6 @@ const schoolSettingsSchema = new mongoose.Schema({
     default: 'Term 1',
     trim: true,
   },
-  minAttendancePercentage: {
-    type: Number,
-    default: 75,
-    min: 50,
-    max: 100,
-  },
-  maxStudentsPerSection: {
-    type: Number,
-    default: 35,
-    min: 5,
-    max: 100,
-  },
   // Grading scale fields (Gap 6)
   gradingScale: {
     type: [{
@@ -117,12 +101,6 @@ const schoolSettingsSchema = new mongoose.Schema({
       { label: 'D', minPercent: 50, maxPercent: 59 },
       { label: 'F', minPercent: 0, maxPercent: 49 },
     ],
-  },
-  passingPercentage: {
-    type: Number,
-    default: 40,
-    min: 0,
-    max: 100,
   },
 }, { timestamps: true })
 

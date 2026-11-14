@@ -48,7 +48,6 @@ describe('Settings Controller Tests', () => {
       const createdDoc = {
         _id: 'new-settings-123',
         attendanceAlertThreshold: 75,
-        autoFeeOverdueAlerts: true,
         allowedDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         isActive: true,
       }
@@ -229,8 +228,7 @@ describe('Settings Controller Tests', () => {
           primaryColor: '#1E3A8A',
           allowedDays: ['Monday', 'Tuesday', 'Wednesday'],
           activeTerm: 'Term 2',
-          passingPercentage: 45,
-          minAttendancePercentage: 80,
+          attendanceAlertThreshold: 80,
           regNo: 'REG-12345',
         },
       }
@@ -241,8 +239,7 @@ describe('Settings Controller Tests', () => {
       expect(mockDoc.primaryColor).toBe('#1E3A8A')
       expect(mockDoc.allowedDays).toEqual(['Monday', 'Tuesday', 'Wednesday'])
       expect(mockDoc.activeTerm).toBe('Term 2')
-      expect(mockDoc.passingPercentage).toBe(45)
-      expect(mockDoc.minAttendancePercentage).toBe(80)
+      expect(mockDoc.attendanceAlertThreshold).toBe(80)
       expect(mockDoc.regNo).toBe('REG-12345')
       expect(mockDoc.save).toHaveBeenCalled()
       expect(cacheUtil.invalidateCache).toHaveBeenCalledWith('ref:school-settings')

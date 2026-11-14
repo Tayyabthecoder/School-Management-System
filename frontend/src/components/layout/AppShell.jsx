@@ -88,6 +88,14 @@ export default function AppShell() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex transition-colors duration-200">
+      {/* Keyboard users can jump past the sidebar and header */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-indigo-600 focus:text-white focus:text-sm focus:font-semibold"
+      >
+        Skip to main content
+      </a>
+
       {/* Mobile overlay backdrop */}
       {isSidebarOpen && (
         <div
@@ -107,7 +115,7 @@ export default function AppShell() {
         } ml-0`}
       >
         <Header />
-        <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">
+        <main id="main-content" tabIndex={-1} className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto focus:outline-none">
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Outlet />

@@ -313,7 +313,7 @@ function DeleteConfirmModal({
               <p className="text-xs text-red-100">Permanent Action • Super Admin Access</p>
             </div>
           </div>
-          <button
+          <button aria-label="Close"
             onClick={onClose}
             disabled={deleting}
             className="text-red-200 hover:text-white text-sm p-1 rounded-lg hover:bg-red-700/50 transition-colors"
@@ -417,7 +417,7 @@ export function AddClassModal({ open, onClose, onCreated }) {
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Plus className="w-5 h-5 text-indigo-600" /> Add New Academic Class
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button aria-label="Close" onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -518,7 +518,7 @@ export function AddSectionModal({ open, grade, onClose, onAdded }) {
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Plus className="w-5 h-5 text-indigo-600" /> Add Section to {grade.name}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button aria-label="Close" onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>

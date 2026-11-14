@@ -4,7 +4,6 @@ const { DAYS_OF_WEEK } = require('../../config/constants')
 const updateSettingsSchema = z.object({
   body: z.object({
     attendanceAlertThreshold: z.coerce.number().min(50).max(100).optional(),
-    autoFeeOverdueAlerts: z.boolean().optional(),
     allowedDays: z.array(z.enum(DAYS_OF_WEEK, {
       error: () => 'Invalid day of the week',
     })).min(1, 'At least one operating day must remain enabled').optional(),
@@ -27,9 +26,6 @@ const updateSettingsSchema = z.object({
 
     // Academic Policies
     activeTerm: z.string().trim().max(50).optional(),
-    passingPercentage: z.coerce.number().min(0).max(100).optional(),
-    minAttendancePercentage: z.coerce.number().min(50).max(100).optional(),
-    maxStudentsPerSection: z.coerce.number().int().min(5).max(100).optional(),
 
     // Grading Scale
     gradingScale: z.array(z.object({

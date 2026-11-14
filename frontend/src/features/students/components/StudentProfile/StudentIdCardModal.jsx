@@ -408,7 +408,7 @@ export default function StudentIdCardModal({ open, student, onClose }) {
             >
               <Printer className="w-4 h-4" /> Print ID Card
             </button>
-            <button
+            <button aria-label="Close"
               onClick={onClose}
               className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
             >

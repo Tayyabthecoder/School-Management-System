@@ -52,3 +52,6 @@ coverage/
 
 # Local audit report
 PROJECT_REPORT.md
+
+# Database/upload backups (contain student data)
+backup/

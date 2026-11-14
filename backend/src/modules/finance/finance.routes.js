@@ -9,6 +9,7 @@ const {
   recordPaymentSchema,
   applyConcessionSchema,
   assignFeeToStudentSchema,
+  triggerMonthlyChallansSchema,
 } = require('./finance.dto')
 
 router.use(verifyToken)
@@ -34,7 +35,7 @@ router.post('/concession', checkPermission(['super_admin', 'accountant'], 'finan
 
 // Automated Monthly Challans
 router.get('/monthly-challans/status', checkPermission(['super_admin', 'accountant'], 'finance', 'read'), financeController.getMonthlyChallansCronStatus)
-router.post('/monthly-challans/generate', checkPermission(['super_admin', 'accountant'], 'finance', 'create'), financeController.triggerMonthlyChallansManually)
+router.post('/monthly-challans/generate', checkPermission(['super_admin', 'accountant'], 'finance', 'create'), validate(triggerMonthlyChallansSchema), financeController.triggerMonthlyChallansManually)
 
 module.exports = router
 

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import PageLoader from '../components/ui/PageLoader'
-import api, { refreshAccessToken } from '../lib/axios'
+import { refreshAccessToken } from '../lib/axios'
+import { useAllowedDays } from '../hooks/useAllowedDays'
 import { CalendarX } from 'lucide-react'
 
 // R6: In-App Day Blocked Component for active sessions on restricted days
@@ -45,9 +46,8 @@ export default function ProtectedRoute() {
   const { isAuthenticated, isInitializing, user, logout } = useAuthStore()
   const location = useLocation()
 
-  // R6: Day restriction state
-  const [dayInfo, setDayInfo] = useState(null)
-  const [dayChecked, setDayChecked] = useState(false)
+  // R6: Day restriction state (shared, cached query)
+  const { data: dayInfo, isFetched: dayChecked } = useAllowedDays()
 
   useEffect(() => {
     if (isInitializing && !isAuthenticated && user) {
@@ -57,18 +57,6 @@ export default function ProtectedRoute() {
       })
     }
   }, [isInitializing, isAuthenticated, user, logout])
-
-  // Fetch day restrictions info
-  useEffect(() => {
-    api.get('/settings/allowed-days')
-      .then((res) => {
-        if (res.data?.success) setDayInfo(res.data.data)
-      })
-      .catch(() => {
-        setDayInfo({ today: '', allowedDays: [], isAllowedToday: true })
-      })
-      .finally(() => setDayChecked(true))
-  }, [])
 
   if (isInitializing && !isAuthenticated && user) {
     return <PageLoader />

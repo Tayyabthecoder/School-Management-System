@@ -7,6 +7,7 @@
  * with an Authorization header and parses the event-stream itself.
  */
 import { useAuthStore } from '../store/authStore'
+import { refreshAccessToken } from './axios'
 import { parseSSEBuffer } from './sseParser'
 
 const SSE_URL = '/api/v1/reports/dashboard/live'
@@ -59,6 +60,11 @@ const openStream = async (onEvent) => {
       cache: 'no-store',
       signal: controller.signal,
     })
+    if (response.status === 401) {
+      // The access token expired while no API call refreshed it: renew it now so the retry
+      // below (and the server's expiry-close) reconnects with a valid token.
+      try { await refreshAccessToken() } catch (_) { /* axios logs the user out on a hard failure */ }
+    }
     if (!response.ok || !response.body) {
       throw new Error(`SSE connection rejected (HTTP ${response.status})`)
     }

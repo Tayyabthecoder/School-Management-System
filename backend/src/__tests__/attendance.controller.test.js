@@ -30,6 +30,79 @@ describe('Attendance Controller Tests', () => {
     sseController.broadcast.mockImplementation(() => {})
   })
 
+  describe('markStudentAttendance edge cases', () => {
+    const baseReq = (overrides = {}) => ({
+      body: {
+        classId: 'class123',
+        sectionId: 'A',
+        date: '2026-10-01',
+        periodNumber: 1,
+        records: [{ studentId: 'student1', status: 'Present' }],
+        ...overrides,
+      },
+      user: { _id: 'teacher123' },
+    })
+
+    it('updates the register when a concurrent request created it first (duplicate key)', async () => {
+      const raced = { records: [], save: jest.fn().mockImplementation(function save() { return Promise.resolve(this) }) }
+      StudentAttendance.findOne
+        .mockResolvedValueOnce(null) // nothing yet when we looked
+        .mockResolvedValueOnce(raced) // but it exists by the time create() fails
+      StudentAttendance.create.mockRejectedValue(Object.assign(new Error('E11000 duplicate key'), { code: 11000 }))
+
+      await attendanceController.markStudentAttendance(baseReq(), res, next)
+
+      expect(next).not.toHaveBeenCalled()
+      expect(raced.records).toEqual([{ studentId: 'student1', status: 'Present' }])
+      expect(raced.markedBy).toBe('teacher123')
+      expect(raced.save).toHaveBeenCalled()
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }))
+    })
+
+    it('passes other create errors through instead of swallowing them', async () => {
+      StudentAttendance.findOne.mockResolvedValue(null)
+      StudentAttendance.create.mockRejectedValue(new Error('disk full'))
+
+      await attendanceController.markStudentAttendance(baseReq(), res, next)
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'disk full' }))
+    })
+
+    it('replaces the records of an existing register for the same class, section, day and period', async () => {
+      const existing = { records: [{ studentId: 'old', status: 'Absent' }], save: jest.fn().mockImplementation(function save() { return Promise.resolve(this) }) }
+      StudentAttendance.findOne.mockResolvedValue(existing)
+
+      await attendanceController.markStudentAttendance(baseReq(), res, next)
+
+      expect(StudentAttendance.create).not.toHaveBeenCalled()
+      expect(existing.records).toEqual([{ studentId: 'student1', status: 'Present' }])
+      expect(existing.save).toHaveBeenCalled()
+    })
+
+    it('writes one low-attendance alert per student below the threshold, and none above it', async () => {
+      StudentAttendance.findOne.mockResolvedValue(null)
+      StudentAttendance.create.mockResolvedValue({ _id: 'att1' })
+      Student.find.mockResolvedValue([{ _id: 'low' }, { _id: 'fine' }])
+      SchoolSettings.findOne.mockReturnValue({ sort: jest.fn().mockResolvedValue({ attendanceAlertThreshold: 75 }) })
+      // Four sessions this month: 'low' was present once (25%), 'fine' present every time (100%).
+      const session = (low, fine) => ({ records: [{ studentId: 'low', status: low }, { studentId: 'fine', status: fine }] })
+      StudentAttendance.find.mockResolvedValue([
+        session('Absent', 'Present'), session('Absent', 'Present'), session('Absent', 'Present'), session('Present', 'Present'),
+      ])
+
+      await attendanceController.markStudentAttendance(
+        baseReq({ records: [{ studentId: 'low', status: 'Absent' }, { studentId: 'fine', status: 'Absent' }] }),
+        res,
+        next
+      )
+
+      expect(next).not.toHaveBeenCalled()
+      const alerts = auditLogUtil.logAudit.mock.calls.filter(([arg]) => arg.action === 'LOW_ATTENDANCE_ALERT')
+      expect(alerts).toHaveLength(1)
+      expect(alerts[0][0]).toMatchObject({ documentId: 'low', newValues: { monthlyRate: 25, threshold: 75 } })
+    })
+  })
+
   describe('markStudentAttendance', () => {
     it('saves attendance, invalidates cache and broadcasts attendance:updated', async () => {
       req = {

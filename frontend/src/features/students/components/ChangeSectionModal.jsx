@@ -96,7 +96,7 @@ export default function ChangeSectionModal({
               <p className="text-xs text-indigo-200">Reassign section within {classObj?.name || 'Class'}</p>
             </div>
           </div>
-          <button
+          <button aria-label="Close"
             onClick={onClose}
             disabled={loading}
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white flex items-center justify-center transition-colors"

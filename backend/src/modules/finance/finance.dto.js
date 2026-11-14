@@ -44,7 +44,20 @@ const assignFeeToStudentSchema = z.object({
   }),
 })
 
+const triggerMonthlyChallansSchema = z.object({
+  body: z.object({
+    // An empty string means "today" (the controller falls back to the current date).
+    targetDate: z.union([
+      z.literal(''),
+      z.string().refine((v) => !Number.isNaN(new Date(v).getTime()), { message: 'targetDate must be a valid date' }),
+    ]).optional(),
+    academicYearId: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid id').optional(),
+    force: z.boolean().optional(),
+  }).default({}),
+})
+
 module.exports = {
+  triggerMonthlyChallansSchema,
   createFeeStructureSchema,
   recordPaymentSchema,
   applyConcessionSchema,

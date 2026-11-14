@@ -12,6 +12,7 @@ const {
 const { upload } = require('../../middleware/upload.middleware')
 
 const promotionController = require('./promotion.controller')
+const { savePromotionConfigSchema, previewPromotionSchema, executePromotionSchema } = require('./promotion.dto')
 const { downloadStudentDocument } = require('../uploads/uploads.controller')
 
 router.use(verifyToken)
@@ -21,9 +22,9 @@ router.get('/me/portal', studentsController.getStudentPortalData)
 
 // Promotion endpoints
 router.get('/promotion/config', checkPermission(['super_admin']), promotionController.getPromotionConfig)
-router.post('/promotion/config', checkPermission(['super_admin']), promotionController.savePromotionConfig)
-router.post('/promotion/preview', checkPermission(['super_admin']), promotionController.previewPromotion)
-router.post('/promotion/execute', checkPermission(['super_admin']), promotionController.executePromotion)
+router.post('/promotion/config', checkPermission(['super_admin']), validate(savePromotionConfigSchema), promotionController.savePromotionConfig)
+router.post('/promotion/preview', checkPermission(['super_admin']), validate(previewPromotionSchema), promotionController.previewPromotion)
+router.post('/promotion/execute', checkPermission(['super_admin']), validate(executePromotionSchema), promotionController.executePromotion)
 
 // Excel template & bulk upload endpoints (must precede /:id)
 router.get('/import-template', checkPermission(['super_admin', 'hr_manager'], 'students', 'read'), studentsController.downloadImportTemplate)

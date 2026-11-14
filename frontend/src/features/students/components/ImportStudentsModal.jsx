@@ -172,7 +172,7 @@ export default function ImportStudentsModal({
               </p>
             </div>
           </div>
-          <button
+          <button aria-label="Close"
             onClick={handleModalClose}
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors"
           >

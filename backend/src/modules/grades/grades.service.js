@@ -23,13 +23,8 @@ const calculateGradeLetter = (percentage, gradingScale = null) => {
   return 'F'
 }
 
-const isPassingGrade = (marksObtained, passMarks = 40, passingPercentage = null, maxMarks = 100) => {
+const isPassingGrade = (marksObtained, passMarks = 40) => {
   const obtained = Number(marksObtained) || 0
-  if (passingPercentage !== null && passingPercentage !== undefined) {
-    const max = Math.max(1, Number(maxMarks) || 100)
-    const pct = (obtained / max) * 100
-    return pct >= passingPercentage
-  }
   const pass = Number(passMarks) || 40
   return obtained >= pass
 }

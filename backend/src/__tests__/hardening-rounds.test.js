@@ -139,3 +139,47 @@ describe('SSE stream expiry', () => {
     expect(sse._clients.size).toBe(2)
   })
 })
+
+describe('promotion and challan payload schemas', () => {
+  const { savePromotionConfigSchema, previewPromotionSchema, executePromotionSchema } = require('../modules/students/promotion.dto')
+  const { triggerMonthlyChallansSchema } = require('../modules/finance/finance.dto')
+  const id = (n) => String(n).padStart(24, 'a')
+
+  test('promotion config accepts well-formed mappings and rejects operator objects', () => {
+    const ok = savePromotionConfigSchema.safeParse({
+      body: { academicYearId: id(1), finalExamTermName: 'Final Term', mappings: [{ fromClassId: id(2), toClassId: id(3) }] },
+    })
+    expect(ok.success).toBe(true)
+
+    const injected = savePromotionConfigSchema.safeParse({
+      body: { academicYearId: { $ne: null }, mappings: [] },
+    })
+    expect(injected.success).toBe(false)
+    expect(savePromotionConfigSchema.safeParse({ body: { academicYearId: id(1), mappings: [{ fromClassId: 'x', toClassId: id(3) }] } }).success).toBe(false)
+  })
+
+  test('preview needs a config or an academic year', () => {
+    expect(previewPromotionSchema.safeParse({ body: {} }).success).toBe(false)
+    expect(previewPromotionSchema.safeParse({ body: { configId: id(1) } }).success).toBe(true)
+  })
+
+  test('execute validates overrides', () => {
+    const base = { configId: id(1) }
+    expect(executePromotionSchema.safeParse({ body: { ...base, overrides: [{ studentId: id(2), decision: 'promote' }] } }).success).toBe(true)
+    expect(executePromotionSchema.safeParse({ body: { ...base, overrides: [{ studentId: id(2), decision: 'delete' }] } }).success).toBe(false)
+    expect(executePromotionSchema.safeParse({ body: { overrides: [] } }).success).toBe(false)
+  })
+
+  test('the manual challan trigger accepts an empty body and rejects bad input', () => {
+    expect(triggerMonthlyChallansSchema.safeParse({ body: {} }).success).toBe(true)
+    expect(triggerMonthlyChallansSchema.safeParse({ body: { targetDate: '2026-05-01', force: true } }).success).toBe(true)
+    expect(triggerMonthlyChallansSchema.safeParse({ body: { targetDate: 'not a date' } }).success).toBe(false)
+    expect(triggerMonthlyChallansSchema.safeParse({ body: { academicYearId: { $gt: '' } } }).success).toBe(false)
+    expect(triggerMonthlyChallansSchema.safeParse({ body: { force: 'yes' } }).success).toBe(false)
+  })
+})
+
+test('the manual challan trigger treats an empty targetDate as "today"', () => {
+  const { triggerMonthlyChallansSchema } = require('../modules/finance/finance.dto')
+  expect(triggerMonthlyChallansSchema.safeParse({ body: { targetDate: '', force: false } }).success).toBe(true)
+})

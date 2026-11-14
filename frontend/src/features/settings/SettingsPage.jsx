@@ -200,11 +200,7 @@ const DEFAULT_SCHOOL_PROFILE = {
 
 const DEFAULT_ACADEMIC_CONFIG = {
   activeTerm: 'Term 1',
-  passingPercentage: 50,
-  minAttendancePercentage: 75,
-  maxStudentsPerSection: 35,
   attendanceAlertThreshold: 75,
-  autoFeeOverdueAlerts: true,
 }
 
 // ─── Main Settings Page ───────────────────────────────────────────────────────
@@ -348,11 +344,7 @@ export default function SettingsPage() {
         setAcademicConfig(prev => ({
           ...prev,
           activeTerm: s.activeTerm || prev.activeTerm,
-          passingPercentage: s.passingPercentage !== undefined ? s.passingPercentage : prev.passingPercentage,
-          minAttendancePercentage: s.minAttendancePercentage !== undefined ? s.minAttendancePercentage : prev.minAttendancePercentage,
-          maxStudentsPerSection: s.maxStudentsPerSection !== undefined ? s.maxStudentsPerSection : prev.maxStudentsPerSection,
           attendanceAlertThreshold: s.attendanceAlertThreshold !== undefined ? s.attendanceAlertThreshold : 75,
-          autoFeeOverdueAlerts: s.autoFeeOverdueAlerts !== undefined ? s.autoFeeOverdueAlerts : true,
         }))
         if (Array.isArray(s.gradingScale) && s.gradingScale.length > 0) {
           setGradingScale(s.gradingScale)
@@ -428,11 +420,7 @@ export default function SettingsPage() {
     try {
       const res = await api.patch('/settings', {
         activeTerm: academicConfig.activeTerm,
-        passingPercentage: academicConfig.passingPercentage,
-        minAttendancePercentage: academicConfig.minAttendancePercentage,
-        maxStudentsPerSection: academicConfig.maxStudentsPerSection,
         attendanceAlertThreshold: academicConfig.attendanceAlertThreshold,
-        autoFeeOverdueAlerts: academicConfig.autoFeeOverdueAlerts,
       })
       if (res.data?.success) {
         writeStoredJson('sms_academic_config', academicConfig)
@@ -514,11 +502,7 @@ export default function SettingsPage() {
         setAcademicConfig(imported.academicConfig)
         await api.patch('/settings', {
           activeTerm: imported.academicConfig.activeTerm,
-          passingPercentage: imported.academicConfig.passingPercentage,
-          minAttendancePercentage: imported.academicConfig.minAttendancePercentage,
-          maxStudentsPerSection: imported.academicConfig.maxStudentsPerSection,
           attendanceAlertThreshold: imported.academicConfig.attendanceAlertThreshold,
-          autoFeeOverdueAlerts: imported.academicConfig.autoFeeOverdueAlerts,
         })
       }
       if (Array.isArray(imported.gradingScale)) {

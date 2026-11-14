@@ -13,6 +13,8 @@ import { SkeletonTable } from '../../../components/ui/Skeleton'
 import { formatDate } from '../../../lib/formatters'
 import { confirmAction } from '../../../store/confirmStore'
 import api from '../../../lib/axios'
+import { useQueryClient } from '@tanstack/react-query'
+import { useAllowedDays, ALLOWED_DAYS_KEY } from '../../../hooks/useAllowedDays'
 import { useToast } from '../../../store/toastStore'
 
 const DAYS_OF_WEEK = [
@@ -62,15 +64,12 @@ export default function AcademicSessionsTab({
     }
   }
 
+  // Seed the editable list from the shared cached query.
+  const queryClient = useQueryClient()
+  const { data: allowedDaysData } = useAllowedDays()
   useEffect(() => {
-    api.get('/settings/allowed-days')
-      .then((res) => {
-        if (res.data?.success && res.data.data?.allowedDays) {
-          setAllowedDays(res.data.data.allowedDays)
-        }
-      })
-      .catch((err) => logError('Failed to load allowed days:', err))
-  }, [])
+    if (Array.isArray(allowedDaysData?.allowedDays)) setAllowedDays(allowedDaysData.allowedDays)
+  }, [allowedDaysData])
 
   const handleToggleDay = (day) => {
     setAllowedDays((prev) => {
@@ -92,6 +91,7 @@ export default function AcademicSessionsTab({
       const res = await api.patch('/settings', { allowedDays })
       if (res.data?.success) {
         toast.success('School operating days updated successfully!')
+        queryClient.invalidateQueries({ queryKey: ALLOWED_DAYS_KEY })
       }
     } catch (err) {
       toast.error(err.response?.data?.error?.message || 'Failed to update operating days')
@@ -263,39 +263,6 @@ export default function AcademicSessionsTab({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Passing Mark Threshold (%)</label>
-            <input
-              type="number"
-              min={33}
-              max={90}
-              value={academicConfig?.passingPercentage ?? 50}
-              onChange={(e) => setAcademicConfig({ ...academicConfig, passingPercentage: Number(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Min Attendance Requirement (%)</label>
-            <input
-              type="number"
-              min={50}
-              max={95}
-              value={academicConfig?.minAttendancePercentage ?? 75}
-              onChange={(e) => setAcademicConfig({ ...academicConfig, minAttendancePercentage: Number(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Max Students / Section Cap</label>
-            <input
-              type="number"
-              min={10}
-              max={80}
-              value={academicConfig?.maxStudentsPerSection ?? 35}
-              onChange={(e) => setAcademicConfig({ ...academicConfig, maxStudentsPerSection: Number(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-            />
-          </div>
-          <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Low Attendance Alert Threshold (%)</label>
             <input
               type="number"
@@ -305,18 +272,6 @@ export default function AcademicSessionsTab({
               onChange={(e) => setAcademicConfig({ ...academicConfig, attendanceAlertThreshold: Number(e.target.value) })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
             />
-          </div>
-          <div className="flex flex-col justify-center">
-            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-2">Automated Notifications</label>
-            <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-800 dark:text-slate-200">
-              <input
-                type="checkbox"
-                checked={academicConfig?.autoFeeOverdueAlerts ?? true}
-                onChange={(e) => setAcademicConfig({ ...academicConfig, autoFeeOverdueAlerts: e.target.checked })}
-                className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer"
-              />
-              Send Auto Overdue Fee Alerts
-            </label>
           </div>
         </div>
       </form>

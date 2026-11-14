@@ -10,6 +10,7 @@ const { logAudit } = require('../utils/audit-log.util')
  * Standard default tuition fees for classes if no previous fee structure exists
  */
 const DEFAULT_CLASS_TUITION = {
+  // Legacy misspelling kept as an alias: classes created with it must still get the default fee.
   'Play Jouior': 8000,
   'Play Junior': 8000,
   'Grade 1': 8500,

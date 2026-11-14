@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { School, Lock, User, AlertCircle, KeyRound, CalendarX, ShieldCheck } from 'lucide-react'
 import api from '../../lib/axios'
+import { useAllowedDays } from '../../hooks/useAllowedDays'
 import { useAuthStore } from '../../store/authStore'
 
 // Seeded demo credentials must never ship in a production bundle: anyone could click
@@ -26,29 +27,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   // R6: Day restriction state
-  const [dayInfo, setDayInfo] = useState(null) // { today, allowedDays, isAllowedToday }
-  const [dayLoading, setDayLoading] = useState(true)
+  const { data: dayInfo, isLoading: dayLoading } = useAllowedDays() // { today, allowedDays, isAllowedToday }
   const [showAdminBypass, setShowAdminBypass] = useState(false)
 
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
-
-  // Fetch allowed days on mount (public endpoint, no token needed)
-  useEffect(() => {
-    api.get('/settings/allowed-days')
-      .then((res) => {
-        if (res.data?.success) setDayInfo(res.data.data)
-      })
-      .catch(() => {
-        // Fallback: fail-open on network error to avoid false lockouts
-        setDayInfo({
-          today: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
-          allowedDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          isAllowedToday: true,
-        })
-      })
-      .finally(() => setDayLoading(false))
-  }, [])
 
   const handleLogin = async (usr, pwd) => {
     setError('')
