@@ -183,3 +183,14 @@ test('the manual challan trigger treats an empty targetDate as "today"', () => {
   const { triggerMonthlyChallansSchema } = require('../modules/finance/finance.dto')
   expect(triggerMonthlyChallansSchema.safeParse({ body: { targetDate: '', force: false } }).success).toBe(true)
 })
+
+describe('seed data', () => {
+  test('receipt numbers are sequential, never random (random 4-digit values collided and broke seeding)', () => {
+    const source = fs.readFileSync(path.join(__dirname, '..', '..', 'seed', 'seed.js'), 'utf8')
+    const receiptLine = source.split(/\r?\n/).find((l) => l.includes('const receiptNo'))
+
+    expect(receiptLine).toBeDefined()
+    expect(receiptLine).not.toMatch(/random/i)
+    expect(receiptLine).toContain('receiptSeq++')
+  })
+})

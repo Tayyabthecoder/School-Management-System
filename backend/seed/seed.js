@@ -35,6 +35,10 @@ const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) +
  * Shared by the CLI below and by the integration tests, which call it on a throwaway database.
  */
 const populateDatabase = async ({ log = console.log } = {}) => {
+  // Receipt numbers must be unique (unique index on Payment.receiptNo). They used to be random
+  // four-digit numbers, which collided often enough to make seeding (and the integration test
+  // suites that seed) fail at random; hand them out sequentially instead.
+  let receiptSeq = 1000
   log('[Seed Engine] Cleaning existing database collections...')
   await Promise.all([
     Role.deleteMany({}),
@@ -256,7 +260,7 @@ const populateDatabase = async ({ log = console.log } = {}) => {
       })
 
       if (isPaid) {
-        const receiptNo = `REC-2026-${String(getRandomInt(1000, 9999))}`
+        const receiptNo = `REC-2026-${String(receiptSeq++)}`
         await Payment.create({
           receiptNo,
           studentFeeId: sf._id,
