@@ -254,6 +254,7 @@ const executePromotion = async (req, res, next) => {
     let promotedCount = 0
     let retainedCount = 0
     let graduatedCount = 0
+    let unresolvedCount = 0
     try {
       const { promote, retain, unresolved } = await evaluatePromotion(config)
 
@@ -285,6 +286,9 @@ const executePromotion = async (req, res, next) => {
           promotedCount++
         } else {
           retainedCount++
+          // Students without final grades are kept in their class; report them so the admin can
+          // enter the missing marks and promote them manually instead of finding out later.
+          if (item.decision === 'unresolved' && !overrideMap.has(item.studentId.toString())) unresolvedCount++
         }
       }
 
@@ -311,13 +315,15 @@ const executePromotion = async (req, res, next) => {
         promotedCount,
         graduatedCount,
         retainedCount,
+        unresolvedCount,
       },
     })
 
     res.json({
       success: true,
-      message: `Promotion completed: ${promotedCount} students promoted, ${graduatedCount} graduated, ${retainedCount} retained`,
-      data: { promotedCount, graduatedCount, retainedCount },
+      message: `Promotion completed: ${promotedCount} students promoted, ${graduatedCount} graduated, ${retainedCount} retained` +
+        (unresolvedCount > 0 ? ` (${unresolvedCount} of them have no final grades yet)` : ''),
+      data: { promotedCount, graduatedCount, retainedCount, unresolvedCount },
     })
   } catch (error) {
     next(error)

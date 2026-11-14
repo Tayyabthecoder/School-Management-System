@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSchoolName } from '../../../../hooks/useSchoolName'
 import {
   GraduationCap,
   Printer,
@@ -18,6 +19,7 @@ export function FrontCard({
   formattedDoa,
   sessionYear,
 }) {
+  const schoolName = useSchoolName()
   return (
     <div
       id="student-id-front"
@@ -159,7 +161,7 @@ export function FrontCard({
           Academic Session: {sessionYear}
         </span>
         <span className="text-[8px] font-bold text-amber-300 uppercase tracking-widest">
-          Al-Haq Model Academy
+          {schoolName}
         </span>
       </div>
     </div>
@@ -176,6 +178,7 @@ export function BackCard({
   studentAddress,
   phoneDisplay,
 }) {
+  const schoolName = useSchoolName()
   return (
     <div
       id="student-id-back"
@@ -258,7 +261,7 @@ export function BackCard({
 
             <div className="text-right">
               <p className="text-[8px] font-black text-slate-800">Principal Signature</p>
-              <p className="text-[7px] text-slate-500 font-bold">Al-Haq Model Academy</p>
+              <p className="text-[7px] text-slate-500 font-bold">{schoolName}</p>
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ import {
   CalendarPlus,
 } from 'lucide-react'
 import { useRole } from '../../hooks/useRole'
+import { useSchoolName } from '../../hooks/useSchoolName'
 import { useAuthStore } from '../../store/authStore'
 import { useUIStore } from '../../store/uiStore'
 
@@ -61,6 +62,7 @@ export default function Sidebar() {
   const { isSidebarOpen } = useUIStore()
 
   const userRole = useRole() || 'student'
+  const schoolName = useSchoolName()
 
   return (
     <aside
@@ -82,7 +84,7 @@ export default function Sidebar() {
                   v2.0
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-1 font-medium">Al-Haq Model Academy</p>
+              <p className="text-[10px] text-slate-400 mt-1 font-medium truncate max-w-[9rem]" title={schoolName}>{schoolName}</p>
             </div>
           )}
         </div>

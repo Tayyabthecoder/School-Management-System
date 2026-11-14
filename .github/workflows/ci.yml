@@ -111,7 +111,7 @@ jobs:
       # Informational for now (exit-code 0): surfaces fixable HIGH/CRITICAL findings in the
       # base images and dependencies without blocking merges. Set exit-code to 1 to enforce.
       - name: Scan backend image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: sms-backend:ci
           severity: HIGH,CRITICAL
@@ -119,7 +119,7 @@ jobs:
           exit-code: '0'
 
       - name: Scan frontend image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: sms-frontend:ci
           severity: HIGH,CRITICAL

@@ -230,3 +230,34 @@ describe('imports reject rows with missing required data', () => {
     expect(res.json.mock.calls[0][0].data).toMatchObject({ createdCount: 1, errorCount: 0 })
   })
 })
+
+describe('ungraded students in the execute result', () => {
+  test('are counted separately from students who failed', async () => {
+    Grade.find.mockReturnValue({ lean: jest.fn().mockResolvedValue([]) }) // no marks entered
+    PromotionConfig.findById.mockReturnValue(mockConfigLookup(buildConfig()))
+    PromotionConfig.findOneAndUpdate.mockResolvedValue({ _id: 'cfg-1' })
+    Student.bulkWrite.mockResolvedValue({})
+    const res = mockRes()
+
+    await promotionController.executePromotion({ body: { configId: 'cfg-1' }, user: { _id: 'admin' } }, res, jest.fn())
+
+    const payload = res.json.mock.calls[0][0]
+    expect(payload.data).toMatchObject({ promotedCount: 0, retainedCount: 1, unresolvedCount: 1 })
+    expect(payload.message).toContain('1 of them have no final grades yet')
+  })
+
+  test('a manual override promotes them and removes them from the count', async () => {
+    Grade.find.mockReturnValue({ lean: jest.fn().mockResolvedValue([]) })
+    PromotionConfig.findById.mockReturnValue(mockConfigLookup(buildConfig()))
+    PromotionConfig.findOneAndUpdate.mockResolvedValue({ _id: 'cfg-1' })
+    Student.bulkWrite.mockResolvedValue({})
+    const res = mockRes()
+
+    await promotionController.executePromotion({
+      body: { configId: 'cfg-1', overrides: [{ studentId: 'stu-1', decision: 'promote' }] },
+      user: { _id: 'admin' },
+    }, res, jest.fn())
+
+    expect(res.json.mock.calls[0][0].data).toMatchObject({ promotedCount: 1, unresolvedCount: 0 })
+  })
+})

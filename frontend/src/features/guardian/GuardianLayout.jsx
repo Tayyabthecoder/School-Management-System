@@ -2,10 +2,12 @@ import React from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { School, LogOut, User } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
+import { useSchoolName } from '../../hooks/useSchoolName'
 
 import PageLoader from '../../components/ui/PageLoader'
 
 export default function GuardianLayout() {
+  const schoolName = useSchoolName()
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
@@ -25,7 +27,7 @@ export default function GuardianLayout() {
             </div>
             <div>
               <h1 className="font-bold text-base text-gray-900 leading-tight">Guardian Portal</h1>
-              <p className="text-xs text-gray-500">Al-Haq Model Academy & College</p>
+              <p className="text-xs text-gray-500">{schoolName}</p>
             </div>
           </div>
 
