@@ -53,29 +53,28 @@ describe('Grades Controller Tests', () => {
         }),
       })
 
-      Grade.findOneAndUpdate.mockImplementation((filter, update) => Promise.resolve(update))
+      Grade.bulkWrite.mockResolvedValue({})
+      Grade.find.mockResolvedValue([{ studentId: 'stu1' }, { studentId: 'stu2' }])
 
       await gradesController.saveGrades(req, res, next)
 
-      expect(Grade.findOneAndUpdate).toHaveBeenCalledWith(
-        { examId: 'exam123', studentId: 'stu1' },
-        expect.objectContaining({
-          percentage: 85,
-          gradeLetter: 'A',
-        }),
-        expect.any(Object)
-      )
+      // One ordered bulk write carries every student's mark
+      expect(Grade.bulkWrite).toHaveBeenCalledTimes(1)
+      const [operations, options] = Grade.bulkWrite.mock.calls[0]
+      expect(options).toEqual({ ordered: true })
+      expect(operations).toHaveLength(2)
+      expect(operations[0].updateOne).toMatchObject({
+        filter: { examId: 'exam123', studentId: 'stu1' },
+        upsert: true,
+        update: { $set: expect.objectContaining({ marksObtained: 85, percentage: 85, gradeLetter: 'A', enteredBy: 'teacher123' }) },
+      })
+      expect(operations[1].updateOne).toMatchObject({
+        filter: { examId: 'exam123', studentId: 'stu2' },
+        update: { $set: expect.objectContaining({ percentage: 65, gradeLetter: 'B' }) },
+      })
+      expect(Grade.findOneAndUpdate).not.toHaveBeenCalled()
 
-      expect(Grade.findOneAndUpdate).toHaveBeenCalledWith(
-        { examId: 'exam123', studentId: 'stu2' },
-        expect.objectContaining({
-          percentage: 65,
-          gradeLetter: 'B',
-        }),
-        expect.any(Object)
-      )
-
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }))
+      expect(res.json).toHaveBeenCalledWith({ success: true, data: [{ studentId: 'stu1' }, { studentId: 'stu2' }] })
     })
 
     it('throws error when marks obtained exceed maximum marks', async () => {

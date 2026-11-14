@@ -212,10 +212,19 @@ const generateMonthlyFeeChallansUnlocked = async ({
     }
   }
 
+  // Only a tuition concession carries into next month's tuition. A discount given on an
+  // admission, exam or other one-off fee must not silently reduce every later tuition challan.
+  const tuitionQuery = FeeStructure.find({ feeType: 'Tuition' })
+  const tuitionStructures = tuitionQuery && typeof tuitionQuery.select === 'function'
+    ? await tuitionQuery.select('_id').lean()
+    : ((await tuitionQuery) || [])
+  const tuitionStructureIds = (tuitionStructures || []).map((s) => s._id)
+
   // Fetch recent student fees that had discounts to copy concession type and percentage
   const discountQuery = StudentFee.find({
     studentId: { $in: studentsToGenerate.map((s) => s._id) },
     discount: { $gt: 0 },
+    feeStructureId: { $in: tuitionStructureIds },
   })
   const historicalFeesWithDiscount = discountQuery && typeof discountQuery.sort === 'function'
     ? await discountQuery.sort({ createdAt: -1 })

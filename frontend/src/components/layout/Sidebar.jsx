@@ -19,40 +19,41 @@ import { useRole } from '../../hooks/useRole'
 import { useSchoolName } from '../../hooks/useSchoolName'
 import { useAuthStore } from '../../store/authStore'
 import { useUIStore } from '../../store/uiStore'
+import { ACCESS } from '../../config/access'
 
 const NAV_SECTIONS = [
   {
     title: 'Academics & Faculty',
     items: [
-      { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', roles: ['super_admin', 'accountant', 'hr_manager'] },
-      { label: 'Faculty Workspace', icon: Clock, path: '/teacher/workspace', roles: ['super_admin', 'teacher'] },
-      { label: 'Students Directory', icon: Users, path: '/students', roles: ['super_admin', 'teacher', 'hr_manager'] },
-      { label: 'Classes & Sections', icon: GraduationCap, path: '/academics', roles: ['super_admin', 'teacher'] },
-      { label: 'Daily Attendance', icon: CalendarCheck, path: '/attendance', roles: ['super_admin', 'teacher', 'hr_manager'] },
+      { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', roles: ACCESS.dashboard },
+      { label: 'Faculty Workspace', icon: Clock, path: '/teacher/workspace', roles: ACCESS.teacherWorkspace },
+      { label: 'Students Directory', icon: Users, path: '/students', roles: ACCESS.students },
+      { label: 'Classes & Sections', icon: GraduationCap, path: '/academics', roles: ACCESS.academics },
+      { label: 'Daily Attendance', icon: CalendarCheck, path: '/attendance', roles: ACCESS.attendance },
     ],
   },
   {
     title: 'Exams & Records',
     items: [
-      { label: 'Grades & Exams', icon: Award, path: '/grades', roles: ['super_admin', 'teacher'] },
-      { label: 'Report Cards & Transcripts', icon: School, path: '/grades/report-cards', roles: ['super_admin', 'teacher'] },
-      { label: 'Annual Promotion', icon: GraduationCap, path: '/students/promotion', roles: ['super_admin'] },
+      { label: 'Grades & Exams', icon: Award, path: '/grades', roles: ACCESS.grades },
+      { label: 'Report Cards & Transcripts', icon: School, path: '/grades/report-cards', roles: ACCESS.grades },
+      { label: 'Annual Promotion', icon: GraduationCap, path: '/students/promotion', roles: ACCESS.promotion },
     ],
   },
   {
     title: 'Finance & Operations',
     items: [
-      { label: 'Fees & Bank Challans', icon: CircleDollarSign, path: '/finance', roles: ['super_admin', 'accountant'] },
-      { label: 'Staff Directory', icon: UserCheck, path: '/teachers', roles: ['super_admin', 'teacher', 'hr_manager'] },
-      { label: 'HR & Monthly Payroll', icon: Briefcase, path: '/hr', roles: ['super_admin', 'hr_manager'] },
-      { label: 'My Leave', icon: CalendarPlus, path: '/my-leave', roles: ['teacher', 'accountant', 'hr_manager'] },
+      { label: 'Fees & Bank Challans', icon: CircleDollarSign, path: '/finance', roles: ACCESS.finance },
+      { label: 'Staff Directory', icon: UserCheck, path: '/teachers', roles: ACCESS.staffDirectory },
+      { label: 'HR & Monthly Payroll', icon: Briefcase, path: '/hr', roles: ACCESS.hr },
+      { label: 'My Leave', icon: CalendarPlus, path: '/my-leave', roles: ACCESS.myLeave },
     ],
   },
   {
     title: 'Analytics & System',
     items: [
-      { label: 'Reports & Export Engine', icon: BarChart3, path: '/reports', roles: ['super_admin', 'accountant', 'hr_manager'] },
-      { label: 'System Settings & RBAC', icon: Settings, path: '/settings', roles: ['super_admin'] },
+      { label: 'Reports & Export Engine', icon: BarChart3, path: '/reports', roles: ACCESS.reports },
+      { label: 'System Settings & RBAC', icon: Settings, path: '/settings', roles: ACCESS.settings },
     ],
   },
 ]

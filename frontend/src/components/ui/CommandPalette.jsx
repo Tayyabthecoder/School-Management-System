@@ -21,27 +21,28 @@ import {
 } from 'lucide-react'
 import { useUIStore } from '../../store/uiStore'
 import { useRole } from '../../hooks/useRole'
+import { ACCESS } from '../../config/access'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../lib/axios'
 
 const STATIC_COMMANDS = [
   // Navigation
-  { id: 'nav-dashboard', title: 'Dashboard & Analytics', category: 'Navigation', icon: LayoutDashboard, path: '/dashboard', roles: ['super_admin', 'accountant', 'hr_manager'] },
-  { id: 'nav-students', title: 'Students Directory & Admissions', category: 'Navigation', icon: Users, path: '/students', roles: ['super_admin', 'teacher', 'hr_manager'] },
-  { id: 'nav-classes', title: 'Classes & Academic Sections', category: 'Navigation', icon: GraduationCap, path: '/academics', roles: ['super_admin', 'teacher'] },
-  { id: 'nav-timetable', title: 'Weekly Timetable Schedule', category: 'Navigation', icon: Clock, path: '/academics/timetable', roles: ['super_admin', 'teacher'] },
-  { id: 'nav-attendance', title: 'Daily Attendance Marking', category: 'Navigation', icon: CalendarCheck, path: '/attendance', roles: ['super_admin', 'teacher', 'hr_manager'] },
-  { id: 'nav-grades', title: 'Exam Schedules & Marks Entry', category: 'Navigation', icon: Award, path: '/grades', roles: ['super_admin', 'teacher'] },
-  { id: 'nav-transcripts', title: 'Multi-Year Transcripts & Report Cards', category: 'Navigation', icon: FileText, path: '/grades/report-cards', roles: ['super_admin', 'teacher'] },
-  { id: 'nav-finance', title: 'Finance Ledger & Bank Challans', category: 'Navigation', icon: CircleDollarSign, path: '/finance', roles: ['super_admin', 'accountant'] },
-  { id: 'nav-hr', title: 'HR Management & Staff Directory', category: 'Navigation', icon: Briefcase, path: '/hr', roles: ['super_admin', 'hr_manager'] },
-  { id: 'nav-reports', title: 'Dynamic Custom Report Builder', category: 'Navigation', icon: BarChart3, path: '/reports', roles: ['super_admin', 'accountant', 'hr_manager'] },
-  { id: 'nav-settings', title: 'System Administration & Settings', category: 'Navigation', icon: Settings, path: '/settings', roles: ['super_admin'] },
+  { id: 'nav-dashboard', title: 'Dashboard & Analytics', category: 'Navigation', icon: LayoutDashboard, path: '/dashboard', roles: ACCESS.dashboard },
+  { id: 'nav-students', title: 'Students Directory & Admissions', category: 'Navigation', icon: Users, path: '/students', roles: ACCESS.students },
+  { id: 'nav-classes', title: 'Classes & Academic Sections', category: 'Navigation', icon: GraduationCap, path: '/academics', roles: ACCESS.academics },
+  { id: 'nav-timetable', title: 'Weekly Timetable Schedule', category: 'Navigation', icon: Clock, path: '/academics/timetable', roles: ACCESS.academics },
+  { id: 'nav-attendance', title: 'Daily Attendance Marking', category: 'Navigation', icon: CalendarCheck, path: '/attendance', roles: ACCESS.attendance },
+  { id: 'nav-grades', title: 'Exam Schedules & Marks Entry', category: 'Navigation', icon: Award, path: '/grades', roles: ACCESS.grades },
+  { id: 'nav-transcripts', title: 'Multi-Year Transcripts & Report Cards', category: 'Navigation', icon: FileText, path: '/grades/report-cards', roles: ACCESS.grades },
+  { id: 'nav-finance', title: 'Finance Ledger & Bank Challans', category: 'Navigation', icon: CircleDollarSign, path: '/finance', roles: ACCESS.finance },
+  { id: 'nav-hr', title: 'HR Management & Staff Directory', category: 'Navigation', icon: Briefcase, path: '/hr', roles: ACCESS.hr },
+  { id: 'nav-reports', title: 'Dynamic Custom Report Builder', category: 'Navigation', icon: BarChart3, path: '/reports', roles: ACCESS.reports },
+  { id: 'nav-settings', title: 'System Administration & Settings', category: 'Navigation', icon: Settings, path: '/settings', roles: ACCESS.settings },
 
   // Quick Actions
-  { id: 'act-new-student', title: 'Register New Student (5-Step Wizard)', category: 'Quick Action', icon: PlusCircle, path: '/students', roles: ['super_admin', 'teacher'] },
-  { id: 'act-new-challan', title: 'Issue Bank Fee Challan', category: 'Quick Action', icon: CircleDollarSign, path: '/finance', roles: ['super_admin', 'accountant'] },
-  { id: 'act-mark-att', title: 'Record Class Attendance', category: 'Quick Action', icon: CalendarCheck, path: '/attendance', roles: ['super_admin', 'teacher'] },
+  { id: 'act-new-student', title: 'Register New Student (5-Step Wizard)', category: 'Quick Action', icon: PlusCircle, path: '/students', roles: ACCESS.studentRegistration },
+  { id: 'act-new-challan', title: 'Issue Bank Fee Challan', category: 'Quick Action', icon: CircleDollarSign, path: '/finance', roles: ACCESS.finance },
+  { id: 'act-mark-att', title: 'Record Class Attendance', category: 'Quick Action', icon: CalendarCheck, path: '/attendance', roles: ACCESS.attendanceMarking },
 ]
 
 export default function CommandPalette() {

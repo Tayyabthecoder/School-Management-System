@@ -142,6 +142,7 @@ describe('grades controller', () => {
 
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 400 }))
     expect(Grade.findOneAndUpdate).not.toHaveBeenCalled()
+    expect(Grade.bulkWrite).not.toHaveBeenCalled()
   })
 
   test('createExam rejects pass marks above max marks', async () => {

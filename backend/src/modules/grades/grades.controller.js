@@ -79,24 +79,30 @@ const saveGrades = async (req, res, next) => {
       throw new ApiError(400, `Marks obtained cannot exceed maximum marks (${exam.maxMarks})`)
     }
 
-    const saved = []
-    for (const item of grades) {
+    // One bulk write instead of one awaited upsert per student: a single round trip, applied in
+    // order by the server, so a crash or dropped connection can no longer leave the class half saved
+    // after N separate requests. (Marks are already validated: >= 0 by the schema, <= max above.)
+    const operations = grades.map((item) => {
       const percentage = calculatePercentage(item.marksObtained, exam.maxMarks)
       const gradeLetter = calculateGradeLetter(percentage, gradingScale)
-
-      const doc = await Grade.findOneAndUpdate(
-        { examId, studentId: item.studentId },
-        {
-          marksObtained: item.marksObtained,
-          percentage,
-          gradeLetter,
-          remarks: item.remarks || '',
-          enteredBy: req.user._id,
+      return {
+        updateOne: {
+          filter: { examId, studentId: item.studentId },
+          update: {
+            $set: {
+              marksObtained: item.marksObtained,
+              percentage,
+              gradeLetter,
+              remarks: item.remarks || '',
+              enteredBy: req.user._id,
+            },
+          },
+          upsert: true,
         },
-        { upsert: true, new: true, runValidators: true }
-      )
-      saved.push(doc)
-    }
+      }
+    })
+    await Grade.bulkWrite(operations, { ordered: true })
+    const saved = await Grade.find({ examId, studentId: { $in: grades.map((g) => g.studentId) } })
 
     await logAudit({
       req,

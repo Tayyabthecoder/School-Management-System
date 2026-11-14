@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
 import RoleRoute from './RoleRoute'
+import { ACCESS } from '../config/access'
 import AppShell from '../components/layout/AppShell'
 
 import LoginPage from '../features/auth/LoginPage'
@@ -54,65 +55,65 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* Teacher workspace */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'teacher']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.teacherWorkspace} />}>
             <Route path="/teacher/workspace" element={<TeacherWorkspacePage />} />
           </Route>
 
           {/* Academic & Timetable Management */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'teacher']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.academics} />}>
             <Route path="/academics" element={<ClassesPage />} />
             <Route path="/academics/timetable" element={<TimetablePage />} />
           </Route>
 
           {/* Student Directory & Profiles */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'teacher', 'accountant', 'hr_manager']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.students} />}>
             <Route path="/students" element={<StudentListPage />} />
             <Route path="/students/:id" element={<StudentProfilePage />} />
           </Route>
 
           {/* Student Annual Promotion Engine */}
-          <Route element={<RoleRoute allowedRoles={['super_admin']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.promotion} />}>
             <Route path="/students/promotion" element={<PromotionPage />} />
           </Route>
 
           {/* Faculty / Staff Directory */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'hr_manager', 'teacher']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.staffDirectory} />}>
             <Route path="/teachers" element={<TeachersPage />} />
           </Route>
 
           {/* Attendance Tracking */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'teacher', 'hr_manager']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.attendance} />}>
             <Route path="/attendance" element={<AttendancePage />} />
           </Route>
 
           {/* Grades & Examination */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'teacher']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.grades} />}>
             <Route path="/grades" element={<GradesPage />} />
             <Route path="/grades/report-cards" element={<ReportCardPage />} />
           </Route>
 
           {/* Finance & Fee Collection */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'accountant']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.finance} />}>
             <Route path="/finance" element={<FinancePage />} />
           </Route>
 
           {/* Human Resources & Payroll */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'hr_manager']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.hr} />}>
             <Route path="/hr" element={<HRPage />} />
           </Route>
 
           {/* Staff self-service leave (FUNC-03) */}
-          <Route element={<RoleRoute allowedRoles={['teacher', 'accountant', 'hr_manager']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.myLeave} />}>
             <Route path="/my-leave" element={<MyLeavePage />} />
           </Route>
 
           {/* Reporting & Analytics */}
-          <Route element={<RoleRoute allowedRoles={['super_admin', 'accountant', 'hr_manager']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.reports} />}>
             <Route path="/reports" element={<ReportsPage />} />
           </Route>
 
           {/* System Administration & Settings */}
-          <Route element={<RoleRoute allowedRoles={['super_admin']} />}>
+          <Route element={<RoleRoute allowedRoles={ACCESS.settings} />}>
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>

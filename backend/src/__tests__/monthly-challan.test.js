@@ -176,6 +176,29 @@ describe('Automated Monthly Challan Service & Feature Tests', () => {
       )
     })
 
+    it('carries a concession forward only from tuition fees', async () => {
+      AcademicYear.findOne.mockReturnValue({ sort: jest.fn().mockResolvedValue(mockAcademicYear) })
+      Class.find.mockReturnValue({ sort: jest.fn().mockResolvedValue(mockClasses) })
+      FeeStructure.findOne.mockResolvedValue(null)
+      FeeStructure.create.mockImplementation((data) => Promise.resolve({ _id: `fs_${data.classId}`, ...data }))
+      FeeStructure.find.mockReturnValue({
+        select: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue([{ _id: 'tuition-1' }, { _id: 'tuition-2' }]) }),
+      })
+      Student.find.mockReturnValue({ populate: jest.fn().mockResolvedValue(mockStudents) })
+      StudentFee.find.mockImplementation((query) => (
+        query && query.discount && query.discount.$gt !== undefined
+          ? { sort: jest.fn().mockResolvedValue([]) }
+          : { select: jest.fn().mockResolvedValue([]) }
+      ))
+      StudentFee.insertMany.mockImplementation((items) => Promise.resolve(items))
+
+      await generateMonthlyFeeChallans({ targetDate: new Date(2026, 9, 1) })
+
+      expect(FeeStructure.find).toHaveBeenCalledWith({ feeType: 'Tuition' })
+      const concessionQuery = StudentFee.find.mock.calls.map(([q]) => q).find((q) => q && q.discount)
+      expect(concessionQuery.feeStructureId).toEqual({ $in: ['tuition-1', 'tuition-2'] })
+    })
+
     it('skips students who already have challans for the target month (idempotency)', async () => {
       AcademicYear.findOne.mockReturnValue({
         sort: jest.fn().mockResolvedValue(mockAcademicYear),
