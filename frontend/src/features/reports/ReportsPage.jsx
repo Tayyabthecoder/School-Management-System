@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { logError } from '../../lib/logger'
+import React, { useState } from 'react'
 import { FileSpreadsheet, Sparkles, BarChart3 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
-import api from '../../lib/axios'
+import { useClasses } from '../../hooks/useClasses'
 import ExportReportsTab from './components/ExportReportsTab'
 import CustomReportBuilderTab from './components/CustomReportBuilderTab'
 import AnalyticsIntelligenceTab from './components/AnalyticsIntelligenceTab'
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState('export') // 'export' | 'custom' | 'analytics'
-  const [classesList, setClassesList] = useState([])
-
-  useEffect(() => {
-    api.get('/classes')
-      .then(res => {
-        if (res.data?.success) setClassesList(res.data.data || [])
-      })
-      .catch((err) => logError('Failed to load classes list:', err))
-  }, [])
+  const { data: classesList = [] } = useClasses()
 
   return (
     <div>

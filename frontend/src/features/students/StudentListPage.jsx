@@ -10,6 +10,7 @@ import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
+import { useClasses } from '../../hooks/useClasses'
 import ChangeSectionModal from './components/ChangeSectionModal'
 import ImportStudentsModal from './components/ImportStudentsModal'
 import StudentRegistrationModal from './components/StudentRegistrationModal'
@@ -18,7 +19,9 @@ import { logError } from '../../lib/logger'
 export default function StudentListPage() {
   const toast = useToast()
   const [students, setStudents] = useState([])
-  const [classes, setClasses] = useState([])
+  const { data: fetchedClasses, refetch: fetchClasses } = useClasses()
+  // Same fallback as before when the school has no classes yet or the request fails
+  const classes = fetchedClasses && fetchedClasses.length > 0 ? fetchedClasses : FALLBACK_GRADES
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [tableClassFilter, setTableClassFilter] = useState('')
@@ -50,22 +53,8 @@ export default function StudentListPage() {
     }
   }
 
-  const fetchClasses = async () => {
-    try {
-      const res = await api.get('/classes')
-      if (res.data?.success && res.data.data.length > 0) {
-        setClasses(res.data.data)
-      } else {
-        setClasses(FALLBACK_GRADES)
-      }
-    } catch (err) {
-      setClasses(FALLBACK_GRADES)
-    }
-  }
-
   useEffect(() => {
     fetchStudents()
-    fetchClasses()
   }, [])
 
   const displayClasses = classes && classes.length > 0 ? classes : FALLBACK_GRADES

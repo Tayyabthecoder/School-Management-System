@@ -8,6 +8,8 @@ import Badge from '../../components/ui/Badge'
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import { confirmAction } from '../../store/confirmStore'
 import api from '../../lib/axios'
+import { useQueryClient } from '@tanstack/react-query'
+import { CLASSES_KEY } from '../../hooks/useClasses'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 import { GRADE_THEMES, FALLBACK_GRADES as INITIAL_FALLBACK_GRADES } from '../../constants/grades'
@@ -26,6 +28,7 @@ import { logError } from '../../lib/logger'
 
 export default function ClassesPage() {
   const toast = useToast()
+  const queryClient = useQueryClient()
   const { user } = useAuthStore()
   const userRole = user?.roleName || (typeof user?.role === 'object' ? user?.role?.name : user?.role) || ''
   const isSuperAdmin = userRole === 'super_admin'
@@ -95,6 +98,8 @@ export default function ClassesPage() {
       ])
       if (clsRes.data?.success && clsRes.data.data.length > 0) {
         setClasses(clsRes.data.data)
+        // Every other page reading the class list sees the change without waiting for expiry
+        queryClient.setQueryData(CLASSES_KEY, clsRes.data.data)
       } else {
         setClasses(INITIAL_FALLBACK_GRADES)
       }
@@ -105,7 +110,7 @@ export default function ClassesPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [queryClient])
 
   useEffect(() => {
     fetchData()

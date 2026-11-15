@@ -7,12 +7,13 @@ import Badge from '../../components/ui/Badge'
 import api from '../../lib/axios'
 import { useAuthStore } from '../../store/authStore'
 import { logError } from '../../lib/logger'
+import { useClasses } from '../../hooks/useClasses'
 
 export default function ReportCardPage() {
   const { user } = useAuthStore()
   const isStudent = user?.role === 'student' || user?.roleName === 'student'
 
-  const [classes, setClasses] = useState([])
+  const { data: classes = [] } = useClasses({ enabled: !isStudent })
   const [selectedClassId, setSelectedClassId] = useState('')
   const [students, setStudents] = useState([])
   const [selectedStudentId, setSelectedStudentId] = useState(user?.studentId || '')
@@ -23,20 +24,12 @@ export default function ReportCardPage() {
   const [downloading, setDownloading] = useState(false)
   const [bulkDownloading, setBulkDownloading] = useState(false)
 
-  // Load classes if staff/admin
+  // Staff/admin start on the first class once the list is available
   useEffect(() => {
-    if (!isStudent) {
-      api.get('/classes')
-        .then(res => {
-          const clsList = res.data?.data || []
-          setClasses(clsList)
-          if (clsList.length > 0 && !selectedClassId) {
-            setSelectedClassId(clsList[0]._id)
-          }
-        })
-        .catch(logError)
+    if (!isStudent && classes.length > 0 && !selectedClassId) {
+      setSelectedClassId(classes[0]._id)
     }
-  }, [isStudent])
+  }, [isStudent, classes, selectedClassId])
 
   // Load students for selected class
   useEffect(() => {
