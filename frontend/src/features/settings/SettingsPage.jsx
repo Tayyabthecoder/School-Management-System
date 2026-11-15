@@ -201,6 +201,7 @@ const DEFAULT_SCHOOL_PROFILE = {
 const DEFAULT_ACADEMIC_CONFIG = {
   activeTerm: 'Term 1',
   attendanceAlertThreshold: 75,
+  providentFundPercent: 0,
 }
 
 // ─── Main Settings Page ───────────────────────────────────────────────────────
@@ -345,6 +346,7 @@ export default function SettingsPage() {
           ...prev,
           activeTerm: s.activeTerm || prev.activeTerm,
           attendanceAlertThreshold: s.attendanceAlertThreshold !== undefined ? s.attendanceAlertThreshold : 75,
+          providentFundPercent: s.providentFundPercent !== undefined ? s.providentFundPercent : 0,
         }))
         if (Array.isArray(s.gradingScale) && s.gradingScale.length > 0) {
           setGradingScale(s.gradingScale)
@@ -421,6 +423,7 @@ export default function SettingsPage() {
       const res = await api.patch('/settings', {
         activeTerm: academicConfig.activeTerm,
         attendanceAlertThreshold: academicConfig.attendanceAlertThreshold,
+        providentFundPercent: academicConfig.providentFundPercent,
       })
       if (res.data?.success) {
         writeStoredJson('sms_academic_config', academicConfig)
@@ -503,6 +506,7 @@ export default function SettingsPage() {
         await api.patch('/settings', {
           activeTerm: imported.academicConfig.activeTerm,
           attendanceAlertThreshold: imported.academicConfig.attendanceAlertThreshold,
+          providentFundPercent: imported.academicConfig.providentFundPercent,
         })
       }
       if (Array.isArray(imported.gradingScale)) {

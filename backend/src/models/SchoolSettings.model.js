@@ -8,6 +8,13 @@ const schoolSettingsSchema = new mongoose.Schema({
     min: 50,
     max: 100,
   },
+  // Employee provident-fund contribution, as a percentage of basic pay (0 = not used)
+  providentFundPercent: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 20,
+  },
   allowedDays: {
     type: [String],
     enum: DAYS_OF_WEEK,

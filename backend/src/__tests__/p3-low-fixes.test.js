@@ -155,8 +155,12 @@ describe('FUNC-03: staff self-service leave and half-day payroll deductions', ()
     const Staff = require('../models/Staff.model')
     const StaffAttendance = require('../models/StaffAttendance.model')
     const PayrollRecord = require('../models/PayrollRecord.model')
+    const LeaveRequest = require('../models/LeaveRequest.model')
+    const SchoolSettings = require('../models/SchoolSettings.model')
     const staff = { _id: 'st1', salary: 30000, allowances: 0, deductions: 0 }
     const spies = [
+      jest.spyOn(LeaveRequest, 'find').mockResolvedValue([]),
+      jest.spyOn(SchoolSettings, 'findOne').mockReturnValue({ lean: jest.fn().mockResolvedValue({ providentFundPercent: 0 }) }),
       jest.spyOn(Staff, 'find').mockResolvedValue([staff]),
       jest.spyOn(StaffAttendance, 'aggregate').mockResolvedValue([{ _id: 'st1', count: 1.5 }]),
       jest.spyOn(PayrollRecord, 'findOne').mockResolvedValue(null),

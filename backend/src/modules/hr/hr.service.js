@@ -13,6 +13,56 @@ const calculateAbsentDeductions = (monthlySalary, absentDaysCount, daysInMonth =
   return days * perDay
 }
 
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const DEFAULT_WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+const dayKey = (date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+
+/**
+ * Unpaid-leave days that should reduce a month's pay: every school working day inside an approved
+ * Unpaid leave that falls in the month. A day already deducted as an absence (a full 1, or the 0.5
+ * of a half day) is not charged twice, and overlapping leave requests count a day once.
+ *
+ * @param {{ fromDate: Date|string, toDate: Date|string }[]} leaves approved Unpaid leave of one staff member
+ * @param {Date} monthStart first moment of the month
+ * @param {Date} monthEnd last moment of the month
+ * @param {string[]} workingDays weekday names the school operates on
+ * @param {Map<string, number>} alreadyDeducted dayKey -> weight (1 or 0.5) already charged as absence
+ */
+const countUnpaidLeaveDays = (leaves, monthStart, monthEnd, workingDays = DEFAULT_WORKING_DAYS, alreadyDeducted = new Map()) => {
+  const working = new Set(workingDays && workingDays.length ? workingDays : DEFAULT_WORKING_DAYS)
+  const counted = new Set()
+  let days = 0
+
+  for (const leave of leaves || []) {
+    const from = new Date(leave.fromDate)
+    const to = new Date(leave.toDate)
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) continue
+
+    const cursor = new Date(Math.max(from.getTime(), monthStart.getTime()))
+    cursor.setHours(0, 0, 0, 0)
+    const last = new Date(Math.min(to.getTime(), monthEnd.getTime()))
+
+    // Bounded: a month has at most 31 days
+    for (let guard = 0; cursor <= last && guard < 40; guard++) {
+      const key = dayKey(cursor)
+      if (working.has(DAY_NAMES[cursor.getDay()]) && !counted.has(key)) {
+        counted.add(key)
+        days += Math.max(0, 1 - (alreadyDeducted.get(key) || 0))
+      }
+      cursor.setDate(cursor.getDate() + 1)
+    }
+  }
+  return days
+}
+
+/** Employee provident-fund contribution: a percentage of basic pay (0 when not configured). */
+const calculateProvidentFund = (basicPay, percent) => {
+  const basic = Math.max(0, Number(basicPay) || 0)
+  const pct = Math.min(100, Math.max(0, Number(percent) || 0))
+  return Math.round((basic * pct) / 100)
+}
+
 const EOBI_FIXED_PKR = 370 // Pakistan statutory rate
 
 const computeIncomeTax = (annualGross) => {
@@ -69,6 +119,9 @@ const computeNetSalary = ({
 module.exports = {
   calculatePerDaySalary,
   calculateAbsentDeductions,
+  countUnpaidLeaveDays,
+  calculateProvidentFund,
+  dayKey,
   computeIncomeTax,
   computeNetSalary,
 }

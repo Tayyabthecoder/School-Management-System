@@ -15,7 +15,13 @@ const { ApiError } = require('../../middleware/error.middleware')
 const { escapeRegex } = require('../../utils/regex.util')
 const { BCRYPT_ROUNDS } = require('../../config/constants')
 const { getOrSet } = require('../../utils/cache.util')
-const { computeNetSalary, calculateAbsentDeductions } = require('./hr.service')
+const {
+  computeNetSalary,
+  calculateAbsentDeductions,
+  countUnpaidLeaveDays,
+  calculateProvidentFund,
+  dayKey,
+} = require('./hr.service')
 
 const getStaffList = async (req, res, next) => {
   try {
@@ -274,6 +280,39 @@ const runPayroll = async (req, res, next) => {
     const absenceMap = new Map()
     absenceAgg.forEach(a => absenceMap.set((a._id || '').toString(), a.count))
 
+    // Approved Unpaid leave costs a day's pay like an absence (other leave types stay paid), counted
+    // on the school's working days and never twice for a day that is already marked absent.
+    const settings = await getOrSet('ref:school-settings', 300, async () => SchoolSettings.findOne({ isActive: true }).lean())
+    const providentFundPercent = Number(settings?.providentFundPercent) || 0
+    const unpaidLeaves = staffIds.length > 0
+      ? await LeaveRequest.find({
+          staffId: { $in: staffIds },
+          status: 'Approved',
+          leaveType: 'Unpaid',
+          fromDate: { $lte: endDate },
+          toDate: { $gte: startDate },
+        })
+      : []
+    const leavesByStaff = new Map()
+    for (const leave of unpaidLeaves || []) {
+      const key = String(leave.staffId)
+      if (!leavesByStaff.has(key)) leavesByStaff.set(key, [])
+      leavesByStaff.get(key).push(leave)
+    }
+    const absentDayWeights = new Map() // staffId -> Map(dayKey -> weight), only for staff on unpaid leave
+    if (leavesByStaff.size > 0) {
+      const marked = await StaffAttendance.find({
+        staffId: { $in: [...leavesByStaff.keys()] },
+        status: { $in: ['Absent', 'Half Day'] },
+        date: { $gte: startDate, $lte: endDate },
+      })
+      for (const row of marked || []) {
+        const key = String(row.staffId)
+        if (!absentDayWeights.has(key)) absentDayWeights.set(key, new Map())
+        absentDayWeights.get(key).set(dayKey(new Date(row.date)), row.status === 'Half Day' ? 0.5 : 1)
+      }
+    }
+
     const records = []
     for (const staff of activeStaff) {
       const existing = await PayrollRecord.findOne({ staffId: staff._id, month, year })
@@ -282,13 +321,22 @@ const runPayroll = async (req, res, next) => {
         continue
       }
 
-      const absentCount = absenceMap.get(staff._id.toString()) || 0
+      const staffKey = staff._id.toString()
+      const unpaidLeaveDays = countUnpaidLeaveDays(
+        leavesByStaff.get(staffKey),
+        startDate,
+        endDate,
+        settings?.allowedDays,
+        absentDayWeights.get(staffKey)
+      )
+      const absentCount = (absenceMap.get(staffKey) || 0) + unpaidLeaveDays
       const absentDeduction = calculateAbsentDeductions(staff.salary, absentCount)
       const salaryDetails = computeNetSalary({
         basicPay: staff.salary,
         allowances: staff.allowances || 0,
         absentDeduction,
         otherDeductions: staff.deductions || 0,
+        providentFund: calculateProvidentFund(staff.salary, providentFundPercent),
         applyIncomeTax: !!applyIncomeTax,
         applyEobi: applyEobi !== undefined ? !!applyEobi : true,
         applySessi: !!applySessi,

@@ -4,6 +4,7 @@ const { DAYS_OF_WEEK } = require('../../config/constants')
 const updateSettingsSchema = z.object({
   body: z.object({
     attendanceAlertThreshold: z.coerce.number().min(50).max(100).optional(),
+    providentFundPercent: z.coerce.number().min(0).max(20).optional(),
     allowedDays: z.array(z.enum(DAYS_OF_WEEK, {
       error: () => 'Invalid day of the week',
     })).min(1, 'At least one operating day must remain enabled').optional(),

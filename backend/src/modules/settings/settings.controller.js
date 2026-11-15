@@ -56,6 +56,7 @@ const updateSettings = async (req, res, next) => {
     const payload = req.validatedData?.body || req.body
     const {
       attendanceAlertThreshold,
+      providentFundPercent,
       allowedDays,
       schoolName,
       schoolTagline,
@@ -103,6 +104,7 @@ const updateSettings = async (req, res, next) => {
     if (!doc) {
       doc = await SchoolSettings.create({
         attendanceAlertThreshold: attendanceAlertThreshold ?? 75,
+        providentFundPercent: providentFundPercent ?? 0,
         allowedDays: allowedDays ?? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         schoolName: schoolName ? schoolName.trim() : 'School Management System',
         schoolTagline: schoolTagline ? schoolTagline.trim() : '',
@@ -122,6 +124,7 @@ const updateSettings = async (req, res, next) => {
       })
     } else {
       if (attendanceAlertThreshold !== undefined) doc.attendanceAlertThreshold = attendanceAlertThreshold
+      if (providentFundPercent !== undefined) doc.providentFundPercent = providentFundPercent
       if (allowedDays !== undefined) doc.allowedDays = allowedDays
       if (schoolName !== undefined) doc.schoolName = schoolName.trim()
       if (schoolTagline !== undefined) doc.schoolTagline = schoolTagline.trim()
@@ -149,6 +152,7 @@ const updateSettings = async (req, res, next) => {
       documentId: doc._id,
       newValues: {
         attendanceAlertThreshold: doc.attendanceAlertThreshold,
+        providentFundPercent: doc.providentFundPercent,
         allowedDays: doc.allowedDays,
         schoolName: doc.schoolName,
         regNo: doc.regNo,
