@@ -152,7 +152,7 @@ export default function LoginPage() {
             </label>
             <div className="relative">
               <User className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
+              <input aria-label="e.g. admin"
                 type="text"
                 required
                 value={username}
@@ -169,7 +169,7 @@ export default function LoginPage() {
             </label>
             <div className="relative">
               <Lock className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
+              <input aria-label="••••••••"
                 type="password"
                 required
                 value={password}

@@ -1,19 +1,11 @@
 import React from 'react'
 import { BrowserRouter, useNavigate } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import AppRoutes from './routes'
+import { queryClient } from './lib/queryClient'
 import ToastContainer from './components/ui/ToastContainer'
 import ConfirmDialog from './components/ui/ConfirmDialog'
 import { registerNavigator } from './lib/navigation'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-})
 
 // Gives the axios interceptor access to the router (see lib/navigation.js).
 function NavigatorBridge() {

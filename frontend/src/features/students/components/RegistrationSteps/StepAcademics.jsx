@@ -23,7 +23,7 @@ export default function StepAcademics({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Academic Class / Grade <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <select aria-label="Academic Class / Grade"
                         value={newStudent.classId}
                         onChange={(e) => {
                           const targetCls = displayClasses.find(c => String(c._id) === String(e.target.value))
@@ -67,7 +67,7 @@ export default function StepAcademics({
                           </button>
                         ))}
                       </div>
-                      <input
+                      <input aria-label="Custom Section (e.g. C, D)"
                         type="text"
                         value={newStudent.sectionId}
                         onChange={(e) => {
@@ -86,7 +86,7 @@ export default function StepAcademics({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Date of Admission / Joining
                       </label>
-                      <input
+                      <input aria-label="Date of Admission / Joining"
                         type="date"
                         value={newStudent.joiningDate}
                         onChange={(e) => setNewStudent({ ...newStudent, joiningDate: e.target.value })}
@@ -98,7 +98,7 @@ export default function StepAcademics({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Previous School / Institute
                       </label>
-                      <input
+                      <input aria-label="Previous School / Institute"
                         type="text"
                         value={newStudent.previousSchool}
                         onChange={(e) => setNewStudent({ ...newStudent, previousSchool: e.target.value })}

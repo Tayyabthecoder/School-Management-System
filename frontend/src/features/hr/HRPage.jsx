@@ -60,27 +60,27 @@ function AddStaffModal({ open, onClose, onAdded }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name *</label>
-              <input required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              <input aria-label="Full Name" required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Full Name" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">CNIC</label>
-              <input value={form.cnic} onChange={(e) => setForm({ ...form, cnic: e.target.value })}
+              <input aria-label="CNIC" value={form.cnic} onChange={(e) => setForm({ ...form, cnic: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="42101-1234567-1" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Phone *</label>
-              <input required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              <input aria-label="Phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="+92300…" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Email</label>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+              <input aria-label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="email@school.edu.pk" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Department *</label>
-              <select required value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}
+              <select aria-label="Department" required value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                 {['Academics', 'Finance', 'HR', 'Administration', 'IT', 'Operations'].map((d) => (
                   <option key={d}>{d}</option>
@@ -89,17 +89,17 @@ function AddStaffModal({ open, onClose, onAdded }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Designation *</label>
-              <input required value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })}
+              <input aria-label="Designation" required value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="e.g. Senior Teacher" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Joining Date</label>
-              <input type="date" value={form.joiningDate} onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
+              <input aria-label="Joining Date" type="date" value={form.joiningDate} onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Monthly Salary (PKR) *</label>
-              <input required type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })}
+              <input aria-label="Monthly Salary (PKR)" required type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="50000" />
             </div>
           </div>
@@ -359,7 +359,7 @@ export default function HRPage() {
           <div className="flex flex-wrap items-end gap-3">
             <div>
               <label className="block text-xs font-semibold text-indigo-200 mb-1">Month</label>
-              <select
+              <select aria-label="Month"
                 value={payMonth}
                 onChange={(e) => setPayMonth(Number(e.target.value))}
                 className="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
@@ -371,7 +371,7 @@ export default function HRPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-indigo-200 mb-1">Year</label>
-              <select
+              <select aria-label="Year"
                 value={payYear}
                 onChange={(e) => setPayYear(Number(e.target.value))}
                 className="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
@@ -460,7 +460,7 @@ export default function HRPage() {
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
+                <input aria-label="Search staff…"
                   type="text"
                   placeholder="Search staff…"
                   value={search}

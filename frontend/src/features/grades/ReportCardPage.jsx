@@ -130,7 +130,7 @@ export default function ReportCardPage() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
                   Class
                 </label>
-                <select
+                <select aria-label="Class"
                   value={selectedClassId}
                   onChange={(e) => setSelectedClassId(e.target.value)}
                   className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white"
@@ -145,7 +145,7 @@ export default function ReportCardPage() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
                   Student
                 </label>
-                <select
+                <select aria-label="Student"
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white min-w-[200px]"
@@ -162,7 +162,7 @@ export default function ReportCardPage() {
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
               Examination Term
             </label>
-            <select
+            <select aria-label="Examination Term"
               value={termName}
               onChange={(e) => setTermName(e.target.value)}
               className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white"

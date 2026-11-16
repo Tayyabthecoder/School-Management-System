@@ -209,7 +209,7 @@ export default function ChallanBuilderTab({
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase mb-1">
               Institution Name (Top Banner)
             </label>
-            <input
+            <input aria-label="Institution Name (Top Banner)"
               type="text"
               value={safeChallanConfig.instituteName || ''}
               onChange={(e) =>
@@ -226,7 +226,7 @@ export default function ChallanBuilderTab({
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase mb-1">
               Challan Sub-Header
             </label>
-            <input
+            <input aria-label="Challan Sub-Header"
               type="text"
               value={safeChallanConfig.subHeader || ''}
               onChange={(e) =>
@@ -248,7 +248,7 @@ export default function ChallanBuilderTab({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-[10px] text-gray-500 dark:text-slate-400 mb-0.5">Left Signatory</label>
-              <input
+              <input aria-label="Left Signatory"
                 type="text"
                 value={safeChallanConfig.signatories?.leftTitle || ''}
                 onChange={(e) =>
@@ -265,7 +265,7 @@ export default function ChallanBuilderTab({
             </div>
             <div>
               <label className="block text-[10px] text-gray-500 dark:text-slate-400 mb-0.5">Middle Signatory</label>
-              <input
+              <input aria-label="Middle Signatory"
                 type="text"
                 value={safeChallanConfig.signatories?.middleTitle || ''}
                 onChange={(e) =>
@@ -282,7 +282,7 @@ export default function ChallanBuilderTab({
             </div>
             <div>
               <label className="block text-[10px] text-gray-500 dark:text-slate-400 mb-0.5">Right Signatory</label>
-              <input
+              <input aria-label="Right Signatory"
                 type="text"
                 value={safeChallanConfig.signatories?.rightTitle || ''}
                 onChange={(e) =>
@@ -415,7 +415,7 @@ export default function ChallanBuilderTab({
                 </div>
                 <div>
                   <label className="block text-[10px] font-semibold text-gray-500 dark:text-slate-400 uppercase mb-1">Copy Name</label>
-                  <input
+                  <input aria-label="Copy Name"
                     type="text"
                     value={copy.name || ''}
                     onChange={(e) => {
@@ -428,7 +428,7 @@ export default function ChallanBuilderTab({
                 </div>
                 <div>
                   <label className="block text-[10px] font-semibold text-gray-500 dark:text-slate-400 uppercase mb-1">Subtitle / Target</label>
-                  <input
+                  <input aria-label="Subtitle / Target"
                     type="text"
                     value={copy.subtitle || ''}
                     onChange={(e) => {
@@ -676,7 +676,7 @@ export default function ChallanBuilderTab({
             Late Fee Surcharge Amount (PKR)
           </label>
           <div className="relative">
-            <input
+            <input aria-label="Late Fee Surcharge Amount (PKR)"
               type="number"
               min="0"
               value={safeChallanConfig.lateFeeSurcharge}
@@ -740,7 +740,7 @@ export default function ChallanBuilderTab({
         )}
 
         <div className="flex gap-2">
-          <input
+          <input aria-label="Enter new instruction line (e.g. 5. Contact accounts desk for online verification)."
             type="text"
             placeholder="Enter new instruction line (e.g. 5. Contact accounts desk for online verification)."
             value={newInstructionText}

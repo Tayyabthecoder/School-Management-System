@@ -581,7 +581,7 @@ export default function GuardianPortalPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-gray-700 mb-1">Start Date *</label>
-                  <input
+                  <input aria-label="Start Date"
                     type="date"
                     required
                     value={leaveForm.startDate}
@@ -591,7 +591,7 @@ export default function GuardianPortalPage() {
                 </div>
                 <div>
                   <label className="block font-bold text-gray-700 mb-1">End Date *</label>
-                  <input
+                  <input aria-label="End Date"
                     type="date"
                     required
                     value={leaveForm.endDate}
@@ -603,7 +603,7 @@ export default function GuardianPortalPage() {
 
               <div>
                 <label className="block font-bold text-gray-700 mb-1">Leave Category</label>
-                <select
+                <select aria-label="Leave Category"
                   value={leaveForm.category}
                   onChange={(e) => setLeaveForm({ ...leaveForm, category: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-xl"
@@ -617,7 +617,7 @@ export default function GuardianPortalPage() {
 
               <div>
                 <label className="block font-bold text-gray-700 mb-1">Reason / Note *</label>
-                <textarea
+                <textarea aria-label="Reason / Note"
                   rows={3}
                   required
                   placeholder="e.g. Suffering from viral fever, doctor advised 2 days bed rest…"

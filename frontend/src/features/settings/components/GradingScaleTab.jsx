@@ -194,7 +194,7 @@ export default function GradingScaleTab({
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <div>
               <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Grade Label *</label>
-              <input
+              <input aria-label="Grade Label"
                 required
                 type="text"
                 placeholder="e.g. A*, Distinction"
@@ -205,7 +205,7 @@ export default function GradingScaleTab({
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Min Score (%) *</label>
-              <input
+              <input aria-label="Min Score (%)"
                 required
                 type="number"
                 min={0}
@@ -217,7 +217,7 @@ export default function GradingScaleTab({
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Max Score (%) *</label>
-              <input
+              <input aria-label="Max Score (%)"
                 required
                 type="number"
                 min={0}

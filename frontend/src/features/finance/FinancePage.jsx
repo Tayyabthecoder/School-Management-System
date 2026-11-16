@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react'
+import { loadClasses } from '../../hooks/useClasses'
 import {
   CircleDollarSign,
   Users,
@@ -86,7 +87,7 @@ export default function FinancePage() {
     setLoading(true)
     try {
       const [clsRes, stuRes, feesRes, statsRes, cronRes] = await Promise.all([
-        api.get('/classes'),
+        loadClasses(),
         api.get('/students', { params: { limit: 1000 } }),
         api.get('/finance/student-fees', { params: { limit: 1000 } }),
         api.get('/reports/dashboard-stats').catch(() => ({ data: { data: {} } })),
@@ -826,7 +827,7 @@ export default function FinancePage() {
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
+            <input aria-label="Search any student by name, student ID (e.g. STU-0012), or challan # (e.g. CHL-2026-ABCDEF)..."
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

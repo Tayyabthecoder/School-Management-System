@@ -86,7 +86,7 @@ export default function ChangePasswordPage() {
               Current Password
             </label>
             <div className="relative">
-              <input
+              <input aria-label="Enter current password"
                 type="password"
                 required
                 value={currentPassword}
@@ -103,7 +103,7 @@ export default function ChangePasswordPage() {
               New Password
             </label>
             <div className="relative">
-              <input
+              <input aria-label="At least 6 characters"
                 type="password"
                 required
                 value={newPassword}
@@ -120,7 +120,7 @@ export default function ChangePasswordPage() {
               Confirm New Password
             </label>
             <div className="relative">
-              <input
+              <input aria-label="Re-enter new password"
                 type="password"
                 required
                 value={confirmPassword}

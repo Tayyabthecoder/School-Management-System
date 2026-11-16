@@ -157,7 +157,7 @@ export default function CommandPalette() {
         {/* Search Header */}
         <div className="flex items-center px-4 py-3 border-b border-slate-100 dark:border-slate-800 gap-3">
           <Search className="w-5 h-5 text-slate-400 dark:text-slate-500 flex-shrink-0" />
-          <input
+          <input aria-label="Type a command, page, or student name..."
             ref={inputRef}
             type="text"
             value={query}

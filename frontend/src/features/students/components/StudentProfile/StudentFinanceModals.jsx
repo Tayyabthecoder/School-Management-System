@@ -93,7 +93,7 @@ export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
             Concession Category
           </label>
-          <select
+          <select aria-label="Concession Category"
             value={concessionType}
             onChange={(e) => setConcessionType(e.target.value)}
             className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-600/20 font-medium"
@@ -156,7 +156,7 @@ export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
             Concession Approval Reason / Remarks
           </label>
-          <input
+          <input aria-label="Concession Approval Reason / Remarks"
             type="text"
             value={concessionReason}
             onChange={(e) => setConcessionReason(e.target.value)}
@@ -325,7 +325,7 @@ export function RecordPaymentModal({
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
               Amount Being Paid (PKR) <span className="text-red-500">*</span>
             </label>
-            <input
+            <input aria-label="Amount Being Paid (PKR)"
               type="number"
               min="1"
               max={feeRecord.outstandingAmount}
@@ -341,7 +341,7 @@ export function RecordPaymentModal({
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
                 Payment Mode
               </label>
-              <select
+              <select aria-label="Payment Mode"
                 value={paymentMode}
                 onChange={(e) => setPaymentMode(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-600/20 font-medium"
@@ -359,7 +359,7 @@ export function RecordPaymentModal({
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
                 Reference #
               </label>
-              <input
+              <input aria-label="Reference #"
                 type="text"
                 value={referenceNo}
                 onChange={(e) => setReferenceNo(e.target.value)}
@@ -373,7 +373,7 @@ export function RecordPaymentModal({
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
               Payment Remarks
             </label>
-            <input
+            <input aria-label="Payment Remarks"
               type="text"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
@@ -528,7 +528,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
               Base Fee Amount
             </label>
-            <input
+            <input aria-label="Base Fee Amount"
               type="text"
               disabled
               value={formatPKR(baseAmount)}
@@ -539,7 +539,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
               Due Date
             </label>
-            <input
+            <input aria-label="Due Date"
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
@@ -553,7 +553,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
               Concession Waiver (PKR)
             </label>
-            <input
+            <input aria-label="Concession Waiver (PKR)"
               type="number"
               min="0"
               max={baseAmount}
@@ -567,7 +567,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1">
               Concession Type
             </label>
-            <select
+            <select aria-label="Concession Type"
               value={concessionType}
               onChange={(e) => setConcessionType(e.target.value)}
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-600/20"

@@ -63,7 +63,7 @@ export default function StepBasicInfo({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Full Name <span className="text-red-500">*</span>
                       </label>
-                      <input
+                      <input aria-label="Full Name"
                         type="text"
                         value={newStudent.fullName}
                         onChange={(e) => {
@@ -88,7 +88,7 @@ export default function StepBasicInfo({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Date of Birth <span className="text-red-500">*</span>
                       </label>
-                      <input
+                      <input aria-label="Date of Birth"
                         type="date"
                         value={newStudent.dob}
                         max={toLocalDateInput()}
@@ -116,7 +116,7 @@ export default function StepBasicInfo({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Gender <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <select aria-label="Gender"
                         value={newStudent.gender}
                         onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
                         className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 bg-white"
@@ -131,7 +131,7 @@ export default function StepBasicInfo({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         B-Form / CNIC Number
                       </label>
-                      <input
+                      <input aria-label="B-Form / CNIC Number"
                         type="text"
                         value={newStudent.bFormNumber}
                         onChange={(e) => setNewStudent({ ...newStudent, bFormNumber: e.target.value })}
@@ -145,7 +145,7 @@ export default function StepBasicInfo({
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nationality</label>
-                      <input
+                      <input aria-label="Nationality"
                         type="text"
                         value={newStudent.nationality}
                         onChange={(e) => setNewStudent({ ...newStudent, nationality: e.target.value })}
@@ -155,7 +155,7 @@ export default function StepBasicInfo({
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Religion</label>
-                      <input
+                      <input aria-label="Religion"
                         type="text"
                         value={newStudent.religion}
                         onChange={(e) => setNewStudent({ ...newStudent, religion: e.target.value })}
@@ -165,7 +165,7 @@ export default function StepBasicInfo({
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">City</label>
-                      <input
+                      <input aria-label="City"
                         type="text"
                         value={newStudent.city}
                         onChange={(e) => setNewStudent({ ...newStudent, city: e.target.value })}
@@ -178,7 +178,7 @@ export default function StepBasicInfo({
                   {/* Residential Address */}
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Residential Address</label>
-                    <textarea
+                    <textarea aria-label="Residential Address"
                       rows={2}
                       value={newStudent.address}
                       onChange={(e) => setNewStudent({ ...newStudent, address: e.target.value })}

@@ -64,7 +64,7 @@ function AddSubjectModal({ open, classId, className, onClose, onCreated }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Subject Name *</label>
-            <input
+            <input aria-label="Subject Name"
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -74,7 +74,7 @@ function AddSubjectModal({ open, classId, className, onClose, onCreated }) {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Subject Code *</label>
-            <input
+            <input aria-label="Subject Code"
               required
               value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value })}
@@ -84,7 +84,7 @@ function AddSubjectModal({ open, classId, className, onClose, onCreated }) {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Description / Category</label>
-            <input
+            <input aria-label="Description / Category"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="e.g. Core Science Theory & Practical"
@@ -198,7 +198,7 @@ function AssignPeriodModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Day of Week *</label>
-              <select
+              <select aria-label="Day of Week"
                 value={form.dayOfWeek}
                 onChange={(e) => setForm({ ...form, dayOfWeek: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -210,7 +210,7 @@ function AssignPeriodModal({
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Period Number *</label>
-              <select
+              <select aria-label="Period Number"
                 value={form.periodNumber}
                 onChange={(e) => handlePeriodChange(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold"
@@ -222,7 +222,7 @@ function AssignPeriodModal({
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-700 mb-1">Subject *</label>
-              <select
+              <select aria-label="Subject"
                 required
                 value={form.subjectId}
                 onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
@@ -236,7 +236,7 @@ function AssignPeriodModal({
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-700 mb-1">Assigned Faculty Teacher *</label>
-              <select
+              <select aria-label="Assigned Faculty Teacher"
                 required
                 value={form.teacherId}
                 onChange={(e) => setForm({ ...form, teacherId: e.target.value })}
@@ -250,7 +250,7 @@ function AssignPeriodModal({
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Room / Lab</label>
-              <input
+              <input aria-label="Room / Lab"
                 value={form.room}
                 onChange={(e) => setForm({ ...form, room: e.target.value })}
                 placeholder="e.g. Room 102, Science Lab"
@@ -425,7 +425,7 @@ export function AddClassModal({ open, onClose, onCreated }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Class / Grade Name</label>
-            <input
+            <input aria-label="Class / Grade Name"
               type="text"
               required
               value={name}
@@ -438,7 +438,7 @@ export function AddClassModal({ open, onClose, onCreated }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Grade Level (Numeric)</label>
-              <input
+              <input aria-label="Grade Level (Numeric)"
                 type="number"
                 required
                 value={level}
@@ -448,7 +448,7 @@ export function AddClassModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Initial Sections</label>
-              <input
+              <input aria-label="Initial Sections"
                 type="text"
                 required
                 value={sections}
@@ -526,7 +526,7 @@ export function AddSectionModal({ open, grade, onClose, onAdded }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">New Section Identifier</label>
-            <input
+            <input aria-label="New Section Identifier"
               type="text"
               required
               value={sectionName}

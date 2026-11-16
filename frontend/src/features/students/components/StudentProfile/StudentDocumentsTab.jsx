@@ -83,7 +83,7 @@ export default function StudentDocumentsTab({ student, canManage, onDocumentsCha
         </div>
         {canManage && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input
+            <input aria-label="Document name (optional)"
               type="text"
               value={docName}
               onChange={(e) => setDocName(e.target.value)}

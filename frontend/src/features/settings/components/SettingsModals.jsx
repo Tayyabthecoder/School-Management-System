@@ -49,7 +49,7 @@ export function CreateUserModal({ open, onClose, onCreated }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Username *</label>
-          <input
+          <input aria-label="Username"
             required
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase().trim() })}
@@ -59,7 +59,7 @@ export function CreateUserModal({ open, onClose, onCreated }) {
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Role *</label>
-          <select
+          <select aria-label="Role"
             value={form.roleName}
             onChange={(e) => setForm({ ...form, roleName: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -73,7 +73,7 @@ export function CreateUserModal({ open, onClose, onCreated }) {
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Initial Password *</label>
-          <input
+          <input aria-label="Initial Password"
             required
             type="password"
             value={form.password}
@@ -145,7 +145,7 @@ export function ResetPasswordModal({ open, user, onClose }) {
         </p>
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">New Password *</label>
-          <input
+          <input aria-label="New Password"
             required
             type="password"
             value={newPassword}
@@ -223,7 +223,7 @@ export function CreateAcademicYearModal({ open, onClose, onCreated }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Academic Year *</label>
-          <input
+          <input aria-label="Academic Year"
             required
             type="number"
             min={2020}
@@ -236,7 +236,7 @@ export function CreateAcademicYearModal({ open, onClose, onCreated }) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Start Date *</label>
-            <input
+            <input aria-label="Start Date"
               required
               type="date"
               value={form.startDate}
@@ -246,7 +246,7 @@ export function CreateAcademicYearModal({ open, onClose, onCreated }) {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">End Date *</label>
-            <input
+            <input aria-label="End Date"
               required
               type="date"
               value={form.endDate}
@@ -422,7 +422,7 @@ export function AddPaymentMethodModal({ open, onClose, onAdd }) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Channel Type *</label>
-            <select
+            <select aria-label="Channel Type"
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -435,7 +435,7 @@ export function AddPaymentMethodModal({ open, onClose, onAdd }) {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Display Name *</label>
-            <input
+            <input aria-label="Display Name"
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -447,7 +447,7 @@ export function AddPaymentMethodModal({ open, onClose, onAdd }) {
 
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Account / Merchant Title *</label>
-          <input
+          <input aria-label="Account / Merchant Title"
             required
             value={form.accountTitle}
             onChange={(e) => setForm({ ...form, accountTitle: e.target.value })}
@@ -458,7 +458,7 @@ export function AddPaymentMethodModal({ open, onClose, onAdd }) {
 
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Account Number / Till ID / Raast ID *</label>
-          <input
+          <input aria-label="Account Number / Till ID / Raast ID"
             required
             value={form.accountNumber}
             onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
@@ -471,7 +471,7 @@ export function AddPaymentMethodModal({ open, onClose, onAdd }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Branch Code / Name</label>
-              <input
+              <input aria-label="Branch Code / Name"
                 value={form.branchCode}
                 onChange={(e) => setForm({ ...form, branchCode: e.target.value })}
                 placeholder="e.g. 0142 (Campus Main)"
@@ -480,7 +480,7 @@ export function AddPaymentMethodModal({ open, onClose, onAdd }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">IBAN (24 Characters)</label>
-              <input
+              <input aria-label="IBAN (24 Characters)"
                 value={form.iban}
                 onChange={(e) => setForm({ ...form, iban: e.target.value.toUpperCase() })}
                 placeholder="PK36MEZN..."
@@ -546,7 +546,7 @@ export function AddParticularModal({ open, onClose, onAdd }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Particular / Head Name *</label>
-          <input
+          <input aria-label="Particular / Head Name"
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -558,7 +558,7 @@ export function AddParticularModal({ open, onClose, onAdd }) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Fee Type *</label>
-            <select
+            <select aria-label="Fee Type"
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -569,7 +569,7 @@ export function AddParticularModal({ open, onClose, onAdd }) {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Default Amount (PKR)</label>
-            <input
+            <input aria-label="Default Amount (PKR)"
               type="number"
               min="0"
               value={form.defaultAmount}

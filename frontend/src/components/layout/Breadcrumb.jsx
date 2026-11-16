@@ -12,9 +12,9 @@ export default function Breadcrumb({ title, subtitle }) {
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{title}</h1>
         {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>}
       </div>
-      <nav className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
-        <Link to="/dashboard" className="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center">
-          <Home className="w-3.5 h-3.5" />
+      <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <Link to="/dashboard" aria-label="Dashboard" className="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center">
+          <Home className="w-3.5 h-3.5" aria-hidden="true" />
         </Link>
         {pathnames.map((name, index) => {
           const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`

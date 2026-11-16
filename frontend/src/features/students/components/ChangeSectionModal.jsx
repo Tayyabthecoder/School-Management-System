@@ -181,7 +181,7 @@ export default function ChangeSectionModal({
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
               Reason / Administrative Notes (Optional)
             </label>
-            <input
+            <input aria-label="Reason / Administrative Notes (Optional)"
               type="text"
               value={reason}
               onChange={(e) => setReason(e.target.value)}

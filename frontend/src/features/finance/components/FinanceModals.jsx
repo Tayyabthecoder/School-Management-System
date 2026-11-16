@@ -63,7 +63,7 @@ export function RecordPaymentModal({
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase mb-1">
               Payment Amount (PKR)
             </label>
-            <input
+            <input aria-label="Payment Amount (PKR)"
               type="number"
               required
               max={selectedFeeRecord.outstandingAmount}
@@ -77,7 +77,7 @@ export function RecordPaymentModal({
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase mb-1">
               Payment Mode
             </label>
-            <select
+            <select aria-label="Payment Mode"
               value={paymentMode}
               onChange={(e) => setPaymentMode(e.target.value)}
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-600"
@@ -158,7 +158,7 @@ export function ApplyConcessionModal({
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
                 Concession Category
               </label>
-              <select
+              <select aria-label="Concession Category"
                 value={concessionType}
                 onChange={(e) => {
                   const nextVal = e.target.value
@@ -218,7 +218,7 @@ export function ApplyConcessionModal({
                 Discount Amount (PKR)
               </label>
               <div className="relative">
-                <input
+                <input aria-label="Discount Amount (PKR)"
                   type="number"
                   min="0"
                   max={concessionFeeRecord.amountDue}
@@ -257,7 +257,7 @@ export function ApplyConcessionModal({
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase mb-1">
                 Justification / Administrative Reason
               </label>
-              <textarea
+              <textarea aria-label="Justification / Administrative Reason"
                 rows="2"
                 value={concessionReason}
                 onChange={(e) => setConcessionReason(e.target.value)}
@@ -328,7 +328,7 @@ export function GenerateMonthlyChallansModal({
           <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase mb-1">
             Select Target Month & Year
           </label>
-          <input
+          <input aria-label="Select Target Month & Year"
             type="month"
             required
             value={generationTargetDate.slice(0, 7)}

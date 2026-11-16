@@ -64,7 +64,7 @@ export default function UserManagementTab({
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <input
+          <input aria-label="Search by username or role…"
             type="text"
             placeholder="Search by username or role…"
             value={userSearch}

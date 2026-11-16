@@ -100,6 +100,7 @@ function DateRange({ label, fromVal, toVal, onFrom, onTo }) {
       <div>
         <label className="block text-xs font-semibold text-gray-500 mb-1">{label} — From</label>
         <input
+          aria-label={`${label} from`}
           type="date"
           value={fromVal}
           onChange={(e) => onFrom(e.target.value)}
@@ -108,7 +109,7 @@ function DateRange({ label, fromVal, toVal, onFrom, onTo }) {
       </div>
       <div>
         <label className="block text-xs font-semibold text-gray-500 mb-1">To</label>
-        <input
+        <input aria-label="To"
           type="date"
           value={toVal}
           onChange={(e) => onTo(e.target.value)}
@@ -202,7 +203,7 @@ export default function ExportReportsTab() {
                   Payroll & Staff Attendance Month
                 </label>
                 <div className="flex items-center gap-2">
-                  <select
+                  <select aria-label="Payroll & Staff Attendance Month"
                     value={payMonth}
                     onChange={(e) => setPayMonth(Number(e.target.value))}
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
@@ -212,6 +213,7 @@ export default function ExportReportsTab() {
                     ))}
                   </select>
                   <input
+                    aria-label="Payroll year"
                     type="number"
                     value={payYear}
                     onChange={(e) => setPayYear(Number(e.target.value))}

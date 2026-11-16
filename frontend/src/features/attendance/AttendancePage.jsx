@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import { loadClasses } from '../../hooks/useClasses'
 import {
   Calendar,
   Users,
@@ -49,7 +50,7 @@ export default function AttendancePage() {
     const fetchData = async () => {
       try {
         const [clsRes, stuRes] = await Promise.all([
-          api.get('/classes'),
+          loadClasses(),
           api.get('/students', { params: { limit: 1000 } }),
         ])
         if (clsRes.data?.success && clsRes.data.data.length > 0) {

@@ -37,7 +37,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">School / College Name *</label>
-            <input
+            <input aria-label="School / College Name"
               required
               value={profile?.schoolName || ''}
               onChange={(e) => setProfile({ ...profile, schoolName: e.target.value })}
@@ -46,7 +46,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Registration / Affiliation Code</label>
-            <input
+            <input aria-label="Registration / Affiliation Code"
               value={profile?.regNo || ''}
               onChange={(e) => setProfile({ ...profile, regNo: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -56,7 +56,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Official Email Address *</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
+              <input aria-label="Official Email Address"
                 required
                 type="email"
                 value={profile?.email || ''}
@@ -69,7 +69,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Primary Phone / Mobile</label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
+              <input aria-label="Primary Phone / Mobile"
                 value={profile?.phone || ''}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                 className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -78,7 +78,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Emergency Hotline</label>
-            <input
+            <input aria-label="Emergency Hotline"
               value={profile?.hotline || ''}
               onChange={(e) => setProfile({ ...profile, hotline: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -88,7 +88,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Website URL</label>
             <div className="relative">
               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
+              <input aria-label="Website URL"
                 value={profile?.website || ''}
                 onChange={(e) => setProfile({ ...profile, website: e.target.value })}
                 className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
@@ -99,7 +99,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Campus Physical Address</label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <textarea
+              <textarea aria-label="Campus Physical Address"
                 rows={2}
                 value={profile?.address || ''}
                 onChange={(e) => setProfile({ ...profile, address: e.target.value })}
@@ -109,7 +109,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           </div>
           <div className="md:col-span-2">
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">School Tagline / Motto</label>
-            <input
+            <input aria-label="School Tagline / Motto"
               value={profile?.motto || ''}
               onChange={(e) => setProfile({ ...profile, motto: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 italic"
@@ -118,13 +118,13 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Primary Brand Color (PDFs & Official Documents)</label>
             <div className="flex items-center gap-3">
-              <input
+              <input aria-label="Primary Brand Color (PDFs & Official Documents)"
                 type="color"
                 value={profile?.primaryColor || '#3730A3'}
                 onChange={(e) => setProfile({ ...profile, primaryColor: e.target.value })}
                 className="w-10 h-10 p-0.5 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer bg-white"
               />
-              <input
+              <input aria-label="#3730A3"
                 type="text"
                 value={profile?.primaryColor || '#3730A3'}
                 onChange={(e) => setProfile({ ...profile, primaryColor: e.target.value })}
@@ -146,7 +146,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Operating Currency</label>
-            <select
+            <select aria-label="Operating Currency"
               value={profile?.currency || 'PKR'}
               onChange={(e) => setProfile({ ...profile, currency: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
@@ -161,7 +161,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Timezone</label>
-            <select
+            <select aria-label="Timezone"
               value={profile?.timezone || 'Asia/Karachi (GMT+5)'}
               onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
@@ -175,7 +175,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Date Display Format</label>
-            <select
+            <select aria-label="Date Display Format"
               value={profile?.dateFormat || 'DD/MM/YYYY'}
               onChange={(e) => setProfile({ ...profile, dateFormat: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"

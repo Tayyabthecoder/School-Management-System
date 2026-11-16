@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
+import { loadClasses } from '../../hooks/useClasses'
 import { Award, ChevronRight, Download, Save, Search, BookOpen, FileText, Send, CheckCircle2 } from 'lucide-react'
 import Breadcrumb from '../../components/layout/Breadcrumb'
 import { SkeletonGradeCards } from '../../components/ui/Skeleton'
@@ -81,7 +82,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-600 mb-1">Exam Title</label>
-              <input
+              <input aria-label="Exam Title"
                 required
                 placeholder="e.g. Midterm - Mathematics"
                 value={form.title}
@@ -91,7 +92,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Term</label>
-              <select
+              <select aria-label="Term"
                 value={form.termName}
                 onChange={(e) => setForm({ ...form, termName: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -103,7 +104,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Max Marks</label>
-              <input
+              <input aria-label="Max Marks"
                 type="number"
                 min={1}
                 required
@@ -114,7 +115,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Class / Grade</label>
-              <select
+              <select aria-label="Class / Grade"
                 required
                 value={form.classId}
                 onChange={(e) => setForm({ ...form, classId: e.target.value })}
@@ -128,7 +129,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Subject</label>
-              <select
+              <select aria-label="Subject"
                 required
                 value={form.subjectId}
                 onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
@@ -142,7 +143,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Academic Year</label>
-              <select
+              <select aria-label="Academic Year"
                 required
                 value={form.academicYearId}
                 onChange={(e) => setForm({ ...form, academicYearId: e.target.value })}
@@ -156,7 +157,7 @@ function ExamModal({ open, onClose, grades, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Exam Date</label>
-              <input
+              <input aria-label="Exam Date"
                 type="date"
                 required
                 value={form.examDate}
@@ -359,7 +360,7 @@ function GradeEntryTable({ students, exam, onExamUpdated }) {
       <div className="px-5 py-3 border-b border-gray-100">
         <div className="relative max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
+          <input aria-label="Search student…"
             type="text"
             placeholder="Search student…"
             value={search}
@@ -453,7 +454,7 @@ export default function GradesPage() {
   // Fetch grades & students
   useEffect(() => {
     Promise.all([
-      api.get('/classes').catch(() => ({ data: { data: [] } })),
+      loadClasses().catch(() => ({ data: { data: [] } })),
       api.get('/students?limit=1000').catch(() => ({ data: { data: [] } })),
     ]).then(([gRes, sRes]) => {
       const loaded = gRes.data?.data?.length > 0 ? gRes.data.data : FALLBACK_GRADES
@@ -649,7 +650,7 @@ export default function GradesPage() {
               {/* Exam Selector */}
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Exam</label>
-                <select
+                <select aria-label="Exam"
                   value={selectedExam?._id || ''}
                   onChange={(e) => {
                     const exam = exams.find((x) => x._id === e.target.value) || null

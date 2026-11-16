@@ -277,7 +277,7 @@ export default function PersonalMedicalTab({
                   <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                     Full Name *
                   </label>
-                  <input
+                  <input aria-label="Full Name"
                     type="text"
                     required
                     value={editForm.fullName || ''}
@@ -291,7 +291,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Date of Birth *
                     </label>
-                    <input
+                    <input aria-label="Date of Birth"
                       type="date"
                       required
                       value={editForm.dob || ''}
@@ -303,7 +303,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Gender *
                     </label>
-                    <select
+                    <select aria-label="Gender"
                       value={editForm.gender || 'Male'}
                       onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
@@ -320,7 +320,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       B-Form / CNIC
                     </label>
-                    <input
+                    <input aria-label="B-Form / CNIC"
                       type="text"
                       placeholder="e.g. 42101-1234567-1"
                       value={editForm.bFormNumber || ''}
@@ -332,7 +332,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Blood Group
                     </label>
-                    <select
+                    <select aria-label="Blood Group"
                       value={editForm.bloodGroup || ''}
                       onChange={(e) => setEditForm({ ...editForm, bloodGroup: e.target.value })}
                       className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
@@ -352,7 +352,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Nationality
                     </label>
-                    <input
+                    <input aria-label="Nationality"
                       type="text"
                       value={editForm.nationality || ''}
                       onChange={(e) =>
@@ -365,7 +365,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Religion
                     </label>
-                    <input
+                    <input aria-label="Religion"
                       type="text"
                       value={editForm.religion || ''}
                       onChange={(e) => setEditForm({ ...editForm, religion: e.target.value })}
@@ -379,7 +379,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       City
                     </label>
-                    <input
+                    <input aria-label="City"
                       type="text"
                       value={editForm.city || ''}
                       onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
@@ -390,7 +390,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Previous School
                     </label>
-                    <input
+                    <input aria-label="Previous School"
                       type="text"
                       value={editForm.previousSchool || ''}
                       onChange={(e) =>
@@ -405,7 +405,7 @@ export default function PersonalMedicalTab({
                   <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                     Residential Address
                   </label>
-                  <textarea
+                  <textarea aria-label="Residential Address"
                     rows={2}
                     value={editForm.address || ''}
                     onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
@@ -473,7 +473,7 @@ export default function PersonalMedicalTab({
                         </button>
                       </div>
                     </div>
-                    <input
+                    <input aria-label="Father's full name"
                       type="text"
                       placeholder="Father's full name"
                       value={editForm.fatherName || ''}
@@ -494,7 +494,7 @@ export default function PersonalMedicalTab({
                           <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                             Guardian Name *
                           </label>
-                          <input
+                          <input aria-label="Guardian Name"
                             type="text"
                             placeholder="e.g. Mother, Uncle, Brother"
                             value={editForm.guardianName || ''}
@@ -508,7 +508,7 @@ export default function PersonalMedicalTab({
                           <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                             Relationship
                           </label>
-                          <select
+                          <select aria-label="Relationship"
                             value={editForm.guardianRelationship || 'Mother'}
                             onChange={(e) =>
                               setEditForm({
@@ -541,7 +541,7 @@ export default function PersonalMedicalTab({
                           ? "Father's Phone"
                           : "Guardian's Phone"}
                       </label>
-                      <input
+                      <input aria-label="0300-1234567"
                         type="tel"
                         placeholder="0300-1234567"
                         value={editForm.guardianPhone || ''}
@@ -557,7 +557,7 @@ export default function PersonalMedicalTab({
                           ? "Father's Email"
                           : "Guardian's Email"}
                       </label>
-                      <input
+                      <input aria-label="guardian@example.com"
                         type="email"
                         placeholder="guardian@example.com"
                         value={editForm.guardianEmail || ''}
@@ -574,7 +574,7 @@ export default function PersonalMedicalTab({
                       <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                         CNIC
                       </label>
-                      <input
+                      <input aria-label="CNIC"
                         type="text"
                         placeholder="42101-1234567-1"
                         value={editForm.guardianCnic || ''}
@@ -588,7 +588,7 @@ export default function PersonalMedicalTab({
                       <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                         Occupation
                       </label>
-                      <input
+                      <input aria-label="Occupation"
                         type="text"
                         placeholder="e.g. Engineer, Business"
                         value={editForm.guardianOccupation || ''}
@@ -618,7 +618,7 @@ export default function PersonalMedicalTab({
                       <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                         Emergency Contact Name
                       </label>
-                      <input
+                      <input aria-label="Emergency Contact Name"
                         type="text"
                         value={editForm.emergencyName || ''}
                         onChange={(e) =>
@@ -631,7 +631,7 @@ export default function PersonalMedicalTab({
                       <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                         Emergency Phone
                       </label>
-                      <input
+                      <input aria-label="Emergency Phone"
                         type="tel"
                         value={editForm.emergencyPhone || ''}
                         onChange={(e) =>
@@ -646,7 +646,7 @@ export default function PersonalMedicalTab({
                     <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                       Medical Notes & Allergies
                     </label>
-                    <textarea
+                    <textarea aria-label="Medical Notes & Allergies"
                       rows={2}
                       placeholder="e.g. Asthma, Peanut Allergy, None"
                       value={editForm.medicalNotes || ''}

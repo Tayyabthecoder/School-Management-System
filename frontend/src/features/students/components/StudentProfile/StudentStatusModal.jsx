@@ -53,7 +53,7 @@ export default function StudentStatusModal({ open, student, onClose, onUpdated }
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
             Enrollment Status
           </label>
-          <select
+          <select aria-label="Enrollment Status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
@@ -70,7 +70,7 @@ export default function StudentStatusModal({ open, student, onClose, onUpdated }
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Reason / Remarks *
             </label>
-            <textarea
+            <textarea aria-label="Reason / Remarks"
               required
               rows={3}
               value={transferReason}

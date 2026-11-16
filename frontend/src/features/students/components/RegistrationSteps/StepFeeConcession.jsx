@@ -140,7 +140,7 @@ export default function StepFeeConcession({
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">
                           Concession Category
                         </label>
-                        <select
+                        <select aria-label="Concession Category"
                           value={newStudent.feeSetup?.concessionType || 'None'}
                           onChange={(e) => {
                             const val = e.target.value
@@ -238,7 +238,7 @@ export default function StepFeeConcession({
                             <label className="block text-[11px] font-semibold text-gray-600 mb-1">
                               Approval Remarks / Reason
                             </label>
-                            <input
+                            <input aria-label="Approval Remarks / Reason"
                               type="text"
                               value={newStudent.feeSetup?.concessionReason || ''}
                               onChange={(e) => setNewStudent(prev => ({
@@ -331,7 +331,7 @@ export default function StepFeeConcession({
                           <label className="block text-[11px] font-semibold text-gray-600 mb-1">
                             Payment Mode <span className="text-red-500">*</span>
                           </label>
-                          <select
+                          <select aria-label="Payment Mode"
                             value={newStudent.feeSetup?.paymentMode || 'Cash'}
                             onChange={(e) => setNewStudent(prev => ({
                               ...prev,
@@ -351,7 +351,7 @@ export default function StepFeeConcession({
                           <label className="block text-[11px] font-semibold text-gray-600 mb-1">
                             Reference / Remarks
                           </label>
-                          <input
+                          <input aria-label="Reference / Remarks"
                             type="text"
                             value={newStudent.feeSetup?.paymentRemarks || ''}
                             onChange={(e) => setNewStudent(prev => ({

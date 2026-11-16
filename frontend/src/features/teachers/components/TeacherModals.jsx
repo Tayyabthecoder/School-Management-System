@@ -78,7 +78,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-700 mb-1">Full Name *</label>
-              <input
+              <input aria-label="Full Name"
                 type="text"
                 required
                 value={form.fullName}
@@ -89,7 +89,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Phone *</label>
-              <input
+              <input aria-label="Phone"
                 type="text"
                 required
                 value={form.phone}
@@ -100,7 +100,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Email</label>
-              <input
+              <input aria-label="Email"
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -110,7 +110,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Designation</label>
-              <select
+              <select aria-label="Designation"
                 value={form.designation}
                 onChange={(e) => setForm({ ...form, designation: e.target.value })}
                 className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -124,7 +124,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Department</label>
-              <select
+              <select aria-label="Department"
                 value={form.department}
                 onChange={(e) => setForm({ ...form, department: e.target.value })}
                 className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -139,7 +139,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Monthly Salary (PKR)</label>
-              <input
+              <input aria-label="Monthly Salary (PKR)"
                 type="number"
                 value={form.salary}
                 onChange={(e) => setForm({ ...form, salary: Number(e.target.value) })}
@@ -148,7 +148,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Qualification</label>
-              <input
+              <input aria-label="Qualification"
                 type="text"
                 value={form.qualification}
                 onChange={(e) => setForm({ ...form, qualification: e.target.value })}
@@ -247,7 +247,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Target Class *</label>
-              <select
+              <select aria-label="Target Class"
                 required
                 value={form.classId}
                 onChange={(e) => handleClassChange(e.target.value)}
@@ -261,7 +261,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Section *</label>
-              <select
+              <select aria-label="Section"
                 value={form.sectionId}
                 onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
                 className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -273,7 +273,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-700 mb-1">Subject to Teach *</label>
-              <select
+              <select aria-label="Subject to Teach"
                 required
                 value={form.subjectId}
                 onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
@@ -287,7 +287,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Day of Week *</label>
-              <select
+              <select aria-label="Day of Week"
                 value={form.dayOfWeek}
                 onChange={(e) => setForm({ ...form, dayOfWeek: e.target.value })}
                 className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -299,7 +299,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Period Slot *</label>
-              <select
+              <select aria-label="Period Slot"
                 value={form.periodNumber}
                 onChange={(e) => {
                   const pNum = Number(e.target.value)
@@ -316,7 +316,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-700 mb-1">Classroom / Laboratory</label>
-              <input
+              <input aria-label="Classroom / Laboratory"
                 type="text"
                 value={form.room}
                 onChange={(e) => setForm({ ...form, room: e.target.value })}

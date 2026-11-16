@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
+import { loadClasses } from '../../hooks/useClasses'
 import { useAuthStore } from '../../store/authStore'
 import {
   GraduationCap,
@@ -73,7 +74,7 @@ export default function TeachersPage() {
     try {
       const [tRes, cRes, sRes, ttRes] = await Promise.all([
         api.get('/teachers'),
-        api.get('/classes'),
+        loadClasses(),
         api.get('/classes/subjects'),
         api.get('/timetable').catch(() => ({ data: { data: [] } })),
       ])
@@ -210,7 +211,7 @@ export default function TeachersPage() {
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-72">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
+                <input aria-label="Search faculty by name, subject, ID…"
                   type="text"
                   placeholder="Search faculty by name, subject, ID…"
                   value={search}
@@ -522,7 +523,7 @@ export default function TeachersPage() {
 
               <div className="flex items-center gap-3">
                 <label className="text-xs font-semibold text-gray-600">Select Teacher:</label>
-                <select
+                <select aria-label="Select Teacher"
                   value={selectedTeacherScheduleId}
                   onChange={(e) => setSelectedTeacherScheduleId(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-xl text-sm font-semibold text-gray-800 bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"

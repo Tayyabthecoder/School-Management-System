@@ -45,7 +45,7 @@ export default function StepHealthEmergency({
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                       Medical Notes, Dietary Allergies, or Special Care
                     </label>
-                    <textarea
+                    <textarea aria-label="Medical Notes, Dietary Allergies, or Special Care"
                       rows={2}
                       value={newStudent.medicalNotes}
                       onChange={(e) => setNewStudent({ ...newStudent, medicalNotes: e.target.value })}
@@ -66,7 +66,7 @@ export default function StepHealthEmergency({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">Contact Name</label>
-                        <input
+                        <input aria-label="Contact Name"
                           type="text"
                           value={newStudent.emergencyName}
                           onChange={(e) => setNewStudent({ ...newStudent, emergencyName: e.target.value })}
@@ -76,7 +76,7 @@ export default function StepHealthEmergency({
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">Contact Phone</label>
-                        <input
+                        <input aria-label="Contact Phone"
                           type="tel"
                           value={newStudent.emergencyPhone}
                           onChange={(e) => setNewStudent({ ...newStudent, emergencyPhone: e.target.value })}
@@ -86,7 +86,7 @@ export default function StepHealthEmergency({
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">Relationship</label>
-                        <input
+                        <input aria-label="Relationship"
                           type="text"
                           value={newStudent.emergencyRelationship}
                           onChange={(e) => setNewStudent({ ...newStudent, emergencyRelationship: e.target.value })}

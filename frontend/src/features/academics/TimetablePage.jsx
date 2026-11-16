@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
+import { loadClasses } from '../../hooks/useClasses'
 import {
   Calendar,
   Trash2,
@@ -44,7 +45,7 @@ export default function TimetablePage() {
     setLoading(true)
     try {
       const [clsRes, tchRes] = await Promise.all([
-        api.get('/classes'),
+        loadClasses(),
         api.get('/teachers').catch(() => ({ data: { data: [] } })),
       ])
 
@@ -124,7 +125,7 @@ export default function TimetablePage() {
         <div className="flex flex-wrap items-center gap-3">
           <div>
             <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Select Grade</label>
-            <select
+            <select aria-label="Select Grade"
               value={selectedClassId}
               onChange={(e) => {
                 setSelectedClassId(e.target.value)

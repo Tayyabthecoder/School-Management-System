@@ -24,7 +24,7 @@ export default function StepFatherGuardian({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                         Father's Full Name <span className="text-red-500">*</span>
                       </label>
-                      <input
+                      <input aria-label="Father's Full Name"
                         type="text"
                         value={newStudent.fatherName}
                         onChange={(e) => {
@@ -100,7 +100,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Father Contact Phone <span className="text-red-500">*</span>
                           </label>
-                          <input
+                          <input aria-label="Father Contact Phone"
                             type="tel"
                             value={newStudent.fatherPhone}
                             onChange={(e) => {
@@ -125,7 +125,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Father Email Address
                           </label>
-                          <input
+                          <input aria-label="Father Email Address"
                             type="email"
                             value={newStudent.fatherEmail}
                             onChange={(e) => setNewStudent({ ...newStudent, fatherEmail: e.target.value })}
@@ -140,7 +140,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Father CNIC Number
                           </label>
-                          <input
+                          <input aria-label="Father CNIC Number"
                             type="text"
                             value={newStudent.fatherCnic}
                             onChange={(e) => setNewStudent({ ...newStudent, fatherCnic: e.target.value })}
@@ -153,7 +153,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Father Occupation / Business
                           </label>
-                          <input
+                          <input aria-label="Father Occupation / Business"
                             type="text"
                             value={newStudent.fatherOccupation}
                             onChange={(e) => setNewStudent({ ...newStudent, fatherOccupation: e.target.value })}
@@ -183,7 +183,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Guardian Full Name <span className="text-red-500">*</span>
                           </label>
-                          <input
+                          <input aria-label="Guardian Full Name"
                             type="text"
                             value={newStudent.guardianName}
                             onChange={(e) => {
@@ -208,7 +208,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Relationship to Student <span className="text-red-500">*</span>
                           </label>
-                          <select
+                          <select aria-label="Relationship to Student"
                             value={newStudent.guardianRelationship}
                             onChange={(e) => {
                               setNewStudent({ ...newStudent, guardianRelationship: e.target.value })
@@ -234,7 +234,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Guardian Contact Phone <span className="text-red-500">*</span>
                           </label>
-                          <input
+                          <input aria-label="Guardian Contact Phone"
                             type="tel"
                             value={newStudent.guardianPhone}
                             onChange={(e) => {
@@ -259,7 +259,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Guardian Email
                           </label>
-                          <input
+                          <input aria-label="Guardian Email"
                             type="email"
                             value={newStudent.guardianEmail}
                             onChange={(e) => setNewStudent({ ...newStudent, guardianEmail: e.target.value })}
@@ -274,7 +274,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Guardian CNIC Number
                           </label>
-                          <input
+                          <input aria-label="Guardian CNIC Number"
                             type="text"
                             value={newStudent.guardianCnic}
                             onChange={(e) => setNewStudent({ ...newStudent, guardianCnic: e.target.value })}
@@ -287,7 +287,7 @@ export default function StepFatherGuardian({
                           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                             Guardian Occupation
                           </label>
-                          <input
+                          <input aria-label="Guardian Occupation"
                             type="text"
                             value={newStudent.guardianOccupation}
                             onChange={(e) => setNewStudent({ ...newStudent, guardianOccupation: e.target.value })}

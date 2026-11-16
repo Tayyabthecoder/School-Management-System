@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { loadClasses } from '../../hooks/useClasses'
 import {
   GraduationCap, Settings, CheckCircle2, XCircle, AlertTriangle, Play, RefreshCw, Layers
 } from 'lucide-react'
@@ -30,7 +31,7 @@ export default function PromotionPage() {
     const init = async () => {
       try {
         const [clsRes, cfgRes] = await Promise.all([
-          api.get('/classes'),
+          loadClasses(),
           api.get('/students/promotion/config'),
         ])
         const clsList = clsRes.data?.data || []

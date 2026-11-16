@@ -60,7 +60,7 @@ export default function SecuritySystemTab({
         <form onSubmit={handlePasswordChange} className="max-w-md space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Current Password *</label>
-            <input
+            <input aria-label="Current Password"
               required
               type="password"
               value={passwordForm?.currentPassword || ''}
@@ -71,7 +71,7 @@ export default function SecuritySystemTab({
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">New Password *</label>
-            <input
+            <input aria-label="New Password"
               required
               type="password"
               value={passwordForm?.newPassword || ''}
@@ -83,7 +83,7 @@ export default function SecuritySystemTab({
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Confirm New Password *</label>
-            <input
+            <input aria-label="Confirm New Password"
               required
               type="password"
               value={passwordForm?.confirmPassword || ''}

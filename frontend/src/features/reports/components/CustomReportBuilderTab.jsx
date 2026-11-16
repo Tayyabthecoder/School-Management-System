@@ -320,7 +320,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 p-4 bg-gray-50/60 rounded-xl border border-gray-200">
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Grade / Class</label>
-                  <select
+                  <select aria-label="Grade / Class"
                     value={customClassId}
                     onChange={(e) => {
                       setCustomClassId(e.target.value)
@@ -337,7 +337,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Section</label>
-                  <select
+                  <select aria-label="Section"
                     value={customSectionId}
                     onChange={(e) => setCustomSectionId(e.target.value)}
                     className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
@@ -354,7 +354,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Status Filter</label>
-                  <select
+                  <select aria-label="Status Filter"
                     value={customStatus}
                     onChange={(e) => setCustomStatus(e.target.value)}
                     className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
@@ -371,7 +371,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Sort By</label>
-                  <select
+                  <select aria-label="Sort By"
                     value={customSortBy}
                     onChange={(e) => setCustomSortBy(e.target.value)}
                     className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
@@ -385,7 +385,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Sort Direction</label>
-                  <select
+                  <select aria-label="Sort Direction"
                     value={customSortOrder}
                     onChange={(e) => setCustomSortOrder(Number(e.target.value))}
                     className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
@@ -397,7 +397,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Date Range: From</label>
-                  <input
+                  <input aria-label="Date Range: From"
                     type="date"
                     value={customFrom}
                     onChange={(e) => setCustomFrom(e.target.value)}
@@ -407,7 +407,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-500 mb-1">Date Range: To</label>
-                  <input
+                  <input aria-label="Date Range: To"
                     type="date"
                     value={customTo}
                     onChange={(e) => setCustomTo(e.target.value)}

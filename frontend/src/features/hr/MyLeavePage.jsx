@@ -75,7 +75,7 @@ export default function MyLeavePage() {
           )}
           <div>
             <label htmlFor="leaveType" className="block text-xs font-semibold text-gray-600 mb-1">Leave type</label>
-            <select
+            <select aria-label="Leave type"
               id="leaveType"
               value={form.leaveType}
               onChange={(e) => setForm({ ...form, leaveType: e.target.value })}
@@ -87,20 +87,20 @@ export default function MyLeavePage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="fromDate" className="block text-xs font-semibold text-gray-600 mb-1">From</label>
-              <input id="fromDate" required type="date" value={form.fromDate}
+              <input aria-label="From" id="fromDate" required type="date" value={form.fromDate}
                 onChange={(e) => setForm({ ...form, fromDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
             </div>
             <div>
               <label htmlFor="toDate" className="block text-xs font-semibold text-gray-600 mb-1">To</label>
-              <input id="toDate" required type="date" value={form.toDate} min={form.fromDate || undefined}
+              <input aria-label="To" id="toDate" required type="date" value={form.toDate} min={form.fromDate || undefined}
                 onChange={(e) => setForm({ ...form, toDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
             </div>
           </div>
           <div>
             <label htmlFor="reason" className="block text-xs font-semibold text-gray-600 mb-1">Reason</label>
-            <textarea id="reason" required minLength={3} maxLength={500} rows={3} value={form.reason}
+            <textarea aria-label="Reason" id="reason" required minLength={3} maxLength={500} rows={3} value={form.reason}
               onChange={(e) => setForm({ ...form, reason: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
           </div>
