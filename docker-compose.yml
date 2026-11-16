@@ -3,8 +3,8 @@ services:
     image: mongo:7.0@sha256:9896df581dfd0718b7abe112f4c37598d0986c54060e4ec1384997e6503c8c71
     container_name: sms-mongodb
     restart: unless-stopped
-    ports:
-      - '127.0.0.1:${MONGO_HOST_PORT:-27017}:27017'
+    # No host port is published: only the backend (same Docker network) talks to MongoDB.
+    # For local tools see docker-compose.dev-ports.yml.
     environment:
       MONGO_INITDB_DATABASE: sms
       # Authentication is enforced as soon as a root user exists. These only take effect when the
@@ -28,8 +28,6 @@ services:
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     command: ['redis-server', '--requirepass', '${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}']
-    ports:
-      - '127.0.0.1:6379:6379'
     volumes:
       - redis_data:/data
     networks:
@@ -55,6 +53,10 @@ services:
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET must be set}
+      - TRUST_PROXY_HOPS=${TRUST_PROXY_HOPS:-1}
+      # Antivirus scanning of uploads is off unless CLAMAV_HOST is set (see the clamav profile below)
+      - CLAMAV_HOST=${CLAMAV_HOST:-}
+      - CLAMAV_PORT=${CLAMAV_PORT:-3310}
       - CORS_ORIGIN=${CORS_ORIGIN:-https://localhost}
     depends_on:
       mongodb:
@@ -88,7 +90,27 @@ services:
     networks:
       - sms-network
 
+  # Optional antivirus for uploads. Start with:  docker compose --profile antivirus up -d
+  # and set CLAMAV_HOST=clamav in .env. Needs about 1.5 GB of RAM and downloads its signatures on
+  # first start (a few minutes); until it is ready, uploads are refused rather than left unscanned.
+  clamav:
+    image: clamav/clamav:stable@sha256:7054e3f34308c384ea43cd786ea17abf899bd44af40af9f1b099853d7a5c214e
+    container_name: sms-clamav
+    restart: unless-stopped
+    profiles: ['antivirus']
+    volumes:
+      - clamav_db:/var/lib/clamav
+    networks:
+      - sms-network
+    healthcheck:
+      test: ['CMD', '/usr/local/bin/clamdcheck.sh']
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
 volumes:
+  clamav_db:
   mongo_data:
   redis_data:
   backend_uploads:

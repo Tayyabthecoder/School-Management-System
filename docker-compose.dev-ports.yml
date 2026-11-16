@@ -1,0 +1,14 @@
+# Opt-in overlay for development: publishes MongoDB and Redis on the loopback interface only,
+# so tools on your own machine (mongosh, Compass, redis-cli) can connect.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev-ports.yml up -d
+#
+# Do not use this file on a server: the base docker-compose.yml deliberately publishes no database
+# ports. MONGO_HOST_PORT (default 27017) changes the MongoDB host port if a local mongod uses it.
+services:
+  mongodb:
+    ports:
+      - '127.0.0.1:${MONGO_HOST_PORT:-27017}:27017'
+  redis:
+    ports:
+      - '127.0.0.1:6379:6379'

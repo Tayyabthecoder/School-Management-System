@@ -33,9 +33,25 @@ Named volumes: `mongo_data`, `redis_data`, `backend_uploads`, `backend_logs`.
    docker exec -it -e ADMIN_PASSWORD='choose-a-long-secret' sms-backend npm run admin:create
    ```
 
-4. Before exposing the server, remove the host port mappings for MongoDB and Redis in
-   `docker-compose.yml` (`127.0.0.1:27017` and `127.0.0.1:6379`). The backend reaches them over the
-   internal Docker network, so nothing else needs them.
+4. MongoDB and Redis publish **no** host ports by default; the backend reaches them over the internal
+   Docker network. For local tools on a development machine only, add the opt-in overlay:
+   `docker compose -f docker-compose.yml -f docker-compose.dev-ports.yml up -d` (loopback only).
+   Never use that overlay on a server.
+
+## 1b. Optional: antivirus scanning of uploads
+
+Uploaded files are always checked against their real content type, but they are not virus-scanned
+unless you enable ClamAV:
+
+1. In `.env` set `CLAMAV_HOST=clamav`.
+2. Start the scanner next to the stack: `docker compose --profile antivirus up -d`. It needs about 1.5 GB
+   of RAM and downloads its signatures on first start (a few minutes; `docker compose ps` shows
+   `healthy` when it is ready).
+3. Restart the backend so it picks up the setting: `docker compose up -d backend`.
+
+With scanning on, an infected upload is rejected (HTTP 422) and deleted. If the scanner is
+unreachable or still starting, uploads are refused (HTTP 503) rather than accepted unscanned. To
+turn scanning off, empty `CLAMAV_HOST` and restart the backend.
 
 ## 2. TLS certificates and renewal
 
@@ -138,10 +154,10 @@ docker compose ps && docker compose logs --tail=50 backend
 
 - [ ] Real TLS certificate installed and renewal hook tested
 - [ ] `.env` secrets generated, not shared, and not committed
-- [ ] MongoDB and Redis host ports removed from `docker-compose.yml`
+- [ ] MongoDB and Redis host ports not published (the default; do not use `docker-compose.dev-ports.yml`)
 - [ ] `CORS_ORIGIN` matches the public URL
 - [ ] First admin created with `admin:create`; demo seed never run
 - [ ] Nightly backups running, one restore tested
-- [ ] If another proxy or CDN sits in front of nginx, review `trust proxy` in `backend/src/app.js` so
-      login rate limits see the real client address
+- [ ] `TRUST_PROXY_HOPS` matches the proxies in front of the API (1 = the bundled nginx; 2 if a CDN or
+      load balancer sits in front of nginx), so login rate limits see the real client address
 - [ ] CI is green on the commit being deployed

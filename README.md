@@ -519,8 +519,10 @@ npm run build
 - **Stateless Authentication:** Short-lived JWTs (15 minutes) coupled with secure, `httpOnly`, `sameSite` refresh tokens.
 - **Brute Force & DDoS Mitigation:** Granular rate limiting on sensitive routes (`/login`, `/refresh`, `/change-password`, and bulk file imports) with fallback to an in-memory or Redis store.
 - **NoSQL Injection Defense:** `express-mongo-sanitize` scrubs all incoming `req.body`, `req.query`, and `req.params` for dangerous Mongo operators.
-- **Hardened HTTP Headers:** [Helmet](https://helmetjs.github.io/) configured on the backend; production Nginx proxy injects strict Content Security Policy (CSP), HSTS (`max-age=31536000`), X-Frame-Options, and referrer headers.
+- **Hardened HTTP Headers:** [Helmet](https://helmetjs.github.io/) configured on the backend; production Nginx proxy injects a strict Content Security Policy (no `unsafe-inline` or `unsafe-eval` for scripts or styles; a test fails if it is loosened or an inline `<style>` is added), HSTS (`max-age=31536000`), X-Frame-Options, and referrer headers.
 - **Secure File Uploads:** Uploaded media and documents are validated by MIME type, size-checked, stored outside public paths, and served exclusively through authenticated routes (`/api/v1/uploads/files`).
+- **Optional Antivirus Scanning:** set `CLAMAV_HOST` and start the `antivirus` compose profile to scan every upload with ClamAV; infected files are rejected (422) and, if the scanner is down, uploads are refused (503) rather than accepted unscanned. See [DEPLOYMENT.md](./DEPLOYMENT.md).
+- **No Published Database Ports:** MongoDB and Redis are reachable only on the internal Docker network; `docker-compose.dev-ports.yml` is an opt-in loopback overlay for local tools. `TRUST_PROXY_HOPS` sets how many proxies sit in front of the API so rate limits see real client addresses.
 - **Least-Privilege Containers:** Dockerfiles compile code under multi-stage builds and execute under a non-root unprivileged system user (`appuser`).
 
 ---

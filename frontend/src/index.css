@@ -118,3 +118,30 @@
   }
 }
 
+/* A4 voucher printout for Settings > Fee Challan. These rules used to be rendered as an inline
+   <style> element by ChallanBuilderTab; the production CSP no longer allows inline styles, so they
+   live here with the other print rules. */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #printable-challan-voucher, #printable-challan-voucher * {
+    visibility: visible !important;
+  }
+  #printable-challan-voucher {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 10mm !important;
+    background: white !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+@page {
+  size: A4 landscape;
+  margin: 6mm;
+}

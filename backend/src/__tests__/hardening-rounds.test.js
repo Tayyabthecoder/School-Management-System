@@ -194,3 +194,52 @@ describe('seed data', () => {
     expect(receiptLine).toContain('receiptSeq++')
   })
 })
+
+describe('proxy hops and published ports (deployment hardening)', () => {
+  const loadHops = (value) => {
+    const previous = process.env.TRUST_PROXY_HOPS
+    if (value === undefined) delete process.env.TRUST_PROXY_HOPS
+    else process.env.TRUST_PROXY_HOPS = value
+    try {
+      let hops
+      jest.isolateModules(() => { hops = require('../config/env').TRUST_PROXY_HOPS })
+      return hops
+    } finally {
+      if (previous === undefined) delete process.env.TRUST_PROXY_HOPS
+      else process.env.TRUST_PROXY_HOPS = previous
+    }
+  }
+
+  test('TRUST_PROXY_HOPS defaults to one proxy (the bundled nginx)', () => {
+    expect(loadHops(undefined)).toBe(1)
+  })
+
+  test('TRUST_PROXY_HOPS accepts a configured hop count, including 0', () => {
+    expect(loadHops('2')).toBe(2)
+    expect(loadHops('0')).toBe(0)
+  })
+
+  test('an invalid TRUST_PROXY_HOPS falls back to 1 instead of trusting everything', () => {
+    expect(loadHops('abc')).toBe(1)
+    expect(loadHops('-3')).toBe(1)
+    expect(loadHops('99')).toBe(1)
+  })
+
+  test('the default compose file publishes no database ports; the dev overlay does, on loopback only', () => {
+    const root = path.join(__dirname, '..', '..', '..')
+    const base = fs.readFileSync(path.join(root, 'docker-compose.yml'), 'utf8')
+    const overlay = fs.readFileSync(path.join(root, 'docker-compose.dev-ports.yml'), 'utf8')
+
+    // Only the nginx front end publishes ports (80 and 443): exactly one `ports:` block in the file
+    const portBlocks = base.split(/\r?\n/).filter((l) => /^\s*ports:\s*$/.test(l))
+    expect(portBlocks).toHaveLength(1)
+    const published = [...base.matchAll(/^\s*-\s*'(\d+):\d+'\s*$/gm)].map((m) => m[1])
+    expect(published.sort()).toEqual(['443', '80'])
+    expect(overlay).toMatch(/127\.0\.0\.1:\$\{MONGO_HOST_PORT:-27017\}:27017/)
+    expect(overlay).toMatch(/127\.0\.0\.1:6379:6379/)
+    // every published mapping in the overlay is bound to 127.0.0.1, never all interfaces
+    const mappings = overlay.split(/\r?\n/).filter((l) => /^\s*-\s*'.*:\d+'/.test(l))
+    expect(mappings.length).toBe(2)
+    for (const line of mappings) expect(line).toContain("'127.0.0.1:")
+  })
+})

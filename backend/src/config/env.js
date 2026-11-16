@@ -44,6 +44,20 @@ const env = {
   UPLOAD_DIR: process.env.UPLOAD_DIR || './uploads',
   MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB || '10', 10),
   REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
+  // Optional antivirus scanning of uploads with a ClamAV daemon. Empty CLAMAV_HOST = disabled.
+  // When set, every uploaded file is scanned before it is kept; an infected file is rejected and,
+  // if the scanner cannot be reached, the upload is refused (it fails closed).
+  CLAMAV_HOST: (process.env.CLAMAV_HOST || '').trim(),
+  CLAMAV_PORT: parseInt(process.env.CLAMAV_PORT || '3310', 10),
+  CLAMAV_TIMEOUT_MS: parseInt(process.env.CLAMAV_TIMEOUT_MS || '30000', 10),
+  // How many reverse proxies sit in front of the API and set X-Forwarded-For. The bundled nginx is
+  // one hop. Put a CDN or load balancer in front of it and raise this (e.g. 2); run the API directly
+  // exposed (no proxy) and set 0. A wrong value makes every client share one rate-limit bucket (too
+  // few hops) or lets a client spoof its address (too many).
+  TRUST_PROXY_HOPS: (() => {
+    const hops = parseInt(process.env.TRUST_PROXY_HOPS ?? '1', 10)
+    return Number.isInteger(hops) && hops >= 0 && hops <= 10 ? hops : 1
+  })(),
   // The school's own calendar day (weekday rules, "today" views) regardless of the server clock (LOW-04)
   SCHOOL_TIMEZONE: process.env.SCHOOL_TIMEZONE || 'Asia/Karachi',
 }

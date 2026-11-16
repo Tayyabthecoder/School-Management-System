@@ -4,6 +4,8 @@ const fs = require('fs')
 const crypto = require('crypto')
 const env = require('../config/env')
 const { ApiError } = require('./error.middleware')
+const logger = require('../utils/logger')
+const { scanFile } = require('../utils/virus-scan.util')
 
 // Root uploads directory
 const UPLOADS_DIR = path.isAbsolute(env.UPLOAD_DIR)
@@ -161,6 +163,24 @@ const verifyUploadContent = async (req, res, next) => {
     if (!contentMatchesExtension(head, ext)) {
       await fs.promises.unlink(req.file.path).catch(() => {})
       return next(new ApiError(400, `File content does not match its '${ext}' extension`))
+    }
+
+    // Optional antivirus scan (CLAMAV_HOST). Read at call time so it can be switched on per deployment.
+    if (env.CLAMAV_HOST) {
+      let verdict
+      try {
+        verdict = await scanFile(req.file.path, { host: env.CLAMAV_HOST, port: env.CLAMAV_PORT, timeoutMs: env.CLAMAV_TIMEOUT_MS })
+      } catch (scanError) {
+        // Fail closed: a file that could not be scanned is not accepted.
+        await fs.promises.unlink(req.file.path).catch(() => {})
+        logger.error(`Antivirus scan unavailable, upload refused: ${scanError.message}`)
+        return next(new ApiError(503, 'File scanning is temporarily unavailable. Please try again in a few minutes.'))
+      }
+      if (!verdict.clean) {
+        await fs.promises.unlink(req.file.path).catch(() => {})
+        logger.warn(`Malware blocked in upload "${req.file.originalname}" (${verdict.signature}) from user ${req.user?._id || 'unknown'}`)
+        return next(new ApiError(422, `The file was rejected because it contains malware (${verdict.signature}).`))
+      }
     }
     next()
   } catch (error) {

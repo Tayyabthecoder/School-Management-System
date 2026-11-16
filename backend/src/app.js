@@ -32,8 +32,9 @@ const { AdaptiveRateLimitStore } = require('./middleware/rate-limit-store')
 
 const app = express()
 
-// Trust reverse proxy (Nginx) for accurate client IP identification in rate limiting & audit logs
-app.set('trust proxy', 1)
+// Trust the reverse proxy chain (nginx, plus any CDN or load balancer in front of it) for accurate
+// client IP identification in rate limiting & audit logs. The hop count is TRUST_PROXY_HOPS (default 1).
+app.set('trust proxy', env.TRUST_PROXY_HOPS)
 
 // Security & Middlewares
 app.use(helmet({

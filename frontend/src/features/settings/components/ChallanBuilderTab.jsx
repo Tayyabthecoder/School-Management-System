@@ -129,32 +129,6 @@ export default function ChallanBuilderTab({
 
   return (
     <div className="space-y-6">
-      {/* Print CSS for clean A4 voucher printout */}
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden !important;
-          }
-          #printable-challan-voucher, #printable-challan-voucher * {
-            visibility: visible !important;
-          }
-          #printable-challan-voucher {
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100vw !important;
-            margin: 0 !important;
-            padding: 10mm !important;
-            background: white !important;
-            box-shadow: none !important;
-            border: none !important;
-          }
-          @page {
-            size: A4 landscape;
-            margin: 6mm;
-          }
-        }
-      `}</style>
       {/* Header Action Card */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
