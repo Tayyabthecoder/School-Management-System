@@ -142,6 +142,12 @@ docker compose up -d
 docker compose ps && docker compose logs --tail=50 backend
 ```
 
+- **Double-billing guard (no manual migration).** On first start the backend builds a partial unique
+  index on `studentfees` (`studentId_1_monthlyKey_1`). It is quick and touches no existing data: the
+  monthly challan job stamps the challans it creates from now on with a `monthlyKey`, and MongoDB
+  then refuses a second one for the same student and fee structure, even from another server. Older
+  challans, manually assigned fees and a deliberate "force regenerate" are not stamped and may repeat.
+  A run that meets an already-billed student counts it as skipped (`duplicatesBlocked` in the result).
 - Base images are pinned by digest; Dependabot opens pull requests when new digests or package
   versions are available. Merge them after CI passes.
 - **Roll back** the code by checking out the previous commit or tag and rebuilding

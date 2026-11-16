@@ -47,6 +47,28 @@ const getDefaultTuitionForClass = (className, level = 1) => {
  * @param {boolean} [options.force=false] - If true, re-generates even if already generated
  * @returns {Promise<Object>} Summary of generated challans
  */
+const isDuplicateKeyWrite = (writeError) => (writeError?.err?.code ?? writeError?.code) === 11000
+
+/**
+ * Inserts challans without stopping at, or failing on, ones the unique index refuses.
+ * Resolves { inserted, duplicates }: the rows that were written and how many were already there.
+ * Any other failure (validation, connection) is rethrown.
+ */
+const insertChallansIdempotently = async (items) => {
+  if (!items || items.length === 0) return { inserted: [], duplicates: 0 }
+  try {
+    // throwOnValidationError: with ordered:false Mongoose otherwise drops an invalid row without a
+    // word, which would leave that student unbilled and nobody the wiser.
+    const inserted = await StudentFee.insertMany(items, { ordered: false, throwOnValidationError: true })
+    return { inserted: inserted || [], duplicates: 0 }
+  } catch (err) {
+    const writeErrors = Array.isArray(err?.writeErrors) ? err.writeErrors : []
+    const onlyDuplicates = err?.code === 11000 && writeErrors.length > 0 && writeErrors.every(isDuplicateKeyWrite)
+    if (!onlyDuplicates) throw err
+    return { inserted: err.insertedDocs || [], duplicates: writeErrors.length }
+  }
+}
+
 const generateMonthlyFeeChallansUnlocked = async ({
   targetDate = new Date(),
   academicYearId = null,
@@ -275,6 +297,8 @@ const generateMonthlyFeeChallansUnlocked = async ({
     challansToInsert.push({
       studentId: student._id,
       feeStructureId: structure._id,
+      // A normal run is guarded by the unique index; a deliberate force-regenerate is not stamped
+      ...(force ? {} : { monthlyKey: String(structure._id) }),
       amountDue: baseAmount,
       discount,
       concessionType,
@@ -287,11 +311,9 @@ const generateMonthlyFeeChallansUnlocked = async ({
     })
   }
 
-  // 8. Bulk insert all new challans
-  let insertedFees = []
-  if (challansToInsert.length > 0) {
-    insertedFees = await StudentFee.insertMany(challansToInsert, { ordered: false })
-  }
+  // 8. Bulk insert all new challans. A row the unique index refuses (another server billed that
+  // student first) is counted as skipped instead of failing the whole run.
+  const { inserted: insertedFees, duplicates: duplicatesBlocked } = await insertChallansIdempotently(challansToInsert)
 
   // 9. Invalidate caches and log audit
   await invalidateCache('dashboard:stats')
@@ -306,7 +328,8 @@ const generateMonthlyFeeChallansUnlocked = async ({
       dueDate: targetDueDate,
       totalEligible: students.length,
       generatedCount: (insertedFees || []).length,
-      skippedCount,
+      skippedCount: skippedCount + duplicatesBlocked,
+      duplicatesBlocked,
       executedBy,
       runAt: new Date(),
     },
@@ -319,7 +342,8 @@ const generateMonthlyFeeChallansUnlocked = async ({
     dueDate: targetDueDate,
     totalEligibleStudents: students.length,
     generatedCount: (insertedFees || []).length,
-    skippedCount,
+    skippedCount: skippedCount + duplicatesBlocked,
+    duplicatesBlocked,
     executedBy,
     timestamp: new Date(),
   }
@@ -411,6 +435,7 @@ const generateMonthlyFeeChallans = async (options = {}) => {
 
 module.exports = {
   generateMonthlyFeeChallans,
+  insertChallansIdempotently,
   getMonthlyChallansStatus,
   getDefaultTuitionForClass,
 }

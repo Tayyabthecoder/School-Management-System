@@ -199,6 +199,58 @@ describe('Automated Monthly Challan Service & Feature Tests', () => {
       expect(concessionQuery.feeStructureId).toEqual({ $in: ['tuition-1', 'tuition-2'] })
     })
 
+    const mockGenerationSetup = () => {
+      AcademicYear.findOne.mockReturnValue({ sort: jest.fn().mockResolvedValue(mockAcademicYear) })
+      Class.find.mockReturnValue({ sort: jest.fn().mockResolvedValue(mockClasses) })
+      FeeStructure.findOne.mockResolvedValue(null)
+      FeeStructure.create.mockImplementation((data) => Promise.resolve({ _id: `fs_${data.classId}`, ...data }))
+      Student.find.mockReturnValue({ populate: jest.fn().mockResolvedValue(mockStudents) })
+      StudentFee.find.mockImplementation((query) => (
+        query && query.discount && query.discount.$gt !== undefined
+          ? { sort: jest.fn().mockResolvedValue([]) }
+          : { select: jest.fn().mockResolvedValue([]) }
+      ))
+    }
+
+    it('stamps a normal run with the double-billing key but not a forced regeneration', async () => {
+      mockGenerationSetup()
+      StudentFee.insertMany.mockImplementation((items) => Promise.resolve(items))
+
+      await generateMonthlyFeeChallans({ targetDate: new Date(2026, 9, 1) })
+      const normal = StudentFee.insertMany.mock.calls[0][0]
+      expect(normal.length).toBeGreaterThan(0)
+      for (const fee of normal) expect(fee.monthlyKey).toBe(String(fee.feeStructureId))
+
+      StudentFee.insertMany.mockClear()
+      await generateMonthlyFeeChallans({ targetDate: new Date(2026, 9, 1), force: true })
+      const forced = StudentFee.insertMany.mock.calls[0][0]
+      for (const fee of forced) expect(fee).not.toHaveProperty('monthlyKey')
+    })
+
+    it('counts a challan the unique index refused as skipped instead of failing the run', async () => {
+      mockGenerationSetup()
+      const duplicateError = Object.assign(new Error('E11000 duplicate key'), {
+        code: 11000,
+        writeErrors: [{ err: { code: 11000 } }],
+        insertedDocs: [{ _id: 'new-1' }],
+      })
+      StudentFee.insertMany.mockRejectedValue(duplicateError)
+
+      const result = await generateMonthlyFeeChallans({ targetDate: new Date(2026, 9, 1) })
+
+      expect(result.success).toBe(true)
+      expect(result.generatedCount).toBe(1)
+      expect(result.duplicatesBlocked).toBe(1)
+      expect(result.skippedCount).toBe(1)
+    })
+
+    it('still fails the run on any other insert error', async () => {
+      mockGenerationSetup()
+      StudentFee.insertMany.mockRejectedValue(new Error('connection lost'))
+
+      await expect(generateMonthlyFeeChallans({ targetDate: new Date(2026, 9, 1) })).rejects.toThrow('connection lost')
+    })
+
     it('skips students who already have challans for the target month (idempotency)', async () => {
       AcademicYear.findOne.mockReturnValue({
         sort: jest.fn().mockResolvedValue(mockAcademicYear),
@@ -397,5 +449,46 @@ describe('Automated Monthly Challan Service & Feature Tests', () => {
       )
       expect(getCronJob()).toBeDefined()
     })
+  })
+})
+
+describe('insertChallansIdempotently', () => {
+  const { insertChallansIdempotently } = require('../services/monthly-challan.service')
+
+  beforeEach(() => jest.clearAllMocks())
+
+  it('returns nothing to do for an empty list without touching the database', async () => {
+    expect(await insertChallansIdempotently([])).toEqual({ inserted: [], duplicates: 0 })
+    expect(StudentFee.insertMany).not.toHaveBeenCalled()
+  })
+
+  it('inserts unordered so one refused row cannot stop the others', async () => {
+    StudentFee.insertMany.mockResolvedValue([{ _id: 'a' }])
+    await insertChallansIdempotently([{ studentId: 's1' }])
+    expect(StudentFee.insertMany).toHaveBeenCalledWith([{ studentId: 's1' }], { ordered: false, throwOnValidationError: true })
+  })
+
+  it('treats only duplicate-key write errors as already billed', async () => {
+    const mixed = Object.assign(new Error('bulk'), {
+      code: 11000,
+      writeErrors: [{ err: { code: 11000 } }, { err: { code: 121 } }], // second one is a validation failure
+      insertedDocs: [],
+    })
+    StudentFee.insertMany.mockRejectedValue(mixed)
+
+    await expect(insertChallansIdempotently([{ studentId: 's1' }])).rejects.toBe(mixed)
+  })
+
+  it('reports how many rows were written and how many were already there', async () => {
+    StudentFee.insertMany.mockRejectedValue(Object.assign(new Error('dup'), {
+      code: 11000,
+      writeErrors: [{ err: { code: 11000 } }, { err: { code: 11000 } }],
+      insertedDocs: [{ _id: 'x' }, { _id: 'y' }, { _id: 'z' }],
+    }))
+
+    const result = await insertChallansIdempotently([{}, {}, {}, {}, {}])
+
+    expect(result.inserted).toHaveLength(3)
+    expect(result.duplicates).toBe(2)
   })
 })
