@@ -31,14 +31,22 @@ const tokenExpiryMs = (req) => {
   return exp ? exp * 1000 : null
 }
 
+// Fully closes a stream: stops its heartbeat timer, removes it from the registry and ends the
+// response. Ending the response without clearing the timer made the next heartbeat write to a
+// finished response, whose 'error' event is not catchable with try/catch and crashed the process.
+const closeClient = (client, finalEvent = null) => {
+  if (client.heartbeat) clearInterval(client.heartbeat)
+  clients.delete(client)
+  try {
+    if (finalEvent && !client.res.writableEnded) client.res.write(finalEvent)
+    if (!client.res.writableEnded) client.res.end()
+  } catch (_) { /* already closed */ }
+}
+
 const closeExpiredClients = (now = Date.now()) => {
   for (const client of [...clients]) {
     if (client.expiresAt && now > client.expiresAt) {
-      try {
-        client.res.write('event: auth:expired\ndata: {}\n\n')
-        client.res.end()
-      } catch (_) { /* already closed */ }
-      clients.delete(client)
+      closeClient(client, 'event: auth:expired\ndata: {}\n\n')
     }
   }
 }
@@ -50,9 +58,7 @@ const subscribe = (req, res) => {
   }
   const own = [...clients].filter((c) => c.userId === userId)
   while (userId && own.length >= MAX_STREAMS_PER_USER) {
-    const oldest = own.shift()
-    clients.delete(oldest)
-    try { oldest.res.end() } catch (_) { /* already closed */ }
+    closeClient(own.shift())
   }
 
   res.writeHead(200, {
@@ -69,21 +75,25 @@ const subscribe = (req, res) => {
   // Send initial handshake
   res.write(`event: connected\ndata: ${JSON.stringify({ clientId, timestamp: new Date().toISOString() })}\n\n`)
 
+  // A write to a stream the peer already dropped emits 'error' on the response; without a listener
+  // that is an uncaught exception that takes the whole server down.
+  res.on('error', () => closeClient(client))
+
   // Periodic heartbeat to prevent proxy timeout
-  const heartbeat = setInterval(() => {
+  client.heartbeat = setInterval(() => {
     closeExpiredClients()
+    if (!clients.has(client) || res.writableEnded || res.destroyed) {
+      closeClient(client) // this stream was just closed (expired) or is gone: do not write to it
+      return
+    }
     try {
       res.write(': heartbeat\n\n')
     } catch (_) {
-      clearInterval(heartbeat)
-      clients.delete(client)
+      closeClient(client)
     }
   }, 25000)
 
-  req.on('close', () => {
-    clearInterval(heartbeat)
-    clients.delete(client)
-  })
+  req.on('close', () => closeClient(client))
 }
 
 const broadcast = (event, data = {}) => {
@@ -91,10 +101,14 @@ const broadcast = (event, data = {}) => {
   const audience = EVENT_AUDIENCE[event]
   for (const client of clients) {
     if (audience && !audience.includes(client.role)) continue
+    if (client.res.writableEnded || client.res.destroyed) {
+      closeClient(client)
+      continue
+    }
     try {
       client.res.write(payload)
     } catch (_) {
-      clients.delete(client)
+      closeClient(client)
     }
   }
 }
@@ -106,5 +120,6 @@ module.exports = {
   subscribe,
   broadcast,
   closeExpiredClients,
+  closeClient,
   _clients: clients,
 }

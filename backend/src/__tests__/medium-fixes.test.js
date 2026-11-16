@@ -30,9 +30,10 @@ describe('upload magic-byte check', () => {
 })
 
 describe('SSE connection caps', () => {
-  const makeRes = () => ({ writeHead: jest.fn(), write: jest.fn(), end: jest.fn(), status: jest.fn().mockReturnThis(), json: jest.fn() })
+  const makeRes = () => ({ writeHead: jest.fn(), write: jest.fn(), end: jest.fn(), on: jest.fn(), status: jest.fn().mockReturnThis(), json: jest.fn() })
   const makeReq = (id) => ({ user: { _id: id, roleName: 'teacher' }, on: jest.fn() })
-  afterEach(() => sse._clients.clear())
+  // Close streams properly so their heartbeat timers do not outlive the test
+  afterEach(() => { [...sse._clients].forEach((c) => sse.closeClient(c)) })
 
   test('keeps at most MAX_STREAMS_PER_USER streams per user, dropping the oldest', () => {
     const first = makeRes()
