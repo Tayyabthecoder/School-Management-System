@@ -11,9 +11,17 @@ const timetableEntrySchema = new mongoose.Schema({
   startTime: { type: String, required: true }, // "08:00"
   endTime: { type: String, required: true }, // "08:45"
   room: { type: String, default: 'Classroom' },
+  // "<teacherId>|<day>|<period>", set on every write by upsertTimetableEntry(). With the partial unique
+  // index below, MongoDB itself refuses to put one teacher in two classrooms in the same period even
+  // when two admins save at the same moment (the lookup in assertTeacherAvailable alone cannot stop that).
+  teacherSlotKey: { type: String },
 }, { timestamps: true })
 
 timetableEntrySchema.index({ classId: 1, sectionId: 1, dayOfWeek: 1, periodNumber: 1 }, { unique: true })
 timetableEntrySchema.index({ teacherId: 1, dayOfWeek: 1, periodNumber: 1 })
+timetableEntrySchema.index(
+  { teacherSlotKey: 1 },
+  { unique: true, partialFilterExpression: { teacherSlotKey: { $type: 'string' } } }
+)
 
 module.exports = mongoose.model('TimetableEntry', timetableEntrySchema)

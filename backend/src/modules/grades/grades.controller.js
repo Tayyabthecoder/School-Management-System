@@ -2,6 +2,7 @@ const Exam = require('../../models/Exam.model')
 const Grade = require('../../models/Grade.model')
 const Student = require('../../models/Student.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
+const { summarizeAttendanceDays } = require('../../utils/attendance-days.util')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF } = require('../../utils/pdf.util')
 const { ApiError } = require('../../middleware/error.middleware')
@@ -169,20 +170,8 @@ const generateReportCard = async (req, res, next) => {
     const attRecords = await StudentAttendance.find({
       'records.studentId': student._id,
     })
-    let totalDays = 0
-    let presentDays = 0
-    attRecords.forEach((att) => {
-      const rec = att.records.find(
-        (r) => r.studentId && r.studentId.toString() === student._id.toString()
-      )
-      if (rec) {
-        totalDays++
-        if (['Present', 'Late'].includes(rec.status)) {
-          presentDays++
-        }
-      }
-    })
-    const attendancePercentage = totalDays > 0 ? `${Math.round((presentDays / totalDays) * 100)}%` : 'N/A'
+    const { rate: attendanceRate } = summarizeAttendanceDays(attRecords, student._id)
+    const attendancePercentage = attendanceRate === null ? 'N/A' : `${attendanceRate}%`
 
     const settings = await getOrSet('ref:school-settings', 300, async () => {
       return SchoolSettings.findOne({ isActive: true }).lean()

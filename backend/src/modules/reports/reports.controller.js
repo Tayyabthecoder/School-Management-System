@@ -773,20 +773,23 @@ const getFeeTrend = async (req, res, next) => {
 
 const getFeeCollectionByClass = async (req, res, next) => {
   try {
+    // Each fee belongs to the class its fee structure was set up for, not to whatever class the
+    // student is in today: after promotion a student's old fees must stay with the old class,
+    // otherwise last year's collection figures move into the new grade.
     const data = await StudentFee.aggregate([
       {
         $lookup: {
-          from: 'students',
-          localField: 'studentId',
+          from: 'feestructures',
+          localField: 'feeStructureId',
           foreignField: '_id',
-          as: 'student',
+          as: 'structure',
         },
       },
-      { $unwind: '$student' },
+      { $unwind: '$structure' },
       {
         $lookup: {
           from: 'classes',
-          localField: 'student.classId',
+          localField: 'structure.classId',
           foreignField: '_id',
           as: 'class',
         },

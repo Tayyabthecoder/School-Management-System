@@ -8,8 +8,8 @@ const { assertTeacherAvailable } = require('../modules/timetable/timetable.servi
 
 jest.mock('../models/TimetableEntry.model')
 jest.mock('../modules/timetable/timetable.service', () => ({
+  ...jest.requireActual('../modules/timetable/timetable.service'),
   assertTeacherAvailable: jest.fn().mockResolvedValue(),
-  TEACHER_PUBLIC_FIELDS: 'fullName',
 }))
 
 const mockRes = () => {

@@ -3,6 +3,7 @@ const Exam = require('../../models/Exam.model')
 const TimetableEntry = require('../../models/TimetableEntry.model')
 const Grade = require('../../models/Grade.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
+const { summarizeAttendanceDays } = require('../../utils/attendance-days.util')
 const AcademicYear = require('../../models/AcademicYear.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
 const { generatePDFBuffer, buildReportCardPDF, buildTranscriptPDF } = require('../../utils/pdf.util')
@@ -93,20 +94,8 @@ const compileStudentReportData = async (studentId, termName = 'Final Term', acad
     attQuery.date = attDateFilter
   }
   const attRecords = await StudentAttendance.find(attQuery)
-  let totalDays = 0
-  let presentDays = 0
-  attRecords.forEach((att) => {
-    const rec = att.records.find(
-      (r) => r.studentId && r.studentId.toString() === student._id.toString()
-    )
-    if (rec) {
-      totalDays++
-      if (['Present', 'Late'].includes(rec.status)) {
-        presentDays++
-      }
-    }
-  })
-  const attendancePercentage = totalDays > 0 ? `${Math.round((presentDays / totalDays) * 100)}%` : 'N/A'
+  const { rate: attendanceRate } = summarizeAttendanceDays(attRecords, student._id)
+  const attendancePercentage = attendanceRate === null ? 'N/A' : `${attendanceRate}%`
 
   // Aggregates cover graded subjects only; with nothing graded there is no overall result yet
   const totalMaxMarks = gradedSubjects.reduce((sum, g) => sum + g.maxMarks, 0)

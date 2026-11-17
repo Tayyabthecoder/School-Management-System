@@ -10,7 +10,7 @@ const StudentAttendance = require('../../models/StudentAttendance.model')
 const StudentLeaveRequest = require('../../models/StudentLeaveRequest.model')
 const Counter = require('../../models/Counter.model')
 const bcrypt = require('bcryptjs')
-const { assertTeacherAvailable, TEACHER_PUBLIC_FIELDS } = require('../timetable/timetable.service')
+const { assertTeacherAvailable, upsertTimetableEntry, TEACHER_PUBLIC_FIELDS } = require('../timetable/timetable.service')
 const { ApiError } = require('../../middleware/error.middleware')
 const { logAudit } = require('../../utils/audit-log.util')
 const { escapeRegex } = require('../../utils/regex.util')
@@ -148,7 +148,7 @@ const assignTeacherPeriod = async (req, res, next) => {
     // one teacher in two classrooms during the same period.
     await assertTeacherAvailable({ teacherId, dayOfWeek, periodNumber, classId, sectionId })
 
-    const entry = await TimetableEntry.findOneAndUpdate(
+    const entry = await upsertTimetableEntry(
       { classId, sectionId, dayOfWeek, periodNumber },
       {
         subjectId,
@@ -156,12 +156,8 @@ const assignTeacherPeriod = async (req, res, next) => {
         startTime: startTime || '08:00',
         endTime: endTime || '08:45',
         room: room || 'Classroom',
-      },
-      { upsert: true, new: true, runValidators: true }
+      }
     )
-      .populate('classId')
-      .populate('subjectId')
-      .populate('teacherId', TEACHER_PUBLIC_FIELDS)
 
     res.json({ success: true, message: 'Class period assigned successfully', data: entry })
   } catch (error) {

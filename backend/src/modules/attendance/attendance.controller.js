@@ -1,4 +1,5 @@
 const StudentAttendance = require('../../models/StudentAttendance.model')
+const { summarizeAttendanceDays } = require('../../utils/attendance-days.util')
 const StaffAttendance = require('../../models/StaffAttendance.model')
 const Student = require('../../models/Student.model')
 const SchoolSettings = require('../../models/SchoolSettings.model')
@@ -96,18 +97,8 @@ const markStudentAttendance = async (req, res, next) => {
 
       const alertWrites = []
       for (const st of students) {
-        let totalDays = 0
-        let presentDays = 0
-
-        monthlyAttDocs.forEach(attDoc => {
-          const rec = attDoc.records.find(r => r.studentId && r.studentId.toString() === st._id.toString())
-          if (rec) {
-            totalDays++
-            if (['Present', 'Late'].includes(rec.status)) {
-              presentDays++
-            }
-          }
-        })
+        // School days, not registers: a student with eight period registers is one day
+        const { totalDays, attendedDays: presentDays } = summarizeAttendanceDays(monthlyAttDocs, st._id)
 
         if (totalDays >= 3) {
           const monthlyRate = Math.round((presentDays / totalDays) * 100)

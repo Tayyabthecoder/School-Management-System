@@ -1,5 +1,6 @@
 const Student = require('../../models/Student.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
+const { summarizeAttendanceDays } = require('../../utils/attendance-days.util')
 const Grade = require('../../models/Grade.model')
 const Exam = require('../../models/Exam.model')
 const StudentFee = require('../../models/StudentFee.model')
@@ -53,14 +54,10 @@ const getChildAttendance = async (req, res, next) => {
       .sort({ date: -1 })
 
     const history = []
-    let totalDays = 0
-    let presentDays = 0
 
     records.forEach(att => {
       const rec = att.records.find(r => r.studentId && r.studentId.toString() === studentId.toString())
       if (rec) {
-        totalDays++
-        if (['Present', 'Late'].includes(rec.status)) presentDays++
         history.push({
           date: att.date,
           status: rec.status,
@@ -70,7 +67,9 @@ const getChildAttendance = async (req, res, next) => {
       }
     })
 
-    const rate = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 100
+    // The summary counts school days (several period registers on one date are one day)
+    const { totalDays, attendedDays: presentDays, rate: dayRate } = summarizeAttendanceDays(records, studentId)
+    const rate = dayRate === null ? 100 : dayRate
 
     res.json({
       success: true,

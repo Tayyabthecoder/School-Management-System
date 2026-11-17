@@ -30,4 +30,32 @@ const assertTeacherAvailable = async ({ teacherId, dayOfWeek, periodNumber, clas
  */
 const TEACHER_PUBLIC_FIELDS = 'fullName staffId designation department'
 
-module.exports = { assertTeacherAvailable, TEACHER_PUBLIC_FIELDS }
+const teacherSlotKey = (teacherId, dayOfWeek, periodNumber) => `${teacherId}|${dayOfWeek}|${periodNumber}`
+
+/**
+ * Creates or updates the timetable slot identified by `filter` ({ classId, sectionId, dayOfWeek,
+ * periodNumber }) and stamps it with the teacher key that the unique index enforces.
+ *
+ *  - If the teacher got booked into another class for the same period in the meantime (two admins
+ *    saving at once), MongoDB refuses the write and this answers 409, like assertTeacherAvailable.
+ *  - If two writers raced to create the very same slot, the loser is retried once and simply
+ *    updates the slot the winner created.
+ */
+const upsertTimetableEntry = async (filter, fields, attempt = 0) => {
+  const update = { ...fields, teacherSlotKey: teacherSlotKey(fields.teacherId, filter.dayOfWeek, filter.periodNumber) }
+  try {
+    return await TimetableEntry.findOneAndUpdate(filter, update, { upsert: true, new: true, runValidators: true })
+      .populate('classId')
+      .populate('subjectId')
+      .populate('teacherId', TEACHER_PUBLIC_FIELDS)
+  } catch (err) {
+    if (err?.code !== 11000) throw err
+    if (err.keyPattern?.teacherSlotKey) {
+      throw new ApiError(409, `Teacher is already assigned to another class on ${filter.dayOfWeek}, Period ${filter.periodNumber}`)
+    }
+    if (attempt === 0) return upsertTimetableEntry(filter, fields, 1)
+    throw err
+  }
+}
+
+module.exports = { assertTeacherAvailable, upsertTimetableEntry, TEACHER_PUBLIC_FIELDS }

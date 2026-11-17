@@ -6,6 +6,7 @@ const Role = require('../../models/Role.model')
 const Counter = require('../../models/Counter.model')
 const TimetableEntry = require('../../models/TimetableEntry.model')
 const StudentAttendance = require('../../models/StudentAttendance.model')
+const { summarizeAttendanceDays } = require('../../utils/attendance-days.util')
 const Grade = require('../../models/Grade.model')
 const StudentFee = require('../../models/StudentFee.model')
 const FeeStructure = require('../../models/FeeStructure.model')
@@ -485,22 +486,11 @@ const getStudentPortalData = async (req, res, next) => {
       'records.studentId': student._id,
     }).sort({ date: -1 })
 
-    let totalDays = 0
-    let presentDays = 0
-    let absentDays = 0
-    let lateDays = 0
-    let excusedDays = 0
     const history = []
 
     attendanceRecords.forEach((att) => {
       const rec = att.records.find(r => r.studentId && r.studentId.toString() === student._id.toString())
       if (rec) {
-        totalDays++
-        if (rec.status === 'Present') presentDays++
-        else if (rec.status === 'Absent') absentDays++
-        else if (rec.status === 'Late') lateDays++
-        else if (rec.status === 'Excused') excusedDays++
-
         history.push({
           date: att.date,
           status: rec.status,
@@ -510,7 +500,9 @@ const getStudentPortalData = async (req, res, next) => {
       }
     })
 
-    const attendanceRate = totalDays > 0 ? Math.round(((presentDays + lateDays) / totalDays) * 100) : 100
+    // Day totals count school days: several period registers on one date are one day
+    const { totalDays, presentDays, absentDays, lateDays, excusedDays, rate: dayRate } = summarizeAttendanceDays(attendanceRecords, student._id)
+    const attendanceRate = dayRate === null ? 100 : dayRate
 
     // 3. Exam Grades (published only unless admin)
     // Only administrators may preview unpublished results; students and guardians must not.

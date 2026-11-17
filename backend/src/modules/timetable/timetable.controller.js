@@ -1,6 +1,6 @@
 const TimetableEntry = require('../../models/TimetableEntry.model')
 const { ApiError } = require('../../middleware/error.middleware')
-const { assertTeacherAvailable, TEACHER_PUBLIC_FIELDS } = require('./timetable.service')
+const { assertTeacherAvailable, upsertTimetableEntry, TEACHER_PUBLIC_FIELDS } = require('./timetable.service')
 
 const PERIOD_TIMES = [
   { start: '08:00', end: '08:45' },
@@ -58,7 +58,7 @@ const createTimetableEntry = async (req, res, next) => {
       ? await TimetableEntry.exists({ classId, sectionId, dayOfWeek, periodNumber })
       : null
 
-    const entry = await TimetableEntry.findOneAndUpdate(
+    const entry = await upsertTimetableEntry(
       { classId, sectionId, dayOfWeek, periodNumber },
       {
         subjectId,
@@ -66,12 +66,8 @@ const createTimetableEntry = async (req, res, next) => {
         startTime: startTime || PERIOD_TIMES[periodNumber - 1]?.start || '08:00',
         endTime: endTime || PERIOD_TIMES[periodNumber - 1]?.end || '08:45',
         room: room || 'Classroom',
-      },
-      { upsert: true, new: true, runValidators: true }
+      }
     )
-      .populate('classId')
-      .populate('subjectId')
-      .populate('teacherId', TEACHER_PUBLIC_FIELDS)
 
     res.status(existed ? 200 : 201).json({ success: true, data: entry })
   } catch (error) {

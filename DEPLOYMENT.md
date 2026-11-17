@@ -148,6 +148,10 @@ docker compose ps && docker compose logs --tail=50 backend
   then refuses a second one for the same student and fee structure, even from another server. Older
   challans, manually assigned fees and a deliberate "force regenerate" are not stamped and may repeat.
   A run that meets an already-billed student counts it as skipped (`duplicatesBlocked` in the result).
+- **Timetable guard (no manual migration).** The backend also builds a partial unique index on
+  `timetableentries` (`teacherSlotKey_1`) on first start, so a teacher cannot be put in two classrooms
+  in the same period even by two simultaneous saves. Every slot written from now on carries the key;
+  older slots do not, and stay protected by the existing lookup until they are next edited.
 - Base images are pinned by digest; Dependabot opens pull requests when new digests or package
   versions are available. Merge them after CI passes.
 - **Roll back** the code by checking out the previous commit or tag and rebuilding
