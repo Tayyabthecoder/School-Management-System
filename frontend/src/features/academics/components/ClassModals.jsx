@@ -53,7 +53,7 @@ function AddSubjectModal({ open, classId, className, onClose, onCreated }) {
   if (!open) return null
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="p-6 bg-indigo-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-indigo-300" />
@@ -63,39 +63,39 @@ function AddSubjectModal({ open, classId, className, onClose, onCreated }) {
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Subject Name *</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Subject Name *</label>
             <input aria-label="Subject Name"
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="e.g. Physics, Mathematics, Biology"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Subject Code *</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Subject Code *</label>
             <input aria-label="Subject Code"
               required
               value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value })}
               placeholder="e.g. PHY-10, MATH-10"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm uppercase font-mono focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm uppercase font-mono focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Description / Category</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Description / Category</label>
             <input aria-label="Description / Category"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="e.g. Core Science Theory & Practical"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
             />
           </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 text-xs font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50"
             >
               Cancel
             </button>
@@ -186,7 +186,7 @@ function AssignPeriodModal({
   if (!open) return null
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
         <div className="p-6 bg-indigo-900 text-white flex items-center justify-between">
           <div>
             <h3 className="font-bold text-base">Schedule Period Slot</h3>
@@ -197,11 +197,11 @@ function AssignPeriodModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Day of Week *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Day of Week *</label>
               <select aria-label="Day of Week"
                 value={form.dayOfWeek}
                 onChange={(e) => setForm({ ...form, dayOfWeek: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
               >
                 {DAYS.map((d) => (
                   <option key={d} value={d}>{d}</option>
@@ -209,11 +209,11 @@ function AssignPeriodModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Period Number *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Period Number *</label>
               <select aria-label="Period Number"
                 value={form.periodNumber}
                 onChange={(e) => handlePeriodChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm font-semibold"
               >
                 {PERIODS.map((p) => (
                   <option key={p} value={p}>Period {p} ({PERIOD_TIMES[p - 1].start} - {PERIOD_TIMES[p - 1].end})</option>
@@ -221,12 +221,12 @@ function AssignPeriodModal({
               </select>
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Subject *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Subject *</label>
               <select aria-label="Subject"
                 required
                 value={form.subjectId}
                 onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm font-medium"
               >
                 <option value="">— Select Subject —</option>
                 {subjects.map((s) => (
@@ -235,12 +235,12 @@ function AssignPeriodModal({
               </select>
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Assigned Faculty Teacher *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Assigned Faculty Teacher *</label>
               <select aria-label="Assigned Faculty Teacher"
                 required
                 value={form.teacherId}
                 onChange={(e) => setForm({ ...form, teacherId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm font-medium"
               >
                 <option value="">— Select Teacher —</option>
                 {teachers.map((t) => (
@@ -249,17 +249,17 @@ function AssignPeriodModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Room / Lab</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Room / Lab</label>
               <input aria-label="Room / Lab"
                 value={form.room}
                 onChange={(e) => setForm({ ...form, room: e.target.value })}
                 placeholder="e.g. Room 102, Science Lab"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Time Range</label>
-              <div className="text-xs font-mono font-bold text-gray-700 py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg">
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Time Range</label>
+              <div className="text-xs font-mono font-bold text-gray-700 dark:text-slate-300 py-2.5 px-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg">
                 {form.startTime} — {form.endTime}
               </div>
             </div>
@@ -268,7 +268,7 @@ function AssignPeriodModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 text-xs font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50"
             >
               Cancel
             </button>
@@ -302,7 +302,7 @@ function DeleteConfirmModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-red-100">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-red-100 dark:border-red-900">
         <div className="p-6 bg-red-600 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-700/60 rounded-xl">
@@ -323,14 +323,14 @@ function DeleteConfirmModal({
         </div>
 
         <div className="p-6 space-y-4">
-          <p className="text-sm text-gray-700">
-            Are you sure you want to delete <span className="font-bold text-gray-900">{itemName}</span>?
+          <p className="text-sm text-gray-700 dark:text-slate-300">
+            Are you sure you want to delete <span className="font-bold text-gray-900 dark:text-slate-100">{itemName}</span>?
           </p>
 
           {studentCount > 0 ? (
-            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-800">
+            <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-xs text-amber-800 dark:text-amber-200">
                 <p className="font-bold mb-1">
                   Enrolled Students Detected ({studentCount})
                 </p>
@@ -340,7 +340,7 @@ function DeleteConfirmModal({
               </div>
             </div>
           ) : (
-            <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600">
+            <div className="p-3.5 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-xs text-gray-600 dark:text-slate-400">
               This {itemType} has no active enrolled students. Associated timetable periods and subject allocations will be permanently removed.
             </div>
           )}
@@ -350,7 +350,7 @@ function DeleteConfirmModal({
               type="button"
               onClick={onClose}
               disabled={deleting}
-              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 text-xs font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -412,49 +412,49 @@ export function AddClassModal({ open, onClose, onCreated }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-gray-200 shadow-xl">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-gray-200 dark:border-slate-700 shadow-xl">
         <div className="flex items-center justify-between mb-4 pb-2 border-b">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Plus className="w-5 h-5 text-indigo-600" /> Add New Academic Class
+          <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+            <Plus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Add New Academic Class
           </h2>
-          <button aria-label="Close" onClick={onClose} className="text-gray-500 hover:text-gray-600">
+          <button aria-label="Close" onClick={onClose} className="text-gray-500 dark:text-slate-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Class / Grade Name</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase mb-1">Class / Grade Name</label>
             <input aria-label="Class / Grade Name"
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Grade 13 / A-Level Year 1"
-              className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600 font-semibold"
+              className="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600 font-semibold"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Grade Level (Numeric)</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase mb-1">Grade Level (Numeric)</label>
               <input aria-label="Grade Level (Numeric)"
                 type="number"
                 required
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Initial Sections</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase mb-1">Initial Sections</label>
               <input aria-label="Initial Sections"
                 type="text"
                 required
                 value={sections}
                 onChange={(e) => setSections(e.target.value)}
                 placeholder="A, B, C"
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600"
               />
             </div>
           </div>
@@ -463,7 +463,7 @@ export function AddClassModal({ open, onClose, onCreated }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl"
             >
               Cancel
             </button>
@@ -513,35 +513,35 @@ export function AddSectionModal({ open, grade, onClose, onAdded }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-gray-200 shadow-xl">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-gray-200 dark:border-slate-700 shadow-xl">
         <div className="flex items-center justify-between mb-4 pb-2 border-b">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Plus className="w-5 h-5 text-indigo-600" /> Add Section to {grade.name}
+          <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+            <Plus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Add Section to {grade.name}
           </h2>
-          <button aria-label="Close" onClick={onClose} className="text-gray-500 hover:text-gray-600">
+          <button aria-label="Close" onClick={onClose} className="text-gray-500 dark:text-slate-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">New Section Identifier</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase mb-1">New Section Identifier</label>
             <input aria-label="New Section Identifier"
               type="text"
               required
               value={sectionName}
               onChange={(e) => setSectionName(e.target.value)}
               placeholder="e.g. C or D or Morning"
-              className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600 font-bold"
+              className="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600 font-bold"
             />
-            <p className="text-[11px] text-gray-500 mt-1">Section will be converted to uppercase (e.g. Section C).</p>
+            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Section will be converted to uppercase (e.g. Section C).</p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl"
             >
               Cancel
             </button>

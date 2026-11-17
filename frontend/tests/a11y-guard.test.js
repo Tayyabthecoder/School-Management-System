@@ -66,3 +66,24 @@ describe('accessibility guards (things a live axe scan found once)', () => {
     assert.deepEqual(bad, [])
   })
 })
+
+describe('dark mode guards', () => {
+  test('no white surface or neutral text colour is left without a dark: counterpart', () => {
+    // The print-only voucher/ID card previews are paper, so they stay light on purpose.
+    const paper = ['features/settings/components/ChallanVoucherPreview.jsx', 'features/students/components/StudentProfile/StudentIdCardModal.jsx']
+    const bad = []
+    for (const file of jsx) {
+      if (paper.includes(rel(file))) continue
+      fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+        if (/(^|["'` ])bg-white(["'` ]|$)/.test(line) && !/dark:bg-/.test(line)) bad.push(`${rel(file)}:${i + 1}`)
+      })
+    }
+    assert.deepEqual(bad, [])
+  })
+
+  test('the dark base layer colours native form controls', () => {
+    const css = fs.readFileSync(path.join(SRC, 'index.css'), 'utf8')
+    assert.match(css, /\.dark input,[\s\S]*?text-slate-100/)
+    assert.match(css, /color-scheme:\s*dark/)
+  })
+})

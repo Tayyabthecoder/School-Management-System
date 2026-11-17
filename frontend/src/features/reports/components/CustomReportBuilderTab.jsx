@@ -223,14 +223,14 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
   return (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800 mb-5">
               <div>
-                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-indigo-600" />
+                <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   Dynamic Custom Report Builder (SRS FR-RP-03)
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                   Select a primary data entity, pick your required fields, apply filters, and export customized Excel or PDF reports.
                 </p>
               </div>
@@ -238,7 +238,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
             {/* Step 1: Entity Selector */}
             <div className="mb-6">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                 1. Select Primary Data Entity
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -250,14 +250,14 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                       onClick={() => handleEntityChange(ent.id)}
                       className={`p-3.5 rounded-xl border text-left transition-all ${
                         isSelected
-                          ? 'border-indigo-600 bg-indigo-50/60 ring-2 ring-indigo-200'
-                          : 'border-gray-200 bg-gray-50/50 hover:bg-gray-100/70'
+                          ? 'border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/40 ring-2 ring-indigo-200'
+                          : 'border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/40 hover:bg-gray-100/70 dark:hover:bg-slate-800/40'
                       }`}
                     >
-                      <p className={`text-xs font-bold ${isSelected ? 'text-indigo-900' : 'text-gray-800'}`}>
+                      <p className={`text-xs font-bold ${isSelected ? 'text-indigo-900 dark:text-indigo-100' : 'text-gray-800 dark:text-slate-100'}`}>
                         {ent.label}
                       </p>
-                      <p className="text-[10px] text-gray-500 mt-1 line-clamp-2">{ent.description}</p>
+                      <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1 line-clamp-2">{ent.description}</p>
                     </button>
                   )
                 })}
@@ -267,27 +267,27 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
             {/* Step 2: Field Selection Checkboxes */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                   2. Choose Columns to Include ({selectedFields.length} of {activeEntityConfig.fields.length} selected)
                 </label>
                 <div className="flex gap-2">
                   <button
                     onClick={selectAllFields}
-                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                    className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800"
                   >
                     Select All
                   </button>
                   <span className="text-gray-300">|</span>
                   <button
                     onClick={clearAllFields}
-                    className="text-xs font-semibold text-gray-500 hover:text-gray-700"
+                    className="text-xs font-semibold text-gray-500 dark:text-slate-400 hover:text-gray-700"
                   >
                     Clear All
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 p-4 bg-gray-50/60 rounded-xl border border-gray-200">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 p-4 bg-gray-50/60 dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700">
                 {activeEntityConfig.fields.map((f) => {
                   const isChecked = selectedFields.includes(f.id)
                   return (
@@ -296,14 +296,14 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                       onClick={() => toggleField(f.id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
                         isChecked
-                          ? 'bg-white border-indigo-400 text-indigo-900 shadow-sm'
-                          : 'bg-transparent border-gray-200 text-gray-600 hover:bg-gray-100'
+                          ? 'bg-white dark:bg-slate-900 border-indigo-400 text-indigo-900 dark:text-indigo-100 shadow-sm'
+                          : 'bg-transparent border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'
                       }`}
                     >
                       {isChecked ? (
-                        <CheckSquare className="w-4 h-4 text-indigo-600 shrink-0" />
+                        <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       ) : (
-                        <Square className="w-4 h-4 text-gray-500 shrink-0" />
+                        <Square className="w-4 h-4 text-gray-500 dark:text-slate-400 shrink-0" />
                       )}
                       <span className="truncate">{f.label}</span>
                     </label>
@@ -314,19 +314,19 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
             {/* Step 3: Filter Controls */}
             <div className="mb-6">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                 3. Apply Filter Criteria (Optional)
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 p-4 bg-gray-50/60 rounded-xl border border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 p-4 bg-gray-50/60 dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700">
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Grade / Class</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Grade / Class</label>
                   <select aria-label="Grade / Class"
                     value={customClassId}
                     onChange={(e) => {
                       setCustomClassId(e.target.value)
                       setCustomSectionId('ALL')
                     }}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="ALL">All Classes</option>
                     {classesList.map(c => (
@@ -336,11 +336,11 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Section</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Section</label>
                   <select aria-label="Section"
                     value={customSectionId}
                     onChange={(e) => setCustomSectionId(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="ALL">All Sections</option>
                     {(() => {
@@ -353,11 +353,11 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Status Filter</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Status Filter</label>
                   <select aria-label="Status Filter"
                     value={customStatus}
                     onChange={(e) => setCustomStatus(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="ALL">All Statuses</option>
                     <option value="Active">Active</option>
@@ -370,11 +370,11 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Sort By</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Sort By</label>
                   <select aria-label="Sort By"
                     value={customSortBy}
                     onChange={(e) => setCustomSortBy(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="default">Default Order</option>
                     {activeEntityConfig.fields.map(f => (
@@ -384,11 +384,11 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Sort Direction</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Sort Direction</label>
                   <select aria-label="Sort Direction"
                     value={customSortOrder}
                     onChange={(e) => setCustomSortOrder(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value={1}>Ascending (A–Z / 0–9)</option>
                     <option value={-1}>Descending (Z–A / 9–0)</option>
@@ -396,33 +396,33 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Date Range: From</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Date Range: From</label>
                   <input aria-label="Date Range: From"
                     type="date"
                     value={customFrom}
                     onChange={(e) => setCustomFrom(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">Date Range: To</label>
+                  <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 mb-1">Date Range: To</label>
                   <input aria-label="Date Range: To"
                     type="date"
                     value={customTo}
                     onChange={(e) => setCustomTo(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-slate-800">
               <button
                 onClick={handlePreviewCustomReport}
                 disabled={previewLoading}
-                className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-xs font-bold transition-colors shadow-sm disabled:opacity-60"
+                className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-bold transition-colors shadow-sm disabled:opacity-60"
               >
                 <Eye className="w-4 h-4" />
                 {previewLoading ? 'Loading Preview...' : 'Preview Report (First 50)'}
@@ -452,25 +452,25 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
 
           {/* Table Preview Panel */}
           {previewData && (
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 animate-in fade-in duration-150">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-gray-900">Interactive Preview</h3>
-                  <span className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold border border-indigo-100">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100">Interactive Preview</h3>
+                  <span className="text-xs bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-semibold border border-indigo-100 dark:border-indigo-900">
                     {previewData.count} Total Records Matched
                   </span>
                 </div>
-                <span className="text-xs text-gray-500">Showing first {previewData.rows.length} rows</span>
+                <span className="text-xs text-gray-500 dark:text-slate-400">Showing first {previewData.rows.length} rows</span>
               </div>
 
               {previewData.rows.length === 0 ? (
-                <div className="py-12 text-center text-xs text-gray-500">
+                <div className="py-12 text-center text-xs text-gray-500 dark:text-slate-400">
                   No records match your selected criteria.
                 </div>
               ) : (
-                <div className="overflow-x-auto border border-gray-200 rounded-xl">
+                <div className="overflow-x-auto border border-gray-200 dark:border-slate-700 rounded-xl">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300 font-bold border-b border-gray-200 dark:border-slate-700">
                       <tr>
                         {previewData.columns.map((col) => (
                           <th key={col.key} className="px-4 py-2.5 whitespace-nowrap">
@@ -479,11 +479,11 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                       {previewData.rows.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50/70 transition-colors">
+                        <tr key={idx} className="hover:bg-gray-50/70 dark:hover:bg-slate-800/40 transition-colors">
                           {previewData.columns.map((col) => (
-                            <td key={col.key} className="px-4 py-2 text-gray-800 whitespace-nowrap">
+                            <td key={col.key} className="px-4 py-2 text-gray-800 dark:text-slate-100 whitespace-nowrap">
                               {String(row[col.key] !== undefined && row[col.key] !== null ? row[col.key] : '-')}
                             </td>
                           ))}

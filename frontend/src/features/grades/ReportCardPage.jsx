@@ -123,18 +123,18 @@ export default function ReportCardPage() {
       />
 
       {/* Controls Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
           {!isStudent && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                   Class
                 </label>
                 <select aria-label="Class"
                   value={selectedClassId}
                   onChange={(e) => setSelectedClassId(e.target.value)}
-                  className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+                  className="px-3.5 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white"
                 >
                   {classes.map(cls => (
                     <option key={cls._id} value={cls._id}>{cls.name}</option>
@@ -143,13 +143,13 @@ export default function ReportCardPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                   Student
                 </label>
                 <select aria-label="Student"
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white min-w-[200px]"
+                  className="px-3.5 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white min-w-[200px]"
                 >
                   {students.map(st => (
                     <option key={st._id} value={st._id}>{st.fullName} ({st.studentId})</option>
@@ -160,13 +160,13 @@ export default function ReportCardPage() {
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
               Examination Term
             </label>
             <select aria-label="Examination Term"
               value={termName}
               onChange={(e) => setTermName(e.target.value)}
-              className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="px-3.5 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white"
             >
               <option value="Final Term">Final Term</option>
               <option value="Midterm">Midterm</option>
@@ -181,7 +181,7 @@ export default function ReportCardPage() {
             <button
               onClick={handleBulkDownloadClass}
               disabled={bulkDownloading || !selectedClassId}
-              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-xl border border-indigo-200 flex items-center gap-2 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-sm font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800 flex items-center gap-2 transition-colors disabled:opacity-50"
             >
               <FileText className="w-4 h-4" />
               {bulkDownloading ? 'Generating Batch...' : 'Download Class Batch PDF'}
@@ -200,11 +200,11 @@ export default function ReportCardPage() {
       </div>
 
       {loading ? (
-        <div className="bg-white p-12 rounded-2xl border border-gray-200 text-center text-gray-500 animate-pulse">
+        <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-gray-200 dark:border-slate-700 text-center text-gray-500 dark:text-slate-400 animate-pulse">
           Loading report card data...
         </div>
       ) : !reportData ? (
-        <div className="bg-white p-12 rounded-2xl border border-gray-200 text-center text-gray-500">
+        <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-gray-200 dark:border-slate-700 text-center text-gray-500 dark:text-slate-400">
           No grade entries found for this student and term.
         </div>
       ) : (
@@ -238,40 +238,40 @@ export default function ReportCardPage() {
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-500 uppercase">Total Marks</span>
-              <div className="text-xl font-bold text-gray-900 mt-1">
-                {reportData.summary.totalMarksObtained} <span className="text-xs font-normal text-gray-500">/ {reportData.summary.totalMaxMarks}</span>
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Total Marks</span>
+              <div className="text-xl font-bold text-gray-900 dark:text-slate-100 mt-1">
+                {reportData.summary.totalMarksObtained} <span className="text-xs font-normal text-gray-500 dark:text-slate-400">/ {reportData.summary.totalMaxMarks}</span>
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-500 uppercase">Passed Subjects</span>
-              <div className="text-xl font-bold text-green-700 mt-1">
-                {reportData.summary.passedSubjects} <span className="text-xs font-normal text-gray-500">/ {reportData.summary.totalSubjects}</span>
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Passed Subjects</span>
+              <div className="text-xl font-bold text-green-700 dark:text-green-300 mt-1">
+                {reportData.summary.passedSubjects} <span className="text-xs font-normal text-gray-500 dark:text-slate-400">/ {reportData.summary.totalSubjects}</span>
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-500 uppercase">Failed Subjects</span>
-              <div className={`text-xl font-bold mt-1 ${reportData.summary.failedSubjects > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Failed Subjects</span>
+              <div className={`text-xl font-bold mt-1 ${reportData.summary.failedSubjects > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-slate-100'}`}>
                 {reportData.summary.failedSubjects}
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-500 uppercase">Attendance Rate</span>
-              <div className="text-xl font-bold text-indigo-600 mt-1">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Attendance Rate</span>
+              <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">
                 {reportData.attendancePercentage}
               </div>
             </div>
           </div>
 
           {/* Grades Breakdown Table */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-indigo-600" />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 Subject-wise Performance
               </h3>
             </div>
@@ -279,7 +279,7 @@ export default function ReportCardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-50/75 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-200">
+                  <tr className="bg-gray-50/75 dark:bg-slate-800/40 text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-gray-200 dark:border-slate-700">
                     <th className="p-4">Subject</th>
                     <th className="p-4">Max Marks</th>
                     <th className="p-4">Pass Marks</th>
@@ -289,26 +289,26 @@ export default function ReportCardPage() {
                     <th className="p-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-sm">
                   {reportData.grades.map((g, idx) => (
-                    <tr key={g.examId || idx} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="p-4 font-semibold text-gray-900">{g.subjectName}</td>
-                      <td className="p-4 text-gray-600">{g.maxMarks}</td>
-                      <td className="p-4 text-gray-600">{g.passMarks}</td>
-                      <td className="p-4 font-bold text-gray-900">{g.marksObtained ?? '—'}</td>
-                      <td className="p-4 text-gray-600">{g.percentage === null || g.percentage === undefined ? '—' : `${g.percentage}%`}</td>
-                      <td className="p-4 font-bold text-indigo-600">{g.gradeLetter}</td>
+                    <tr key={g.examId || idx} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                      <td className="p-4 font-semibold text-gray-900 dark:text-slate-100">{g.subjectName}</td>
+                      <td className="p-4 text-gray-600 dark:text-slate-400">{g.maxMarks}</td>
+                      <td className="p-4 text-gray-600 dark:text-slate-400">{g.passMarks}</td>
+                      <td className="p-4 font-bold text-gray-900 dark:text-slate-100">{g.marksObtained ?? '—'}</td>
+                      <td className="p-4 text-gray-600 dark:text-slate-400">{g.percentage === null || g.percentage === undefined ? '—' : `${g.percentage}%`}</td>
+                      <td className="p-4 font-bold text-indigo-600 dark:text-indigo-400">{g.gradeLetter}</td>
                       <td className="p-4">
                         {g.status === 'Pending' ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">
                             Pending
                           </span>
                         ) : g.isPassed ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Passed
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300">
                             <XCircle className="w-3.5 h-3.5" /> Retained
                           </span>
                         )}

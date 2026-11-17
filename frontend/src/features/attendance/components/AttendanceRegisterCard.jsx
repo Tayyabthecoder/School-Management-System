@@ -66,7 +66,7 @@ export default function AttendanceRegisterCard({
                         size="sm"
                         icon={CheckCheck}
                         onClick={handleMarkAllPresent}
-                        className="text-emerald-700 hover:text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100/80 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800"
+                        className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100/80 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800"
                       >
                         All Present
                       </Button>
@@ -75,7 +75,7 @@ export default function AttendanceRegisterCard({
                         size="sm"
                         icon={XSquare}
                         onClick={handleMarkAllAbsent}
-                        className="text-rose-700 hover:text-rose-800 bg-rose-50/70 hover:bg-rose-100/80 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800"
+                        className="text-rose-700 dark:text-rose-300 hover:text-rose-800 bg-rose-50/70 hover:bg-rose-100/80 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800"
                       >
                         All Absent
                       </Button>
@@ -92,11 +92,11 @@ export default function AttendanceRegisterCard({
                   </div>
 
                   {activeRoster.length === 0 ? (
-                    <div className="py-12 text-center text-gray-500 text-xs">
+                    <div className="py-12 text-center text-gray-500 dark:text-slate-400 text-xs">
                       No students enrolled in this section.
                     </div>
                   ) : (
-                    <div className="divide-y divide-gray-100 mt-4">
+                    <div className="divide-y divide-gray-100 dark:divide-slate-800 mt-4">
                       {activeRoster.map((student, idx) => {
                         const curStatus = attendance[student._id] || 'Present'
                         return (
@@ -105,19 +105,19 @@ export default function AttendanceRegisterCard({
                             className="py-3 flex items-center justify-between gap-4 text-xs"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="w-6 h-6 rounded-full bg-gray-100 font-bold text-gray-600 flex items-center justify-center text-[10px]">
+                              <span className="w-6 h-6 rounded-full bg-gray-100 dark:bg-slate-800 font-bold text-gray-600 dark:text-slate-400 flex items-center justify-center text-[10px]">
                                 {idx + 1}
                               </span>
                               <div>
-                                <p className="font-bold text-gray-900">{student.fullName}</p>
-                                <p className="text-[10px] text-gray-500 font-mono">ID: {student.studentId} · Roll: {student.rollNumber || 'N/A'}</p>
+                                <p className="font-bold text-gray-900 dark:text-slate-100">{student.fullName}</p>
+                                <p className="text-[10px] text-gray-500 dark:text-slate-400 font-mono">ID: {student.studentId} · Roll: {student.rollNumber || 'N/A'}</p>
                               </div>
                             </div>
 
                             <div className="flex gap-1.5">
                               {['Present', 'Absent', 'Late', 'Excused'].map((st) => {
                                 const isActive = curStatus === st
-                                let btnColor = 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                let btnColor = 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200'
                                 if (isActive) {
                                   if (st === 'Present') btnColor = 'bg-green-600 text-white font-bold shadow-sm'
                                   if (st === 'Absent') btnColor = 'bg-red-600 text-white font-bold shadow-sm'
@@ -143,7 +143,7 @@ export default function AttendanceRegisterCard({
                     </div>
                   )}
 
-                  <div className="pt-6 mt-4 border-t border-gray-100 flex justify-end">
+                  <div className="pt-6 mt-4 border-t border-gray-100 dark:border-slate-800 flex justify-end">
                     <button
                       onClick={handleSubmitAttendance}
                       disabled={submitting || activeRoster.length === 0}

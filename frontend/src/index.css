@@ -17,6 +17,21 @@
   .dark body {
     @apply bg-slate-950 text-slate-100;
   }
+
+  /* Native controls follow the theme: form fields without an explicit text colour would otherwise
+     stay black on a dark surface, and scrollbars/date pickers would stay light. */
+  .dark {
+    color-scheme: dark;
+  }
+  .dark input,
+  .dark select,
+  .dark textarea {
+    @apply text-slate-100;
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    @apply text-slate-500;
+  }
 }
 
 /* Tabular figures for numbers, currency, and IDs */

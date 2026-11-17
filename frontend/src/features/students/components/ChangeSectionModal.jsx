@@ -99,7 +99,7 @@ export default function ChangeSectionModal({
           <button aria-label="Close"
             onClick={onClose}
             disabled={loading}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-white/10 dark:bg-slate-900/10 hover:bg-white/20 text-indigo-200 hover:text-white flex items-center justify-center transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -111,7 +111,7 @@ export default function ChangeSectionModal({
           <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xs font-bold text-slate-500 uppercase tracking-wide">Student</p>
+                <p className="text-2xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Student</p>
                 <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
                   {student.fullName}
                 </h4>
@@ -132,7 +132,7 @@ export default function ChangeSectionModal({
           {/* Section Selection */}
           {otherSections.length === 0 ? (
             <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div className="text-xs text-amber-800 dark:text-amber-300">
                 <p className="font-bold mb-0.5">No Alternate Sections Available</p>
                 <p>
@@ -159,7 +159,7 @@ export default function ChangeSectionModal({
                       onClick={() => setSelectedSection(sec)}
                       className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 ${
                         isCurrent
-                          ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-500 cursor-not-allowed opacity-60'
+                          ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed opacity-60'
                           : isSelected
                           ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/30 ring-2 ring-indigo-600/30'
                           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'

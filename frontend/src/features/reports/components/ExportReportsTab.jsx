@@ -27,53 +27,53 @@ const MONTH_NAMES = [
 function ReportCard({ icon: Icon, color, title, description, actions }) {
   const COLOR_MAP = {
     emerald: {
-      icon: 'bg-emerald-100 text-emerald-700',
-      badge: 'bg-emerald-50 border-emerald-200',
+      icon: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300',
+      badge: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800',
       btn: 'bg-emerald-700 hover:bg-emerald-800',
     },
     indigo: {
-      icon: 'bg-indigo-100 text-indigo-700',
-      badge: 'bg-indigo-50 border-indigo-200',
+      icon: 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300',
+      badge: 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800',
       btn: 'bg-indigo-600 hover:bg-indigo-700',
     },
     amber: {
-      icon: 'bg-amber-100 text-amber-700',
-      badge: 'bg-amber-50 border-amber-200',
+      icon: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+      badge: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800',
       btn: 'bg-amber-700 hover:bg-amber-800',
     },
     rose: {
-      icon: 'bg-rose-100 text-rose-700',
-      badge: 'bg-rose-50 border-rose-200',
+      icon: 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300',
+      badge: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800',
       btn: 'bg-rose-600 hover:bg-rose-700',
     },
     teal: {
-      icon: 'bg-teal-100 text-teal-700',
-      badge: 'bg-teal-50 border-teal-200',
+      icon: 'bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300',
+      badge: 'bg-teal-50 dark:bg-teal-950/40 border-teal-200 dark:border-teal-800',
       btn: 'bg-teal-700 hover:bg-teal-800',
     },
     violet: {
-      icon: 'bg-violet-100 text-violet-700',
-      badge: 'bg-violet-50 border-violet-200',
+      icon: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300',
+      badge: 'bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800',
       btn: 'bg-violet-600 hover:bg-violet-700',
     },
     cyan: {
-      icon: 'bg-cyan-100 text-cyan-700',
-      badge: 'bg-cyan-50 border-cyan-200',
+      icon: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300',
+      badge: 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-200 dark:border-cyan-800',
       btn: 'bg-cyan-700 hover:bg-cyan-800',
     },
   }
   const c = COLOR_MAP[color] || COLOR_MAP.indigo
 
   return (
-    <div className={`bg-white border-2 ${c.badge} rounded-2xl p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between`}>
+    <div className={`bg-white dark:bg-slate-900 border-2 ${c.badge} rounded-2xl p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between`}>
       <div>
         <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-3.5 ${c.icon}`}>
           <Icon className="w-5 h-5" />
         </div>
-        <h3 className="font-bold text-gray-900 text-sm mb-1">{title}</h3>
-        <p className="text-xs text-gray-500 mb-4 line-clamp-2">{description}</p>
+        <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm mb-1">{title}</h3>
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-4 line-clamp-2">{description}</p>
       </div>
-      <div className={`pt-2 border-t border-gray-100 ${actions.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2 gap-2'}`}>
+      <div className={`pt-2 border-t border-gray-100 dark:border-slate-800 ${actions.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2 gap-2'}`}>
         {actions.map((action, i) => (
           <button
             key={i}
@@ -81,7 +81,7 @@ function ReportCard({ icon: Icon, color, title, description, actions }) {
             disabled={action.loading}
             className={`flex items-center justify-center gap-1.5 py-1.5 px-2 text-[11px] font-bold rounded-lg shadow-2xs disabled:opacity-60 transition-colors ${
               action.variant === 'secondary'
-                ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
+                ? 'bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
                 : `${c.btn} text-white`
             }`}
           >
@@ -98,22 +98,22 @@ function DateRange({ label, fromVal, toVal, onFrom, onTo }) {
   return (
     <div className="flex items-end gap-2 flex-wrap">
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1">{label} — From</label>
+        <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">{label} — From</label>
         <input
           aria-label={`${label} from`}
           type="date"
           value={fromVal}
           onChange={(e) => onFrom(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+          className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1">To</label>
+        <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">To</label>
         <input aria-label="To"
           type="date"
           value={toVal}
           onChange={(e) => onTo(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+          className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
         />
       </div>
     </div>
@@ -178,8 +178,8 @@ export default function ExportReportsTab() {
   return (
         <div className="space-y-6">
           {/* Date Range Filters */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-5">
+            <h2 className="text-sm font-bold text-gray-700 dark:text-slate-300 mb-4 flex items-center gap-2">
               <CalendarCheck className="w-4 h-4 text-indigo-500" />
               Report Customization Filters
             </h2>
@@ -199,14 +199,14 @@ export default function ExportReportsTab() {
                 onTo={setAttTo}
               />
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">
                   Payroll & Staff Attendance Month
                 </label>
                 <div className="flex items-center gap-2">
                   <select aria-label="Payroll & Staff Attendance Month"
                     value={payMonth}
                     onChange={(e) => setPayMonth(Number(e.target.value))}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                   >
                     {MONTH_NAMES.map((name, i) => (
                       <option key={i + 1} value={i + 1}>{name}</option>
@@ -217,7 +217,7 @@ export default function ExportReportsTab() {
                     type="number"
                     value={payYear}
                     onChange={(e) => setPayYear(Number(e.target.value))}
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                    className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                     min={2020}
                     max={2030}
                   />

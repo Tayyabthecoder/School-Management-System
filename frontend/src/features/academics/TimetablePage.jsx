@@ -121,11 +121,11 @@ export default function TimetablePage() {
       />
 
       {/* Selector & Actions Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Class & Section Selectors */}
         <div className="flex flex-wrap items-center gap-3">
           <div>
-            <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Select Grade</label>
+            <label className="block text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase mb-1">Select Grade</label>
             <select aria-label="Select Grade"
               value={selectedClassId}
               onChange={(e) => {
@@ -133,7 +133,7 @@ export default function TimetablePage() {
                 const c = classes.find((cl) => cl._id === e.target.value)
                 if (c && c.sections?.length > 0) setSelectedSection(c.sections[0])
               }}
-              className="px-3.5 py-2 border border-gray-300 rounded-xl text-sm font-semibold text-gray-800 bg-white shadow-xs focus:ring-2 focus:ring-indigo-500"
+              className="px-3.5 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-semibold text-gray-800 dark:text-slate-100 bg-white dark:bg-slate-900 shadow-xs focus:ring-2 focus:ring-indigo-500"
             >
               {classes.map((cls) => (
                 <option key={cls._id} value={cls._id}>{cls.name}</option>
@@ -142,7 +142,7 @@ export default function TimetablePage() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Section</label>
+            <label className="block text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase mb-1">Section</label>
             <div className="flex gap-1">
               {availableSections.map((sec) => (
                 <button
@@ -151,7 +151,7 @@ export default function TimetablePage() {
                   className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
                     selectedSection === sec
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200'
                   }`}
                 >
                   Section {sec}
@@ -165,23 +165,23 @@ export default function TimetablePage() {
         <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold text-xs rounded-xl shadow-xs"
+            className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-800/50 text-gray-700 dark:text-slate-300 font-semibold text-xs rounded-xl shadow-xs"
           >
-            <Printer className="w-4 h-4 text-gray-500" /> Print Schedule
+            <Printer className="w-4 h-4 text-gray-500 dark:text-slate-400" /> Print Schedule
           </button>
         </div>
       </div>
 
       {/* Timetable Table */}
-      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-600" />
-            <h2 className="font-bold text-gray-900 text-base">
+            <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="font-bold text-gray-900 dark:text-slate-100 text-base">
               {selectedClass?.name || 'Class'} — Section {selectedSection} Schedule
             </h2>
           </div>
-          <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full">
+          <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full">
             {timetableEntries.length} / 48 Periods Scheduled
           </span>
         </div>
@@ -189,7 +189,7 @@ export default function TimetablePage() {
         {loading ? (
           <SkeletonTable rows={6} />
         ) : (
-          <div className="border border-gray-200 rounded-2xl overflow-x-auto shadow-xs">
+          <div className="border border-gray-200 dark:border-slate-700 rounded-2xl overflow-x-auto shadow-xs">
             <table className="w-full text-left text-xs border-collapse min-w-[750px]">
               <thead>
                 <tr className="bg-indigo-900 text-white">
@@ -204,39 +204,39 @@ export default function TimetablePage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-slate-800">
                 {DAYS.map((day) => (
-                  <tr key={day} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="p-3.5 font-bold text-gray-800 bg-gray-50 border-r border-gray-200">
+                  <tr key={day} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="p-3.5 font-bold text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-800/50 border-r border-gray-200 dark:border-slate-700">
                       {day}
                     </td>
                     {PERIODS.map((p) => {
                       const entry = scheduleMap[`${day}-${p}`]
                       return (
-                        <td key={p} className="p-2 border-r border-gray-200 last:border-0 group relative">
+                        <td key={p} className="p-2 border-r border-gray-200 dark:border-slate-700 last:border-0 group relative">
                           {entry ? (
-                            <div className="p-2.5 bg-indigo-50/80 border border-indigo-100 rounded-xl text-left hover:border-indigo-300 transition-all">
+                            <div className="p-2.5 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900 rounded-xl text-left hover:border-indigo-300 transition-all">
                               <div className="flex items-start justify-between gap-1">
-                                <p className="font-bold text-indigo-950 text-xs leading-tight">
+                                <p className="font-bold text-indigo-950 dark:text-indigo-100 text-xs leading-tight">
                                   {entry.subjectId?.name || 'Subject'}
                                 </p>
                                 {isAdmin && (
                                   <button
                                     onClick={() => handleDeletePeriod(entry._id)}
-                                    className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-600 transition-opacity p-0.5"
+                                    className="opacity-0 group-hover:opacity-100 text-gray-500 dark:text-slate-400 hover:text-red-600 transition-opacity p-0.5"
                                     title="Clear slot"
                                   >
                                     <Trash2 className="w-3 h-3" />
                                   </button>
                                 )}
                               </div>
-                              <p className="text-[11px] text-indigo-700 font-semibold mt-1 truncate">
+                              <p className="text-[11px] text-indigo-700 dark:text-indigo-300 font-semibold mt-1 truncate">
                                 {entry.teacherId?.fullName || 'Faculty'}
                               </p>
-                              <p className="text-[10px] text-gray-500 mt-0.5">{entry.room || 'Room 101'}</p>
+                              <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">{entry.room || 'Room 101'}</p>
                             </div>
                           ) : (
-                            <div className="w-full h-full min-h-[60px] p-2 bg-gray-50/60 border border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-500 text-[10px] font-mono">
+                            <div className="w-full h-full min-h-[60px] p-2 bg-gray-50/60 dark:bg-slate-800/40 border border-dashed border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-slate-400 text-[10px] font-mono">
                               — Empty —
                             </div>
                           )}

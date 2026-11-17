@@ -23,13 +23,13 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
 
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">Full Name</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Full Name</p>
                   <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                     {student.fullName || '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                     Date of Birth & Age
                   </p>
                   <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
@@ -42,31 +42,31 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
                   )}
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">Gender</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Gender</p>
                   <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                     {student.gender || '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                     B-Form / CNIC No.
                   </p>
                   <p className="font-mono font-bold text-indigo-700 dark:text-indigo-400 text-sm mt-0.5">
                     {student.bFormNumber || (
-                      <span className="text-slate-500 font-normal italic">—</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                     )}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">Blood Group</p>
-                  <p className="font-bold text-rose-600 text-sm mt-0.5">
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Blood Group</p>
+                  <p className="font-bold text-rose-600 dark:text-rose-400 text-sm mt-0.5">
                     {student.bloodGroup || (
-                      <span className="text-slate-500 font-normal italic">—</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                     )}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                     Nationality & Religion
                   </p>
                   <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
@@ -74,26 +74,26 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">City</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">City</p>
                   <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                     {student.city || '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">Previous School</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Previous School</p>
                   <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                     {student.previousSchool || (
-                      <span className="text-slate-500 font-normal italic">—</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                     )}
                   </p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-slate-500 font-semibold uppercase text-2xs">
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                     Residential Address
                   </p>
                   <p className="font-medium text-slate-800 dark:text-slate-200 text-sm mt-0.5">
                     {student.address || (
-                      <span className="text-slate-500 font-normal italic">—</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                     )}
                   </p>
                 </div>
@@ -129,49 +129,49 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
                     </div>
                   )}
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">Guardian Name</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Guardian Name</p>
                     <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                       {student.guardian?.name || '—'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">Relationship</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Relationship</p>
                     <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                       {student.guardian?.relationship || '—'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                       Primary Contact Phone
                     </p>
                     <p className="font-bold text-indigo-700 dark:text-indigo-400 text-sm mt-0.5 flex items-center gap-1">
                       <Phone className="w-3.5 h-3.5 text-indigo-500" />
                       {student.guardian?.phone || (
-                        <span className="text-slate-500 font-normal italic">—</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                       )}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">Guardian Email</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Guardian Email</p>
                     <p className="font-medium text-slate-800 dark:text-slate-200 text-sm mt-0.5 truncate">
                       {student.guardian?.email || (
-                        <span className="text-slate-500 font-normal italic">—</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                       )}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">Guardian CNIC</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Guardian CNIC</p>
                     <p className="font-mono text-slate-800 dark:text-slate-200 text-sm mt-0.5">
                       {student.guardian?.cnic || (
-                        <span className="text-slate-500 font-normal italic">—</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                       )}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">Occupation</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Occupation</p>
                     <p className="font-medium text-slate-800 dark:text-slate-200 text-sm mt-0.5">
                       {student.guardian?.occupation || (
-                        <span className="text-slate-500 font-normal italic">—</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                       )}
                     </p>
                   </div>
@@ -186,7 +186,7 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
                 </h2>
                 <div className="grid grid-cols-2 gap-4 text-xs mt-3">
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                       Emergency Contact
                     </p>
                     <p className="font-bold text-slate-800 dark:text-slate-200 text-sm mt-0.5">
@@ -197,12 +197,12 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 font-semibold uppercase text-2xs">
+                    <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">
                       Medical Notes & Allergies
                     </p>
                     <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm mt-0.5">
                       {student.medicalNotes || (
-                        <span className="text-slate-500 font-normal italic">—</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                       )}
                     </p>
                   </div>

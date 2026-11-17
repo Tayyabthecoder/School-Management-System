@@ -177,7 +177,7 @@ export default function GradingScaleTab({
                   <button
                     type="button"
                     onClick={() => handleDeleteItem(index)}
-                    className="text-gray-500 hover:text-rose-600 p-1 transition-colors"
+                    className="text-gray-500 dark:text-slate-400 hover:text-rose-600 p-1 transition-colors"
                     title="Remove grade bracket"
                   >
                     <Trash2 className="w-4 h-4" />

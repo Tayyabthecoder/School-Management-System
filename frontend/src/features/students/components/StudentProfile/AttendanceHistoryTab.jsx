@@ -76,7 +76,7 @@ export default function AttendanceHistoryTab({
       {/* Attendance KPI Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="card-surface p-4 text-center">
-          <p className="text-2xs text-slate-500 font-semibold uppercase">Total Days Logged</p>
+          <p className="text-2xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Total Days Logged</p>
           <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">
             {attendanceStats.totalAttended}
           </p>
@@ -154,7 +154,7 @@ export default function AttendanceHistoryTab({
         </div>
 
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+        <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
           {DAYS_OF_WEEK.map((d) => (
             <div key={d} className="py-1">
               {d}
@@ -215,7 +215,7 @@ export default function AttendanceHistoryTab({
               }
             } else if (isSunday) {
               statusStyles =
-                'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600'
+                'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
             }
 
             return (
@@ -339,7 +339,7 @@ export default function AttendanceHistoryTab({
                   <p className="font-bold text-slate-900 dark:text-slate-100">
                     {formatDate(item.date)}
                   </p>
-                  <p className="text-slate-500 text-2xs">
+                  <p className="text-slate-500 dark:text-slate-400 text-2xs">
                     {item.date.toLocaleDateString('en-US', { weekday: 'long' })}
                   </p>
                 </div>
@@ -367,7 +367,7 @@ export default function AttendanceHistoryTab({
               </div>
             ))
           ) : (
-            <div className="py-10 text-center text-sm text-slate-500">
+            <div className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
               No attendance history available for this student.
             </div>
           )}

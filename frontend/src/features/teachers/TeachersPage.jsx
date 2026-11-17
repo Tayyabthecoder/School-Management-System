@@ -162,7 +162,7 @@ export default function TeachersPage() {
       </div>
 
       {/* ── Tabs Header & Action Bar ─────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-200 dark:border-slate-700 pb-4">
         <div className="flex flex-wrap gap-2">
           {[
             { id: 'directory', label: 'Faculty Directory', icon: Users },
@@ -178,7 +178,7 @@ export default function TeachersPage() {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                   isActive
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                    : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
                 }`}
               >
                 <Icon className="w-4 h-4" />

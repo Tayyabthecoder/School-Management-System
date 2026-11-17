@@ -237,7 +237,7 @@ export default function PersonalMedicalEditForm({
                     {editForm.fatherStatus === 'Deceased' && (
                       <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800 space-y-3">
                         <p className="text-amber-800 dark:text-amber-300 font-bold text-xs flex items-center gap-1">
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                           Appointed Guardian Details (Required for Deceased Father)
                         </p>
                         <div className="grid grid-cols-2 gap-3">

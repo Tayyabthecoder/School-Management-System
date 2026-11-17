@@ -25,12 +25,12 @@ import { cachedGet } from '../../lib/cachedGet'
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 const GRADE_BADGES = {
-  'A+': 'bg-emerald-100 text-emerald-800 border-emerald-300',
-  'A': 'bg-green-100 text-green-800 border-green-300',
-  'B': 'bg-blue-100 text-blue-800 border-blue-300',
-  'C': 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  'D': 'bg-orange-100 text-orange-800 border-orange-300',
-  'F': 'bg-red-100 text-red-800 border-red-300',
+  'A+': 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 border-emerald-300',
+  'A': 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 border-green-300',
+  'B': 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 border-blue-300',
+  'C': 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 border-yellow-300',
+  'D': 'bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-200 border-orange-300',
+  'F': 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 border-red-300',
 }
 
 export default function StudentPortalPage() {
@@ -160,9 +160,9 @@ export default function StudentPortalPage() {
             <button
               onClick={handleDownloadReportCard}
               disabled={downloadingReport}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-indigo-50 text-indigo-900 rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-60"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 hover:bg-indigo-50 text-indigo-900 dark:text-indigo-100 rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-60"
             >
-              <Download className="w-4 h-4 text-indigo-600" />
+              <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               {downloadingReport ? 'Generating PDF…' : 'Official Report Card'}
             </button>
           </div>
@@ -171,9 +171,9 @@ export default function StudentPortalPage() {
 
       {/* ── Low Attendance Warning Banner ──────────────────────────── */}
       {isLowAttendance && (
-        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl shadow-sm flex items-start gap-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="text-xs text-amber-800">
+        <div className="bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-500 p-4 rounded-xl shadow-sm flex items-start gap-3">
+          <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-800 dark:text-amber-200">
             <p className="font-bold">Low Attendance Warning</p>
             <p className="mt-0.5">
               Your current attendance rate is <strong>{attRate}%</strong>, which is below the minimum required standard of 75%. Please ensure regular attendance to maintain examination eligibility.
@@ -183,7 +183,7 @@ export default function StudentPortalPage() {
       )}
 
       {/* ── Navigation Tabs ────────────────────────────────────────── */}
-      <div className="flex border-b border-gray-200 bg-white rounded-2xl px-3 shadow-sm">
+      <div className="flex border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl px-3 shadow-sm">
         {[
           { id: 'timetable', label: 'Class Schedule', icon: Clock },
           { id: 'attendance', label: 'My Attendance', icon: CalendarCheck },
@@ -198,8 +198,8 @@ export default function StudentPortalPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 py-4 px-4 text-xs font-bold transition-all border-b-2 ${
                 isActive
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-900'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -221,7 +221,7 @@ export default function StudentPortalPage() {
                 className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   selectedDay === day
                     ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                    : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
                 }`}
               >
                 {day}
@@ -231,36 +231,36 @@ export default function StudentPortalPage() {
 
           {/* Periods Schedule Cards */}
           {dayTimetable.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center border border-dashed border-gray-200">
-              <Clock className="w-10 h-10 text-gray-500 mx-auto mb-2" />
-              <p className="text-sm font-bold text-gray-700">No classes scheduled on {selectedDay}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Enjoy your free study or recreational period!</p>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-dashed border-gray-200 dark:border-slate-700">
+              <Clock className="w-10 h-10 text-gray-500 dark:text-slate-400 mx-auto mb-2" />
+              <p className="text-sm font-bold text-gray-700 dark:text-slate-300">No classes scheduled on {selectedDay}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Enjoy your free study or recreational period!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {dayTimetable.map((period) => (
                 <div
                   key={period._id}
-                  className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:border-indigo-300 transition-all space-y-2"
+                  className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm hover:border-indigo-300 transition-all space-y-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-lg">
+                    <span className="px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-lg">
                       Period {period.periodNumber}
                     </span>
-                    <span className="text-xs text-gray-500 font-mono">
+                    <span className="text-xs text-gray-500 dark:text-slate-400 font-mono">
                       {period.startTime} – {period.endTime}
                     </span>
                   </div>
 
-                  <h3 className="font-extrabold text-gray-900 text-base">
+                  <h3 className="font-extrabold text-gray-900 dark:text-slate-100 text-base">
                     {period.subjectId?.name || 'Subject'}
                   </h3>
-                  <p className="text-xs text-gray-500">
-                    Teacher: <strong className="text-gray-800">{period.teacherId?.fullName || 'Assigned Faculty'}</strong>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
+                    Teacher: <strong className="text-gray-800 dark:text-slate-100">{period.teacherId?.fullName || 'Assigned Faculty'}</strong>
                   </p>
 
-                  <div className="pt-2 border-t border-gray-100 text-xs text-gray-500 flex justify-between">
-                    <span>Room: <strong className="text-gray-700">{period.room || 'Classroom'}</strong></span>
+                  <div className="pt-2 border-t border-gray-100 dark:border-slate-800 text-xs text-gray-500 dark:text-slate-400 flex justify-between">
+                    <span>Room: <strong className="text-gray-700 dark:text-slate-300">{period.room || 'Classroom'}</strong></span>
                     <span className="font-mono text-[10px]">{period.subjectId?.code}</span>
                   </div>
                 </div>
@@ -274,67 +274,67 @@ export default function StudentPortalPage() {
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-semibold uppercase">Overall Attendance</p>
-              <p className={`text-3xl font-extrabold mt-1 ${isLowAttendance ? 'text-amber-700' : 'text-green-700'}`}>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Overall Attendance</p>
+              <p className={`text-3xl font-extrabold mt-1 ${isLowAttendance ? 'text-amber-700 dark:text-amber-300' : 'text-green-700 dark:text-green-300'}`}>
                 {attRate}%
               </p>
-              <p className="text-[10px] text-gray-500 mt-1">Minimum target: 75%</p>
+              <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">Minimum target: 75%</p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-semibold uppercase">Total Days</p>
-              <p className="text-3xl font-extrabold text-gray-900 mt-1">{attendance.summary?.totalDays ?? 0}</p>
-              <p className="text-[10px] text-gray-500 mt-1">Recorded sessions</p>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Total Days</p>
+              <p className="text-3xl font-extrabold text-gray-900 dark:text-slate-100 mt-1">{attendance.summary?.totalDays ?? 0}</p>
+              <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">Recorded sessions</p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-semibold uppercase">Present Days</p>
-              <p className="text-3xl font-extrabold text-green-700 mt-1">{attendance.summary?.presentDays ?? 0}</p>
-              <p className="text-[10px] text-gray-500 mt-1">On-time attendance</p>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Present Days</p>
+              <p className="text-3xl font-extrabold text-green-700 dark:text-green-300 mt-1">{attendance.summary?.presentDays ?? 0}</p>
+              <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">On-time attendance</p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-semibold uppercase">Absent Days</p>
-              <p className="text-3xl font-extrabold text-red-600 mt-1">{attendance.summary?.absentDays ?? 0}</p>
-              <p className="text-[10px] text-gray-500 mt-1">Unexcused missed days</p>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Absent Days</p>
+              <p className="text-3xl font-extrabold text-red-600 dark:text-red-400 mt-1">{attendance.summary?.absentDays ?? 0}</p>
+              <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">Unexcused missed days</p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-              <p className="text-xs text-gray-500 font-semibold uppercase">Excused / Late</p>
-              <p className="text-3xl font-extrabold text-amber-700 mt-1">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Excused / Late</p>
+              <p className="text-3xl font-extrabold text-amber-700 dark:text-amber-300 mt-1">
                 {(attendance.summary?.excusedDays || 0) + (attendance.summary?.lateDays || 0)}
               </p>
-              <p className="text-[10px] text-gray-500 mt-1">Approved leaves & late</p>
+              <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">Approved leaves & late</p>
             </div>
           </div>
 
           {/* Attendance History Table */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <h3 className="font-bold text-gray-900 text-sm">Recent Daily Attendance Records</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Showing last 30 recorded days</p>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-gray-100 dark:border-slate-800">
+              <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm">Recent Daily Attendance Records</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Showing last 30 recorded days</p>
             </div>
 
             {attendance.history?.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 text-xs">No attendance records logged yet.</div>
+              <div className="p-8 text-center text-gray-500 dark:text-slate-400 text-xs">No attendance records logged yet.</div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-slate-800">
                 {attendance.history.map((record, i) => {
-                  let statusColor = 'bg-gray-100 text-gray-700'
-                  if (record.status === 'Present') statusColor = 'bg-green-100 text-green-800'
-                  else if (record.status === 'Absent') statusColor = 'bg-red-100 text-red-800'
-                  else if (record.status === 'Late') statusColor = 'bg-amber-100 text-amber-800'
-                  else if (record.status === 'Excused') statusColor = 'bg-blue-100 text-blue-800'
+                  let statusColor = 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300'
+                  if (record.status === 'Present') statusColor = 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200'
+                  else if (record.status === 'Absent') statusColor = 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200'
+                  else if (record.status === 'Late') statusColor = 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200'
+                  else if (record.status === 'Excused') statusColor = 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200'
 
                   return (
-                    <div key={record.date ? String(record.date) : i} className="p-4 flex items-center justify-between text-xs hover:bg-gray-50">
+                    <div key={record.date ? String(record.date) : i} className="p-4 flex items-center justify-between text-xs hover:bg-gray-50 dark:hover:bg-slate-800/50">
                       <div className="flex items-center gap-3">
-                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <Calendar className="w-4 h-4 text-gray-500 dark:text-slate-400" />
                         <div>
-                          <span className="font-bold text-gray-800">{formatDate(record.date)}</span>
+                          <span className="font-bold text-gray-800 dark:text-slate-100">{formatDate(record.date)}</span>
                           {record.remarks && (
-                            <p className="text-[11px] text-gray-500 mt-0.5">{record.remarks}</p>
+                            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">{record.remarks}</p>
                           )}
                         </div>
                       </div>
@@ -353,11 +353,11 @@ export default function StudentPortalPage() {
 
       {/* ── TAB 3: Grades ──────────────────────────────────────────── */}
       {activeTab === 'grades' && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-gray-900 text-base">Examination Performance & Marks</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Subject-wise marks and official letter grades</p>
+              <h3 className="font-bold text-gray-900 dark:text-slate-100 text-base">Examination Performance & Marks</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Subject-wise marks and official letter grades</p>
             </div>
             <button
               onClick={handleDownloadReportCard}
@@ -369,13 +369,13 @@ export default function StudentPortalPage() {
           </div>
 
           {grades.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 text-xs">
+            <div className="text-center py-12 text-gray-500 dark:text-slate-400 text-xs">
               No examination marks published yet for your current session.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-[10px]">
+                <thead className="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 font-bold uppercase text-[10px]">
                   <tr>
                     <th className="p-3">Exam / Term</th>
                     <th className="p-3">Subject</th>
@@ -386,7 +386,7 @@ export default function StudentPortalPage() {
                     <th className="p-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                   {grades.map((grade) => {
                     const marks = grade.marksObtained ?? 0
                     const total = grade.examId?.totalMarks || 100
@@ -401,24 +401,24 @@ export default function StudentPortalPage() {
                     else if (pct >= 33) gradeLetter = 'D'
 
                     return (
-                      <tr key={grade._id} className="hover:bg-gray-50">
-                        <td className="p-3 font-bold text-gray-900">{grade.examId?.name || 'Exam'}</td>
-                        <td className="p-3 text-gray-700 font-semibold">{grade.examId?.subjectId?.name || 'Subject'}</td>
-                        <td className="p-3 text-center font-bold text-gray-900">{marks}</td>
-                        <td className="p-3 text-center text-gray-500">{total}</td>
-                        <td className="p-3 text-center font-bold text-indigo-600">{pct}%</td>
+                      <tr key={grade._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                        <td className="p-3 font-bold text-gray-900 dark:text-slate-100">{grade.examId?.name || 'Exam'}</td>
+                        <td className="p-3 text-gray-700 dark:text-slate-300 font-semibold">{grade.examId?.subjectId?.name || 'Subject'}</td>
+                        <td className="p-3 text-center font-bold text-gray-900 dark:text-slate-100">{marks}</td>
+                        <td className="p-3 text-center text-gray-500 dark:text-slate-400">{total}</td>
+                        <td className="p-3 text-center font-bold text-indigo-600 dark:text-indigo-400">{pct}%</td>
                         <td className="p-3 text-center">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${GRADE_BADGES[gradeLetter] || 'bg-gray-100'}`}>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${GRADE_BADGES[gradeLetter] || 'bg-gray-100 dark:bg-slate-800'}`}>
                             {gradeLetter}
                           </span>
                         </td>
                         <td className="p-3 text-center">
                           {isPassing ? (
-                            <span className="text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded-full text-[10px]">
+                            <span className="text-green-700 dark:text-green-300 font-bold bg-green-50 dark:bg-green-950/40 px-2 py-0.5 rounded-full text-[10px]">
                               Passed
                             </span>
                           ) : (
-                            <span className="text-red-700 font-bold bg-red-50 px-2 py-0.5 rounded-full text-[10px]">
+                            <span className="text-red-700 dark:text-red-300 font-bold bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-full text-[10px]">
                               Failed
                             </span>
                           )}
@@ -436,46 +436,46 @@ export default function StudentPortalPage() {
       {/* ── TAB 4: Fees ────────────────────────────────────────────── */}
       {activeTab === 'fees' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-            <h3 className="font-bold text-gray-900 text-base mb-1">Fee Invoices & Challan Receipts</h3>
-            <p className="text-xs text-gray-500 mb-4">View issued fee challans, payment statuses, and download printable receipts</p>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
+            <h3 className="font-bold text-gray-900 dark:text-slate-100 text-base mb-1">Fee Invoices & Challan Receipts</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">View issued fee challans, payment statuses, and download printable receipts</p>
 
             {fees.length === 0 ? (
-              <div className="text-center py-12 text-gray-500 text-xs">
+              <div className="text-center py-12 text-gray-500 dark:text-slate-400 text-xs">
                 No fee records issued for your profile.
               </div>
             ) : (
               <div className="space-y-3">
                 {fees.map((fee) => {
-                  let statusBadge = 'bg-amber-100 text-amber-800'
-                  if (fee.status === 'Paid') statusBadge = 'bg-green-100 text-green-800'
-                  if (fee.status === 'Overdue') statusBadge = 'bg-red-100 text-red-800'
+                  let statusBadge = 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200'
+                  if (fee.status === 'Paid') statusBadge = 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200'
+                  if (fee.status === 'Overdue') statusBadge = 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200'
 
                   return (
                     <div
                       key={fee._id}
-                      className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                      className="p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-gray-900 text-sm">
+                          <h4 className="font-bold text-gray-900 dark:text-slate-100 text-sm">
                             {fee.feeStructureId?.name || 'Tuition Fee'}
                           </h4>
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${statusBadge}`}>
                             {fee.status}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Amount: <strong className="text-gray-900">{formatPKR(fee.netAmount || fee.amount)}</strong> · Due Date: <strong>{formatDate(fee.dueDate)}</strong>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                          Amount: <strong className="text-gray-900 dark:text-slate-100">{formatPKR(fee.netAmount || fee.amount)}</strong> · Due Date: <strong>{formatDate(fee.dueDate)}</strong>
                         </p>
                       </div>
 
                       <button
                         onClick={() => handleDownloadChallan(fee._id, fee.challanNo)}
                         disabled={downloadingChallanId === fee._id}
-                        className="px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 text-gray-700 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+                        className="px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
                       >
-                        <Download className="w-3.5 h-3.5 text-indigo-600" />
+                        <Download className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                         {downloadingChallanId === fee._id ? 'Downloading…' : 'Print Challan'}
                       </button>
                     </div>

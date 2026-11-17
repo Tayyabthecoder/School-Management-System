@@ -18,13 +18,13 @@ export default function ReportsPage() {
       />
 
       {/* Tabs Header */}
-      <div className="flex border-b border-gray-200 space-x-3 mb-6">
+      <div className="flex border-b border-gray-200 dark:border-slate-700 space-x-3 mb-6">
         <button
           onClick={() => setActiveTab('export')}
           className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-colors ${
             activeTab === 'export'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:border-gray-300'
           }`}
         >
           <FileSpreadsheet className="w-4 h-4" />
@@ -35,8 +35,8 @@ export default function ReportsPage() {
           onClick={() => setActiveTab('custom')}
           className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-colors ${
             activeTab === 'custom'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:border-gray-300'
           }`}
         >
           <Sparkles className="w-4 h-4 text-amber-500" />
@@ -47,8 +47,8 @@ export default function ReportsPage() {
           onClick={() => setActiveTab('analytics')}
           className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-colors ${
             activeTab === 'analytics'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:border-gray-300'
           }`}
         >
           <BarChart3 className="w-4 h-4" />

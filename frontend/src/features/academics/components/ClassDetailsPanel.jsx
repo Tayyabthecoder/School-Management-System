@@ -29,12 +29,12 @@ export default function ClassDetailsPanel({
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setNavLevel('sections')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back to Sections
                 </button>
                 <span className="text-gray-300">|</span>
-                <button onClick={() => setNavLevel('grades')} className="text-xs text-gray-500 hover:text-gray-800 font-medium">
+                <button onClick={() => setNavLevel('grades')} className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-800 font-medium">
                   All Grades
                 </button>
               </div>
@@ -44,29 +44,29 @@ export default function ClassDetailsPanel({
                   <button
                     type="button"
                     onClick={() => setDeleteSectionModal({ open: true, classObj: selectedGrade, sectionName: selectedSection, deleting: false })}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold rounded-lg shadow-xs transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 text-xs font-semibold rounded-lg shadow-xs transition-colors"
                   >
                     <Trash2 className="w-4 h-4 text-red-500" /> Delete Section {selectedSection}
                   </button>
                 )}
                 <button
                   onClick={() => window.print()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg shadow-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-800/50 text-gray-700 dark:text-slate-300 text-xs font-semibold rounded-lg shadow-xs"
                 >
-                  <Printer className="w-4 h-4 text-gray-500" /> Print Schedule
+                  <Printer className="w-4 h-4 text-gray-500 dark:text-slate-400" /> Print Schedule
                 </button>
               </div>
             </div>
 
             {/* ── SECTION A: CURRICULUM SUBJECTS ───────────────────────── */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-3 border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-3 border-b border-gray-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                     Assigned Curriculum Subjects — {selectedGrade.name} (Section {selectedSection})
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                     Manage active subjects, syllabus codes, and faculty assignments for this grade level.
                   </p>
                 </div>
@@ -89,35 +89,35 @@ export default function ClassDetailsPanel({
                   {classSubjects.map((sub, idx) => (
                     <div
                       key={sub._id || idx}
-                      className="p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-indigo-300 transition-colors flex flex-col justify-between"
+                      className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-200 dark:border-slate-700 hover:border-indigo-300 transition-colors flex flex-col justify-between"
                     >
                       <div>
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-xs font-mono font-bold text-indigo-700 bg-white px-2 py-0.5 rounded border border-gray-200">
+                          <span className="text-xs font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-gray-200 dark:border-slate-700">
                             {sub.code}
                           </span>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Active
+                            <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Active
                             </span>
                             <button
                               onClick={() => handleDeleteSubject(sub._id, sub.name)}
-                              className="text-gray-500 hover:text-red-600 p-1 transition-colors"
+                              className="text-gray-500 dark:text-slate-400 hover:text-red-600 p-1 transition-colors"
                               title="Deactivate subject"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>
-                        <h4 className="font-bold text-gray-900 text-sm">{sub.name}</h4>
-                        <p className="text-xs text-gray-500 mt-0.5">{sub.description || 'Core Academic Subject'}</p>
+                        <h4 className="font-bold text-gray-900 dark:text-slate-100 text-sm">{sub.name}</h4>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{sub.description || 'Core Academic Subject'}</p>
                       </div>
 
                       <div className="mt-3 pt-3 border-t border-gray-200/60 flex items-center justify-between text-xs">
-                        <span className="text-gray-500 font-medium">Grade {selectedGrade.level}</span>
+                        <span className="text-gray-500 dark:text-slate-400 font-medium">Grade {selectedGrade.level}</span>
                         <button
                           onClick={() => setSelectedSlotForAssign({ subjectId: sub._id, dayOfWeek: 'Monday', periodNumber: 1 })}
-                          className="text-xs font-bold text-indigo-600 hover:underline"
+                          className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
                         >
                           Schedule Slot →
                         </button>
@@ -126,23 +126,23 @@ export default function ClassDetailsPanel({
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-50 p-8 rounded-2xl text-center border border-dashed border-gray-300">
+                <div className="bg-gray-50 dark:bg-slate-800/50 p-8 rounded-2xl text-center border border-dashed border-gray-300 dark:border-slate-600">
                   <BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-gray-700">No subjects configured for this grade yet</p>
-                  <p className="text-xs text-gray-500 mt-1">Click the "Add Subject to Class" button above to add subjects to the curriculum.</p>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">No subjects configured for this grade yet</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Click the "Add Subject to Class" button above to add subjects to the curriculum.</p>
                 </div>
               )}
             </div>
 
             {/* ── SECTION B: DYNAMIC WEEKLY TIMETABLE MATRIX ─────────────── */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                     Weekly Timetable Matrix — {selectedGrade.name} (Section {selectedSection})
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                     Live period schedule mapped across Monday to Saturday. Click any slot to edit or assign.
                   </p>
                 </div>
@@ -160,7 +160,7 @@ export default function ClassDetailsPanel({
               {loadingDetails ? (
                 <SkeletonTable rows={6} />
               ) : (
-                <div className="border border-gray-200 rounded-2xl overflow-x-auto shadow-xs">
+                <div className="border border-gray-200 dark:border-slate-700 rounded-2xl overflow-x-auto shadow-xs">
                   <table className="w-full text-left text-xs border-collapse min-w-[750px]">
                     <thead>
                       <tr className="bg-indigo-900 text-white">
@@ -175,39 +175,39 @@ export default function ClassDetailsPanel({
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-200 dark:divide-slate-800">
                       {DAYS.map((day) => (
-                        <tr key={day} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="p-3.5 font-bold text-gray-800 bg-gray-50 border-r border-gray-200">
+                        <tr key={day} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="p-3.5 font-bold text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-800/50 border-r border-gray-200 dark:border-slate-700">
                             {day}
                           </td>
                           {PERIODS.map((p) => {
                             const entry = timetableMap[`${day}-${p}`]
                             return (
-                              <td key={p} className="p-2 border-r border-gray-200 last:border-0 group relative">
+                              <td key={p} className="p-2 border-r border-gray-200 dark:border-slate-700 last:border-0 group relative">
                                 {entry ? (
-                                  <div className="p-2.5 bg-indigo-50/80 border border-indigo-100 rounded-xl text-left hover:border-indigo-300 transition-all">
+                                  <div className="p-2.5 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900 rounded-xl text-left hover:border-indigo-300 transition-all">
                                     <div className="flex items-start justify-between gap-1">
-                                      <p className="font-bold text-indigo-950 text-xs leading-tight">
+                                      <p className="font-bold text-indigo-950 dark:text-indigo-100 text-xs leading-tight">
                                         {entry.subjectId?.name || 'Subject'}
                                       </p>
                                       <button
                                         onClick={() => handleDeletePeriod(entry._id)}
-                                        className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-600 transition-opacity p-0.5"
+                                        className="opacity-0 group-hover:opacity-100 text-gray-500 dark:text-slate-400 hover:text-red-600 transition-opacity p-0.5"
                                         title="Clear slot"
                                       >
                                         <Trash2 className="w-3 h-3" />
                                       </button>
                                     </div>
-                                    <p className="text-[11px] text-indigo-700 font-semibold mt-1 truncate">
+                                    <p className="text-[11px] text-indigo-700 dark:text-indigo-300 font-semibold mt-1 truncate">
                                       {entry.teacherId?.fullName || 'Faculty'}
                                     </p>
-                                    <p className="text-[10px] text-gray-500 mt-0.5">{entry.room || 'Room 101'}</p>
+                                    <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">{entry.room || 'Room 101'}</p>
                                   </div>
                                 ) : (
                                   <button
                                     onClick={() => setSelectedSlotForAssign({ dayOfWeek: day, periodNumber: p })}
-                                    className="w-full h-full min-h-[70px] p-2 bg-gray-50/60 hover:bg-indigo-50/50 border border-dashed border-gray-200 hover:border-indigo-300 rounded-xl flex flex-col items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors"
+                                    className="w-full h-full min-h-[70px] p-2 bg-gray-50/60 dark:bg-slate-800/40 hover:bg-indigo-50/50 border border-dashed border-gray-200 dark:border-slate-700 hover:border-indigo-300 rounded-xl flex flex-col items-center justify-center text-gray-500 dark:text-slate-400 hover:text-indigo-600 transition-colors"
                                   >
                                     <Plus className="w-3.5 h-3.5 mb-0.5" />
                                     <span className="text-[10px] font-semibold">Assign</span>
@@ -225,14 +225,14 @@ export default function ClassDetailsPanel({
             </div>
 
             {/* ── SECTION C: ENROLLED STUDENTS ROSTER ──────────────────── */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-3 border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-3 border-b border-gray-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                     Enrolled Students — {selectedGrade.name} (Section {selectedSection})
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                     Roster of active students registered in this section. Super admins can reassign students to another section in {selectedGrade.name}.
                   </p>
                 </div>
@@ -259,10 +259,10 @@ export default function ClassDetailsPanel({
                 )
 
                 return currentSectionStudents.length > 0 ? (
-                  <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-xs">
+                  <div className="overflow-x-auto border border-gray-200 dark:border-slate-700 rounded-xl shadow-xs">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-gray-700 font-bold uppercase text-[11px]">
+                        <tr className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 font-bold uppercase text-[11px]">
                           <th className="py-3 px-4">Student ID</th>
                           <th className="py-3 px-4">Student Name</th>
                           <th className="py-3 px-4">Gender</th>
@@ -271,21 +271,21 @@ export default function ClassDetailsPanel({
                           <th className="py-3 px-4 text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200">
+                      <tbody className="divide-y divide-gray-200 dark:divide-slate-800">
                         {currentSectionStudents.map((st) => (
-                          <tr key={st._id} className="hover:bg-gray-50/60 transition-colors">
-                            <td className="py-3 px-4 font-mono font-bold text-indigo-600">
+                          <tr key={st._id} className="hover:bg-gray-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="py-3 px-4 font-mono font-bold text-indigo-600 dark:text-indigo-400">
                               {st.studentId || '—'}
                             </td>
-                            <td className="py-3 px-4 font-bold text-gray-900">
+                            <td className="py-3 px-4 font-bold text-gray-900 dark:text-slate-100">
                               {st.fullName}
                             </td>
-                            <td className="py-3 px-4 text-gray-600">{st.gender || '—'}</td>
-                            <td className="py-3 px-4 text-gray-600">
+                            <td className="py-3 px-4 text-gray-600 dark:text-slate-400">{st.gender || '—'}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-slate-400">
                               {st.guardian?.name || '—'} ({st.guardian?.phone || '—'})
                             </td>
                             <td className="py-3 px-4">
-                              <span className="px-2 py-0.5 rounded-full text-2xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="px-2 py-0.5 rounded-full text-2xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                 {st.status || 'Active'}
                               </span>
                             </td>
@@ -293,7 +293,7 @@ export default function ClassDetailsPanel({
                               <div className="flex items-center justify-end gap-2">
                                 <a
                                   href={`/students/${st._id}`}
-                                  className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
+                                  className="p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
                                 >
                                   <Eye className="w-3.5 h-3.5" /> View
                                 </a>
@@ -301,7 +301,7 @@ export default function ClassDetailsPanel({
                                   <button
                                     type="button"
                                     onClick={() => setChangeSectionStudent(st)}
-                                    className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
+                                    className="p-1.5 text-amber-700 dark:text-amber-300 hover:text-amber-900 hover:bg-amber-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
                                     title="Change section within same class"
                                   >
                                     <ArrowRightLeft className="w-3.5 h-3.5" /> Change Section
@@ -315,10 +315,10 @@ export default function ClassDetailsPanel({
                     </table>
                   </div>
                 ) : (
-                  <div className="bg-gray-50 p-8 rounded-2xl text-center border border-dashed border-gray-300">
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-8 rounded-2xl text-center border border-dashed border-gray-300 dark:border-slate-600">
                     <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm font-semibold text-gray-700">No students enrolled in this section yet</p>
-                    <p className="text-xs text-gray-500 mt-1">Students enrolled in {selectedGrade.name} - Section {selectedSection} will appear here.</p>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">No students enrolled in this section yet</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Students enrolled in {selectedGrade.name} - Section {selectedSection} will appear here.</p>
                   </div>
                 )
               })()}

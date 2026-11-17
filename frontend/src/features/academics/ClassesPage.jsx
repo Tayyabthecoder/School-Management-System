@@ -250,12 +250,12 @@ export default function ClassesPage() {
       />
 
       {/* Control Header Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-600" /> Academic Class Structure
+          <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+            <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Academic Class Structure
           </h2>
-          <p className="text-xs text-gray-500">Configure academic grades, section rosters, and live curriculum schedules.</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400">Configure academic grades, section rosters, and live curriculum schedules.</p>
         </div>
 
         <button
@@ -271,10 +271,10 @@ export default function ClassesPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-600" /> Academic Grades ({displayClasses.length} Active)
+              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Academic Grades ({displayClasses.length} Active)
               </h2>
-              <p className="text-xs text-gray-500">Explore assigned subjects, section structures, and timetables per grade level.</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">Explore assigned subjects, section structures, and timetables per grade level.</p>
             </div>
             <Badge variant="indigo">{displayClasses.length} Total Classes</Badge>
           </div>
@@ -293,7 +293,7 @@ export default function ClassesPage() {
                   className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-5 text-white shadow-lg ${theme.shadow} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase">
+                    <span className="px-2.5 py-1 rounded-full bg-white/20 dark:bg-slate-900/20 backdrop-blur-md text-xs font-bold uppercase">
                       Level {cls.level}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -340,18 +340,18 @@ export default function ClassesPage() {
           <div className="mb-4">
             <button
               onClick={() => setNavLevel('grades')}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back to All Grades
             </button>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-6">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6">
             <div className="flex items-center justify-between mb-6 pb-4 border-b">
               <div>
-                <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">GRADE LEVEL {selectedGrade.level}</span>
-                <h2 className="text-2xl font-extrabold text-gray-900">{selectedGrade.name} - Select Section</h2>
-                <p className="text-xs text-gray-500 mt-1">Select a section to view its live timetable schedule and curriculum details.</p>
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">GRADE LEVEL {selectedGrade.level}</span>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-slate-100">{selectedGrade.name} - Select Section</h2>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Select a section to view its live timetable schedule and curriculum details.</p>
               </div>
 
               <div className="flex items-center gap-3">
@@ -360,7 +360,7 @@ export default function ClassesPage() {
                   <button
                     type="button"
                     onClick={() => setDeleteClassModal({ open: true, classObj: selectedGrade, deleting: false })}
-                    className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 flex items-center gap-1.5 transition-all shadow-xs"
+                    className="px-3.5 py-1.5 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-700 dark:text-red-300 font-bold text-xs rounded-xl border border-red-200 dark:border-red-800 flex items-center gap-1.5 transition-all shadow-xs"
                   >
                     <Trash2 className="w-3.5 h-3.5" /> Delete Class
                   </button>
@@ -387,14 +387,14 @@ export default function ClassesPage() {
                   <div
                     key={sec}
                     onClick={() => handleSelectSection(sec)}
-                    className="bg-gray-50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                    className="bg-gray-50 dark:bg-slate-800/50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 dark:border-slate-700 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl flex items-center justify-center shadow-md shadow-indigo-600/30">
                         {sec}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border text-gray-600">
+                        <span className="text-xs font-semibold bg-white dark:bg-slate-900 px-2.5 py-1 rounded-full border text-gray-600 dark:text-slate-400">
                           Section {sec}
                         </span>
                         {isSuperAdmin && (
@@ -405,7 +405,7 @@ export default function ClassesPage() {
                               setDeleteSectionModal({ open: true, classObj: selectedGrade, sectionName: sec, deleting: false })
                             }}
                             title={`Delete Section ${sec}`}
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                            className="p-1.5 text-gray-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -413,14 +413,14 @@ export default function ClassesPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">
                       {selectedGrade.name} - Section {sec}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 mb-4 flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5 text-gray-500" /> {secStudentsCount} Enrolled Students
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 mb-4 flex items-center gap-1">
+                      <Users className="w-3.5 h-3.5 text-gray-500 dark:text-slate-400" /> {secStudentsCount} Enrolled Students
                     </p>
 
-                    <div className="w-full py-2 bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
+                    <div className="w-full py-2 bg-white dark:bg-slate-900 group-hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 dark:border-indigo-800 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
                       Open Schedule & Subjects <ChevronRight className="w-4 h-4" />
                     </div>
                   </div>

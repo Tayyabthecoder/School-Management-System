@@ -79,7 +79,7 @@ export default function KeyboardShortcutsModal() {
                             {key}
                           </kbd>
                           {kIdx < sc.keys.length - 1 && (
-                            <span className="text-[10px] text-slate-500 font-bold">+</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">+</span>
                           )}
                         </React.Fragment>
                       ))}

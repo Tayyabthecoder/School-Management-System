@@ -119,7 +119,7 @@ export default function SecuritySystemTab({
               localStorage.setItem('sms_theme', 'light')
               toast.success('Switched to Light Theme')
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 text-xs font-bold shadow-sm"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800/50 text-gray-800 dark:text-slate-100 text-xs font-bold shadow-sm"
           >
             ☀️ Light Mode
           </button>

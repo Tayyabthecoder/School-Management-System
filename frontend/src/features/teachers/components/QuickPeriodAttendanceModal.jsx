@@ -94,7 +94,7 @@ export default function QuickPeriodAttendanceModal({ open, period, onClose, onAt
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 flex flex-col max-h-[90vh]">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 dark:border-slate-800 flex flex-col max-h-[90vh]">
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 p-6 text-white flex items-center justify-between">
           <div>
@@ -117,28 +117,28 @@ export default function QuickPeriodAttendanceModal({ open, period, onClose, onAt
         </div>
 
         {/* Action Controls */}
-        <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setAllStatus('Present')}
-              className="px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-lg font-bold"
+              className="px-3 py-1.5 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 hover:bg-green-100 border border-green-200 dark:border-green-800 rounded-lg font-bold"
             >
               ✓ All Present
             </button>
             <button
               type="button"
               onClick={() => setAllStatus('Absent')}
-              className="px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-bold"
+              className="px-3 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 hover:bg-red-100 border border-red-200 dark:border-red-800 rounded-lg font-bold"
             >
               ✕ All Absent
             </button>
           </div>
 
-          <div className="flex gap-3 text-gray-600 font-semibold">
-            <span className="text-green-700">Present: {presentCount}</span>
-            <span className="text-red-600">Absent: {absentCount}</span>
-            <span className="text-amber-700">Late: {lateCount}</span>
+          <div className="flex gap-3 text-gray-600 dark:text-slate-400 font-semibold">
+            <span className="text-green-700 dark:text-green-300">Present: {presentCount}</span>
+            <span className="text-red-600 dark:text-red-400">Absent: {absentCount}</span>
+            <span className="text-amber-700 dark:text-amber-300">Late: {lateCount}</span>
           </div>
         </div>
 
@@ -147,7 +147,7 @@ export default function QuickPeriodAttendanceModal({ open, period, onClose, onAt
           {loading ? (
             <SkeletonTable rows={5} />
           ) : students.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-xs">
+            <div className="text-center py-8 text-gray-500 dark:text-slate-400 text-xs">
               No students enrolled in this class and section.
             </div>
           ) : (
@@ -156,15 +156,15 @@ export default function QuickPeriodAttendanceModal({ open, period, onClose, onAt
               return (
                 <div
                   key={student._id}
-                  className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-200 transition-colors"
+                  className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-200 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-700 text-xs font-bold flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center">
                       {idx + 1}
                     </span>
                     <div className="min-w-0">
-                      <p className="font-bold text-gray-900 text-xs truncate">{student.fullName}</p>
-                      <p className="text-[10px] text-gray-500 font-mono">ID: {student.studentId} · Roll: {student.rollNumber || 'N/A'}</p>
+                      <p className="font-bold text-gray-900 dark:text-slate-100 text-xs truncate">{student.fullName}</p>
+                      <p className="text-[10px] text-gray-500 dark:text-slate-400 font-mono">ID: {student.studentId} · Roll: {student.rollNumber || 'N/A'}</p>
                     </div>
                   </div>
 
@@ -172,7 +172,7 @@ export default function QuickPeriodAttendanceModal({ open, period, onClose, onAt
                   <div className="flex gap-1.5">
                     {['Present', 'Absent', 'Late', 'Excused'].map((st) => {
                       const isActive = curStatus === st
-                      let btnColor = 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      let btnColor = 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200'
                       if (isActive) {
                         if (st === 'Present') btnColor = 'bg-green-600 text-white font-bold shadow-sm'
                         if (st === 'Absent') btnColor = 'bg-red-600 text-white font-bold shadow-sm'
@@ -199,11 +199,11 @@ export default function QuickPeriodAttendanceModal({ open, period, onClose, onAt
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+        <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-100"
+            className="px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800"
           >
             Cancel
           </button>

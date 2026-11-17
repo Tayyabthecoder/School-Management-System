@@ -11,9 +11,9 @@ export default function RegistrationSuccessDialog({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 dark:border-slate-800">
             <div className="p-6 bg-gradient-to-r from-emerald-600 to-teal-700 text-white text-center relative">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
+              <div className="w-14 h-14 bg-white/20 dark:bg-slate-900/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
                 <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-black">Student Registered Successfully!</h3>
@@ -24,13 +24,13 @@ export default function RegistrationSuccessDialog({
 
             <div className="p-6 space-y-4">
               {/* Student Identification Card */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-gray-200 flex items-center justify-between">
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-200 dark:border-slate-700 flex items-center justify-between">
                 <div>
-                  <h4 className="text-base font-bold text-gray-900">
+                  <h4 className="text-base font-bold text-gray-900 dark:text-slate-100">
                     {registrationSuccessData.data?.fullName || 'Enrolled Student'}
                   </h4>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    ID: <strong className="text-indigo-700 font-mono font-bold">{registrationSuccessData.data?.studentId}</strong>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                    ID: <strong className="text-indigo-700 dark:text-indigo-300 font-mono font-bold">{registrationSuccessData.data?.studentId}</strong>
                   </p>
                 </div>
                 <Badge variant={registrationSuccessData.payment ? 'success' : 'warning'}>
@@ -39,11 +39,11 @@ export default function RegistrationSuccessDialog({
               </div>
 
               {/* Financial Snapshot */}
-              <div className="p-4 bg-indigo-50/60 rounded-2xl border border-indigo-100 space-y-1.5 text-xs text-indigo-950">
+              <div className="p-4 bg-indigo-50/60 dark:bg-indigo-950/40 rounded-2xl border border-indigo-100 dark:border-indigo-900 space-y-1.5 text-xs text-indigo-950 dark:text-indigo-100">
                 {registrationSuccessData.payment ? (
                   <div className="flex justify-between items-center">
                     <span>Payment Receipt No:</span>
-                    <strong className="font-mono text-emerald-700">{registrationSuccessData.receiptNo || 'REC-XXXXX'}</strong>
+                    <strong className="font-mono text-emerald-700 dark:text-emerald-300">{registrationSuccessData.receiptNo || 'REC-XXXXX'}</strong>
                   </div>
                 ) : (
                   <div className="flex justify-between items-center">
@@ -54,7 +54,7 @@ export default function RegistrationSuccessDialog({
                 {registrationSuccessData.payment && (
                   <div className="flex justify-between items-center">
                     <span>Amount Collected Upfront:</span>
-                    <strong className="text-emerald-800 text-sm font-black">{formatPKR(registrationSuccessData.payment?.amountPaid)}</strong>
+                    <strong className="text-emerald-800 dark:text-emerald-200 text-sm font-black">{formatPKR(registrationSuccessData.payment?.amountPaid)}</strong>
                   </div>
                 )}
               </div>
@@ -92,16 +92,16 @@ export default function RegistrationSuccessDialog({
                 <div className="grid grid-cols-2 gap-2.5">
                   <a
                     href={`/students/${registrationSuccessData.data?._id}`}
-                    className="py-2.5 bg-slate-100 hover:bg-slate-200 text-gray-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors"
+                    className="py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-gray-800 dark:text-slate-100 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <Eye className="w-4 h-4 text-indigo-600" />
+                    <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     <span>View Profile</span>
                   </a>
 
                   <button
                     type="button"
                     onClick={() => { setRegistrationSuccessData(null); onClose(); }}
-                    className="py-2.5 border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold text-xs rounded-xl transition-colors"
+                    className="py-2.5 border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-colors"
                   >
                     Done / Close
                   </button>

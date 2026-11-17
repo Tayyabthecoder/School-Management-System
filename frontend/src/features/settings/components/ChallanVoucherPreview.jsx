@@ -68,7 +68,7 @@ export default function ChallanVoucherPreview({
           {/* Live Calculation Summary Banner */}
           <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 text-xs">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-500">Active Heads Total</span>
+              <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400">Active Heads Total</span>
               <p className="font-bold text-gray-900 dark:text-white">PKR {grossFee.toLocaleString()}</p>
             </div>
             <div>

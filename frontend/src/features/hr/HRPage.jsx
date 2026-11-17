@@ -160,10 +160,10 @@ export default function HRPage() {
               <select aria-label="Month"
                 value={payMonth}
                 onChange={(e) => setPayMonth(Number(e.target.value))}
-                className="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
+                className="px-3 py-2 bg-white/10 dark:bg-slate-900/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
               >
                 {MONTHS.map((m, i) => (
-                  <option key={m} value={i + 1} className="text-gray-800">{m}</option>
+                  <option key={m} value={i + 1} className="text-gray-800 dark:text-slate-100">{m}</option>
                 ))}
               </select>
             </div>
@@ -172,17 +172,17 @@ export default function HRPage() {
               <select aria-label="Year"
                 value={payYear}
                 onChange={(e) => setPayYear(Number(e.target.value))}
-                className="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
+                className="px-3 py-2 bg-white/10 dark:bg-slate-900/10 border border-white/20 text-white rounded-lg text-sm focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
               >
                 {[CURRENT_YEAR - 1, CURRENT_YEAR, CURRENT_YEAR + 1].map((y) => (
-                  <option key={y} value={y} className="text-gray-800">{y}</option>
+                  <option key={y} value={y} className="text-gray-800 dark:text-slate-100">{y}</option>
                 ))}
               </select>
             </div>
             <button
               onClick={handleRunPayroll}
               disabled={runningPayroll}
-              className="px-5 py-2 bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-sm rounded-lg shadow-sm disabled:opacity-60 transition-colors"
+              className="px-5 py-2 bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 font-bold text-sm rounded-lg shadow-sm disabled:opacity-60 transition-colors"
             >
               {runningPayroll ? 'Processing…' : `Run ${MONTHS[payMonth - 1]} ${payYear} Payroll`}
             </button>
@@ -209,7 +209,7 @@ export default function HRPage() {
 
         {/* Payroll results */}
         {payrollRun && payrollRecords.length > 0 && (
-          <div className="mt-5 bg-white/10 rounded-xl p-4">
+          <div className="mt-5 bg-white/10 dark:bg-slate-900/10 rounded-xl p-4">
             <p className="text-sm font-semibold text-indigo-100 mb-3">
               {payrollRecords.length} payroll record(s) for {MONTHS[payMonth - 1]} {payYear}
               {draftCount === 0 ? ' · all finalized' : ` · ${draftCount} draft`}
@@ -219,7 +219,7 @@ export default function HRPage() {
                 const staffMember = staff.find((s) => s._id === (rec.staffId?._id || rec.staffId))
                 const name = rec.staffId?.fullName || staffMember?.fullName || 'Staff'
                 return (
-                  <div key={rec._id} className="flex items-center justify-between bg-white/10 rounded-lg px-3 py-2">
+                  <div key={rec._id} className="flex items-center justify-between bg-white/10 dark:bg-slate-900/10 rounded-lg px-3 py-2">
                     <span className="text-sm text-white font-medium">{name}</span>
                     <div className="flex items-center gap-3">
                       <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${rec.status === 'Finalized' ? 'bg-emerald-400/30 text-emerald-100' : 'bg-amber-400/30 text-amber-100'}`}>
@@ -228,7 +228,7 @@ export default function HRPage() {
                       <span className="text-sm font-bold text-emerald-300">{formatPKR(rec.netPay)}</span>
                       <button
                         onClick={() => handleDownloadPayslip(rec._id, name)}
-                        className="flex items-center gap-1 px-2 py-1 bg-white/20 hover:bg-white/30 text-white text-xs rounded-lg"
+                        className="flex items-center gap-1 px-2 py-1 bg-white/20 dark:bg-slate-900/20 hover:bg-white/30 text-white text-xs rounded-lg"
                       >
                         <Download className="w-3 h-3" />
                         Payslip
@@ -251,19 +251,19 @@ export default function HRPage() {
         {/* Staff List */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-indigo-500" />
               Staff Directory ({filtered.length})
             </h2>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400" />
                 <input aria-label="Search staff…"
                   type="text"
                   placeholder="Search staff…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-48"
+                  className="pl-9 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm w-48"
                 />
               </div>
               <button
@@ -279,35 +279,35 @@ export default function HRPage() {
           {loading ? (
             <SkeletonTable rows={6} />
           ) : (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="grid grid-cols-12 px-5 py-3 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+              <div className="grid grid-cols-12 px-5 py-3 bg-gray-50 dark:bg-slate-800/50 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide">
                 <div className="col-span-4">Staff Member</div>
                 <div className="col-span-3">Role & Department</div>
                 <div className="col-span-2 text-right">Salary</div>
                 <div className="col-span-2 text-center">Status</div>
                 <div className="col-span-1" />
               </div>
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-slate-800">
                 {filtered.map((s) => (
                   <React.Fragment key={s._id}>
                     <div
-                      className="grid grid-cols-12 px-5 py-4 items-center hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="grid grid-cols-12 px-5 py-4 items-center hover:bg-gray-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
                       onClick={() => setExpanded(expanded === s._id ? null : s._id)}
                     >
                       <div className="col-span-4 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm flex-shrink-0">
                           {s.fullName?.charAt(0) || '?'}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-800 text-sm">{s.fullName}</p>
-                          <p className="text-xs text-gray-500">{s.staffId}</p>
+                          <p className="font-semibold text-gray-800 dark:text-slate-100 text-sm">{s.fullName}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400">{s.staffId}</p>
                         </div>
                       </div>
                       <div className="col-span-3">
-                        <p className="text-sm text-gray-700">{s.designation}</p>
-                        <p className="text-xs text-gray-500">{s.department}</p>
+                        <p className="text-sm text-gray-700 dark:text-slate-300">{s.designation}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">{s.department}</p>
                       </div>
-                      <div className="col-span-2 text-right font-semibold text-gray-800 text-sm">
+                      <div className="col-span-2 text-right font-semibold text-gray-800 dark:text-slate-100 text-sm">
                         {formatPKR(s.salary)}
                       </div>
                       <div className="col-span-2 text-center">
@@ -317,34 +317,34 @@ export default function HRPage() {
                       </div>
                       <div className="col-span-1 text-right">
                         <ChevronDown
-                          className={`w-4 h-4 text-gray-500 transition-transform ${expanded === s._id ? 'rotate-180' : ''}`}
+                          className={`w-4 h-4 text-gray-500 dark:text-slate-400 transition-transform ${expanded === s._id ? 'rotate-180' : ''}`}
                         />
                       </div>
                     </div>
                     {expanded === s._id && (
-                      <div className="bg-indigo-50/50 px-5 py-4 border-t border-indigo-100 grid grid-cols-3 gap-4 text-sm">
+                      <div className="bg-indigo-50/50 dark:bg-indigo-950/40 px-5 py-4 border-t border-indigo-100 dark:border-indigo-900 grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-xs text-gray-500 font-semibold">Phone</p>
-                          <p className="text-gray-700 mt-0.5">{s.phone || '—'}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold">Phone</p>
+                          <p className="text-gray-700 dark:text-slate-300 mt-0.5">{s.phone || '—'}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 font-semibold">Email</p>
-                          <p className="text-gray-700 mt-0.5 truncate">{s.email || '—'}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold">Email</p>
+                          <p className="text-gray-700 dark:text-slate-300 mt-0.5 truncate">{s.email || '—'}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 font-semibold">Joining Date</p>
-                          <p className="text-gray-700 mt-0.5">{formatDate(s.joiningDate)}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold">Joining Date</p>
+                          <p className="text-gray-700 dark:text-slate-300 mt-0.5">{formatDate(s.joiningDate)}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 font-semibold">CNIC</p>
-                          <p className="text-gray-700 mt-0.5">{s.cnic || '—'}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold">CNIC</p>
+                          <p className="text-gray-700 dark:text-slate-300 mt-0.5">{s.cnic || '—'}</p>
                         </div>
                       </div>
                     )}
                   </React.Fragment>
                 ))}
                 {filtered.length === 0 && (
-                  <div className="py-12 text-center text-sm text-gray-500">No staff members found</div>
+                  <div className="py-12 text-center text-sm text-gray-500 dark:text-slate-400">No staff members found</div>
                 )}
               </div>
             </div>

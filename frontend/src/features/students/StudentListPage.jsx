@@ -175,14 +175,14 @@ export default function StudentListPage() {
         <div className="flex items-center gap-1.5">
           <a
             href={`/students/${row._id}`}
-            className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
+            className="p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
           >
             <Eye className="w-4 h-4" /> View Profile
           </a>
           <button
             type="button"
             onClick={() => setChangeSectionStudent(row)}
-            className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
+            className="p-1.5 text-amber-700 dark:text-amber-300 hover:text-amber-900 hover:bg-amber-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
             title="Change Section within Class"
           >
             <ArrowRightLeft className="w-3.5 h-3.5" /> Change Section
@@ -213,10 +213,10 @@ export default function StudentListPage() {
         subtitle="Vibrant multi-level grade and section visual navigation roster."
       />
 
-      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto flex-1">
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
             <input aria-label="Search student ID or name globally..."
               type="text"
               value={search}
@@ -227,7 +227,7 @@ export default function StudentListPage() {
                 }
               }}
               placeholder="Search student ID or name globally..."
-              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
             />
           </div>
 
@@ -240,7 +240,7 @@ export default function StudentListPage() {
                 setViewMode('table')
               }
             }}
-            className="w-full sm:w-48 px-3 py-2 text-xs font-semibold border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-600 bg-white text-gray-800"
+            className="w-full sm:w-48 px-3 py-2 text-xs font-semibold border border-gray-300 dark:border-slate-600 rounded-lg outline-none focus:ring-2 focus:ring-indigo-600 bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100"
           >
             <option value="">All Classes ({students.length})</option>
             {displayClasses.map((c) => {
@@ -255,7 +255,7 @@ export default function StudentListPage() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+          <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
             <button
               onClick={() => {
                 setViewMode('interactive')
@@ -265,7 +265,7 @@ export default function StudentListPage() {
                 setSearch('')
               }}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                viewMode === 'interactive' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                viewMode === 'interactive' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" /> Card Flow
@@ -273,7 +273,7 @@ export default function StudentListPage() {
             <button
               onClick={() => setViewMode('table')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                viewMode === 'table' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                viewMode === 'table' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900'
               }`}
             >
               <Table className="w-3.5 h-3.5" /> Directory Table
@@ -305,10 +305,10 @@ export default function StudentListPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-indigo-600" /> Select Class / Academic Grade
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Select Class / Academic Grade
                   </h2>
-                  <p className="text-xs text-gray-500">Click on any class or grade to explore available sections and student rosters.</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Click on any class or grade to explore available sections and student rosters.</p>
                 </div>
                 <Badge variant="indigo">{displayClasses.length} Classes Active</Badge>
               </div>
@@ -326,10 +326,10 @@ export default function StudentListPage() {
                       className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-5 text-white shadow-lg ${theme.shadow} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold tracking-wide uppercase">
+                        <span className="px-2.5 py-1 rounded-full bg-white/20 dark:bg-slate-900/20 backdrop-blur-md text-xs font-bold tracking-wide uppercase">
                           {cls.level === 0 || cls.name.toLowerCase().includes('play') ? 'Pre-School' : `Level ${cls.level}`}
                         </span>
-                        <div className="p-2 rounded-xl bg-white/10 group-hover:bg-white/20 transition-colors">
+                        <div className="p-2 rounded-xl bg-white/10 dark:bg-slate-900/10 group-hover:bg-white/20 transition-colors">
                           <GraduationCap className="w-6 h-6 text-white" />
                         </div>
                       </div>
@@ -360,18 +360,18 @@ export default function StudentListPage() {
               <div className="mb-4">
                 <button
                   onClick={handleResetToGrades}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back to All Grades
                 </button>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-6">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6">
                 <div className="flex items-center justify-between mb-6 pb-4 border-b">
                   <div>
-                    <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">GRADE LEVEL {selectedGrade.level}</span>
-                    <h2 className="text-2xl font-extrabold text-gray-900">{selectedGrade.name} - Select Section</h2>
-                    <p className="text-xs text-gray-500 mt-1">Choose a section to view its assigned student roster.</p>
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">GRADE LEVEL {selectedGrade.level}</span>
+                    <h2 className="text-2xl font-extrabold text-gray-900 dark:text-slate-100">{selectedGrade.name} - Select Section</h2>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Choose a section to view its assigned student roster.</p>
                   </div>
                   <Badge variant="indigo">{sectionsToDisplay.length} Sections Available</Badge>
                 </div>
@@ -384,25 +384,25 @@ export default function StudentListPage() {
                       <div
                         key={sec}
                         onClick={() => handleSelectSection(sec)}
-                        className="bg-gray-50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                        className="bg-gray-50 dark:bg-slate-800/50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 dark:border-slate-700 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                       >
                         <div className="flex items-center justify-between mb-4">
                           <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl flex items-center justify-center shadow-md shadow-indigo-600/30">
                             {sec}
                           </div>
-                          <span className="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border text-gray-600">
+                          <span className="text-xs font-semibold bg-white dark:bg-slate-900 px-2.5 py-1 rounded-full border text-gray-600 dark:text-slate-400">
                             Section {sec}
                           </span>
                         </div>
 
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">
                           {selectedGrade.name} - Section {sec}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1 mb-4 flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-gray-500" /> {secCount} Enrolled Students
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 mb-4 flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5 text-gray-500 dark:text-slate-400" /> {secCount} Enrolled Students
                         </p>
 
-                        <div className="w-full py-2 bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
+                        <div className="w-full py-2 bg-white dark:bg-slate-900 group-hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 dark:border-indigo-800 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
                           View Roster <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
@@ -419,23 +419,23 @@ export default function StudentListPage() {
               <div className="mb-4 flex items-center gap-3">
                 <button
                   onClick={handleResetToSections}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back to Sections
                 </button>
                 <span className="text-gray-300">|</span>
                 <button
                   onClick={handleResetToGrades}
-                  className="text-xs text-gray-500 hover:text-gray-800 font-medium"
+                  className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-800 font-medium"
                 >
                   All Grades
                 </button>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-4 flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm mb-4 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-indigo-600 uppercase">{selectedGrade.name}</span>
-                  <h3 className="text-lg font-bold text-gray-900">Section {selectedSection} Roster</h3>
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">{selectedGrade.name}</span>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100">Section {selectedSection} Roster</h3>
                 </div>
                 <Badge variant="success">{filteredStudents.length} Students Active</Badge>
               </div>

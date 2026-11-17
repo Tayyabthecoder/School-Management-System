@@ -175,11 +175,11 @@ export default function GuardianPortalPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center max-w-lg mx-auto mt-12">
+      <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center max-w-lg mx-auto mt-12">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-        <h3 className="font-bold text-red-900 text-lg">Unable to Access Portal</h3>
-        <p className="text-red-700 text-sm mt-1">{error}</p>
-        <p className="text-gray-500 text-xs mt-3">
+        <h3 className="font-bold text-red-900 dark:text-red-100 text-lg">Unable to Access Portal</h3>
+        <p className="text-red-700 dark:text-red-300 text-sm mt-1">{error}</p>
+        <p className="text-gray-500 dark:text-slate-400 text-xs mt-3">
           Please verify your parent account credentials or contact the school office.
         </p>
       </div>
@@ -198,7 +198,7 @@ export default function GuardianPortalPage() {
     <div className="space-y-6 max-w-5xl mx-auto">
       {children.length > 1 && (
         <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Select child">
-          <span className="text-xs font-semibold text-gray-500 mr-1">Viewing:</span>
+          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 mr-1">Viewing:</span>
           {children.map((c) => {
             const selected = c._id === selectedChildId
             return (
@@ -209,7 +209,7 @@ export default function GuardianPortalPage() {
                 aria-selected={selected}
                 onClick={() => handleSelectChild(c._id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-                  selected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-200 hover:border-indigo-400'
+                  selected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:border-indigo-400'
                 }`}
               >
                 {c.fullName}{c.classId?.name ? ` · ${c.classId.name}` : ''}
@@ -256,7 +256,7 @@ export default function GuardianPortalPage() {
       </div>
 
       {/* ── Tabs Navigation ────────────────────────────────────────── */}
-      <div className="flex border-b border-gray-200 bg-white rounded-2xl px-3 shadow-sm">
+      <div className="flex border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl px-3 shadow-sm">
         {TABS.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -266,8 +266,8 @@ export default function GuardianPortalPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 py-4 px-4 text-xs font-bold transition-all border-b-2 ${
                 isActive
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-900'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -280,58 +280,58 @@ export default function GuardianPortalPage() {
       {/* ── TAB 1: Profile ─────────────────────────────────────────── */}
       {activeTab === 'child' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-            <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-              <User className="w-4 h-4 text-indigo-600" /> Academic & Personal Details
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm space-y-4">
+            <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm flex items-center gap-2">
+              <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Academic & Personal Details
             </h3>
-            <div className="divide-y divide-gray-100 text-xs">
+            <div className="divide-y divide-gray-100 dark:divide-slate-800 text-xs">
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Full Name</span>
-                <span className="font-bold text-gray-900">{child?.fullName}</span>
+                <span className="text-gray-500 dark:text-slate-400">Full Name</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{child?.fullName}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Student ID</span>
-                <span className="font-mono font-bold text-indigo-600">{child?.studentId}</span>
+                <span className="text-gray-500 dark:text-slate-400">Student ID</span>
+                <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{child?.studentId}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Date of Birth</span>
-                <span className="font-bold text-gray-900">{formatDate(child?.dob)}</span>
+                <span className="text-gray-500 dark:text-slate-400">Date of Birth</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{formatDate(child?.dob)}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Gender</span>
-                <span className="font-bold text-gray-900">{child?.gender}</span>
+                <span className="text-gray-500 dark:text-slate-400">Gender</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{child?.gender}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Blood Group</span>
-                <span className="font-bold text-red-600">{child?.bloodGroup || 'O+'}</span>
+                <span className="text-gray-500 dark:text-slate-400">Blood Group</span>
+                <span className="font-bold text-red-600 dark:text-red-400">{child?.bloodGroup || 'O+'}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Enrollment Date</span>
-                <span className="font-bold text-gray-900">{formatDate(child?.createdAt)}</span>
+                <span className="text-gray-500 dark:text-slate-400">Enrollment Date</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{formatDate(child?.createdAt)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-            <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-              <Phone className="w-4 h-4 text-indigo-600" /> Parent & Emergency Contacts
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm space-y-4">
+            <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm flex items-center gap-2">
+              <Phone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Parent & Emergency Contacts
             </h3>
-            <div className="divide-y divide-gray-100 text-xs">
+            <div className="divide-y divide-gray-100 dark:divide-slate-800 text-xs">
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Guardian Name</span>
-                <span className="font-bold text-gray-900">{child?.guardian?.name || 'Registered Parent'}</span>
+                <span className="text-gray-500 dark:text-slate-400">Guardian Name</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{child?.guardian?.name || 'Registered Parent'}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Primary Phone</span>
-                <span className="font-bold text-gray-900">{child?.guardian?.phone}</span>
+                <span className="text-gray-500 dark:text-slate-400">Primary Phone</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{child?.guardian?.phone}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Residential Address</span>
-                <span className="font-bold text-gray-900">{child?.address || 'On file'}</span>
+                <span className="text-gray-500 dark:text-slate-400">Residential Address</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{child?.address || 'On file'}</span>
               </div>
               <div className="py-2.5 flex justify-between">
-                <span className="text-gray-500">Emergency Contact</span>
-                <span className="font-bold text-gray-900">{child?.guardian?.phone || 'N/A'}</span>
+                <span className="text-gray-500 dark:text-slate-400">Emergency Contact</span>
+                <span className="font-bold text-gray-900 dark:text-slate-100">{child?.guardian?.phone || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -363,14 +363,14 @@ export default function GuardianPortalPage() {
 
       {/* ── TAB 4: Fees ────────────────────────────────────────────── */}
       {activeTab === 'fees' && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 space-y-4">
           <div>
-            <h3 className="font-bold text-gray-900 text-sm">Fee Invoices & Digital Challans</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Download fee challans and check receipt records</p>
+            <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm">Fee Invoices & Digital Challans</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Download fee challans and check receipt records</p>
           </div>
 
           {fees.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 text-xs">
+            <div className="text-center py-12 text-gray-500 dark:text-slate-400 text-xs">
               No fee records found for this student.
             </div>
           ) : (
@@ -378,19 +378,19 @@ export default function GuardianPortalPage() {
               {fees.map((f) => (
                 <div
                   key={f._id}
-                  className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs"
+                  className="p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-gray-900 text-sm">{f.feeStructureId?.name || 'Tuition Fee'}</span>
+                      <span className="font-bold text-gray-900 dark:text-slate-100 text-sm">{f.feeStructureId?.name || 'Tuition Fee'}</span>
                       <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                        f.status === 'Paid' ? 'bg-green-100 text-green-800' : f.status === 'Overdue' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
+                        f.status === 'Paid' ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200' : f.status === 'Overdue' ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200' : 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200'
                       }`}>
                         {f.status}
                       </span>
                     </div>
-                    <p className="text-gray-500 mt-1">
-                      Due: <strong>{formatDate(f.dueDate)}</strong> · Total: <strong>{formatPKR(f.netAmount || f.amount)}</strong> · Outstanding: <strong className="text-red-600">{formatPKR(f.outstandingAmount || 0)}</strong>
+                    <p className="text-gray-500 dark:text-slate-400 mt-1">
+                      Due: <strong>{formatDate(f.dueDate)}</strong> · Total: <strong>{formatPKR(f.netAmount || f.amount)}</strong> · Outstanding: <strong className="text-red-600 dark:text-red-400">{formatPKR(f.outstandingAmount || 0)}</strong>
                     </p>
                   </div>
 

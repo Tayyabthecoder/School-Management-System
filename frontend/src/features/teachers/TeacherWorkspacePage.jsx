@@ -102,47 +102,47 @@ export default function TeacherWorkspacePage() {
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
                 <CalendarCheck className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-semibold uppercase">Today's Periods</p>
-                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{today?.totalPeriodsToday ?? 0}</p>
-                <p className="text-[11px] text-indigo-600 font-medium">{today?.dayName} Schedule</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Today's Periods</p>
+                <p className="text-2xl font-extrabold text-gray-900 dark:text-slate-100 mt-0.5">{today?.totalPeriodsToday ?? 0}</p>
+                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">{today?.dayName} Schedule</p>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-teal-50 text-teal-700 rounded-xl">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+              <div className="p-3 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 rounded-xl">
                 <Building className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-semibold uppercase">Assigned Classes</p>
-                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.totalAssignedClasses ?? 0}</p>
-                <p className="text-[11px] text-teal-700 font-medium">Distinct Class Sections</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Assigned Classes</p>
+                <p className="text-2xl font-extrabold text-gray-900 dark:text-slate-100 mt-0.5">{workload?.totalAssignedClasses ?? 0}</p>
+                <p className="text-[11px] text-teal-700 dark:text-teal-300 font-medium">Distinct Class Sections</p>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-green-50 text-green-700 rounded-xl">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+              <div className="p-3 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 rounded-xl">
                 <Users className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-semibold uppercase">Total Students</p>
-                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.totalStudents ?? 0}</p>
-                <p className="text-[11px] text-green-700 font-medium">Across Assigned Sections</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Total Students</p>
+                <p className="text-2xl font-extrabold text-gray-900 dark:text-slate-100 mt-0.5">{workload?.totalStudents ?? 0}</p>
+                <p className="text-[11px] text-green-700 dark:text-green-300 font-medium">Across Assigned Sections</p>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-amber-50 text-amber-700 rounded-xl">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-xl">
                 <FileText className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-semibold uppercase">Pending Leaves</p>
-                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.pendingLeaveRequests ?? 0}</p>
-                <p className="text-[11px] text-amber-700 font-medium">Parent Absence Notes</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Pending Leaves</p>
+                <p className="text-2xl font-extrabold text-gray-900 dark:text-slate-100 mt-0.5">{workload?.pendingLeaveRequests ?? 0}</p>
+                <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium">Parent Absence Notes</p>
               </div>
             </div>
           </>
@@ -150,15 +150,15 @@ export default function TeacherWorkspacePage() {
       </div>
 
       {/* ── Today's Schedule Card ───────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-indigo-600" /> Today's Teaching Periods ({today?.dayName})
+            <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Today's Teaching Periods ({today?.dayName})
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">Click any period to record or review classroom attendance.</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Click any period to record or review classroom attendance.</p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full">
+          <span className="text-xs font-semibold px-3 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 rounded-full">
             Session 2026
           </span>
         </div>
@@ -166,10 +166,10 @@ export default function TeacherWorkspacePage() {
         {loading ? (
           <SkeletonTable rows={4} />
         ) : !today?.periods || today.periods.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-            <BookOpen className="w-10 h-10 text-gray-500 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-gray-700">No scheduled periods for {today?.dayName || 'today'}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Enjoy your free day or prepare lesson plans!</p>
+          <div className="text-center py-12 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
+            <BookOpen className="w-10 h-10 text-gray-500 dark:text-slate-400 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">No scheduled periods for {today?.dayName || 'today'}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Enjoy your free day or prepare lesson plans!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -182,10 +182,10 @@ export default function TeacherWorkspacePage() {
                   key={period._id}
                   className={`p-5 rounded-2xl border transition-all ${
                     isActive
-                      ? 'bg-gradient-to-br from-indigo-50 to-indigo-100/50 border-indigo-300 shadow-md ring-2 ring-indigo-500/20'
+                      ? 'bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-indigo-100/50 dark:to-indigo-950/40 border-indigo-300 shadow-md ring-2 ring-indigo-500/20'
                       : isCompleted
-                      ? 'bg-gray-50 border-gray-200 opacity-80'
-                      : 'bg-white border-gray-200 hover:border-indigo-300 shadow-sm'
+                      ? 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 opacity-80'
+                      : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 hover:border-indigo-300 shadow-sm'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -193,24 +193,24 @@ export default function TeacherWorkspacePage() {
                       Period {period.periodNumber}
                     </span>
                     {isActive ? (
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-indigo-200/60 px-2 py-0.5 rounded-full animate-pulse">
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-200/60 px-2 py-0.5 rounded-full animate-pulse">
                         <span className="w-2 h-2 rounded-full bg-indigo-600" /> Active Now
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-500 font-medium">
+                      <span className="text-xs text-gray-500 dark:text-slate-400 font-medium">
                         {period.startTime} – {period.endTime}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-extrabold text-gray-900 text-base mt-1">
+                  <h3 className="font-extrabold text-gray-900 dark:text-slate-100 text-base mt-1">
                     {period.subject?.name || 'Subject'}
                   </h3>
-                  <p className="text-xs text-indigo-700 font-semibold mt-0.5">
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300 font-semibold mt-0.5">
                     Class: {period.class?.name || 'Class'} ({period.sectionId})
                   </p>
 
-                  <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-3 border-t border-gray-200/60">
+                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 mt-3 pt-3 border-t border-gray-200/60">
                     <span>Room: <strong>{period.room || 'Classroom'}</strong></span>
                     <button
                       type="button"
@@ -233,36 +233,36 @@ export default function TeacherWorkspacePage() {
       {/* ── Assigned Classes & Student Leave Requests Grid ───────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Assigned Classes */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-teal-600" /> Assigned Classes & Attendance Status
+            <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-teal-600 dark:text-teal-400" /> Assigned Classes & Attendance Status
             </h2>
           </div>
 
           <div className="space-y-3">
             {assignedClasses.length === 0 ? (
-              <p className="text-xs text-gray-500">No classes assigned to this faculty profile.</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">No classes assigned to this faculty profile.</p>
             ) : (
               assignedClasses.map((cls, idx) => (
                 <div
                   key={`${cls.classId || cls.className}-${cls.sectionId}`}
-                  className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl"
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl"
                 >
                   <div>
-                    <h4 className="font-bold text-gray-900 text-sm">{cls.className} ({cls.sectionId})</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <h4 className="font-bold text-gray-900 dark:text-slate-100 text-sm">{cls.className} ({cls.sectionId})</h4>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                       {cls.studentCount} Active Students · Subjects: {cls.subjects?.join(', ') || 'General'}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {cls.isAttendanceMarkedToday ? (
-                      <span className="flex items-center gap-1 text-xs font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                      <span className="flex items-center gap-1 text-xs font-bold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/40 px-3 py-1 rounded-full">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Marked Today
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+                      <span className="flex items-center gap-1 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-3 py-1 rounded-full">
                         <AlertCircle className="w-3.5 h-3.5" /> Pending Today
                       </span>
                     )}
@@ -274,41 +274,41 @@ export default function TeacherWorkspacePage() {
         </div>
 
         {/* Student Leave Applications Review Queue */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" /> Student Leave Requests
+            <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400" /> Student Leave Requests
             </h2>
-            <span className="text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold px-2 py-0.5 rounded-full">
               {leaveRequests.length} Pending
             </span>
           </div>
 
           <div className="space-y-3">
             {leaveRequests.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 text-xs">
+              <div className="text-center py-8 text-gray-500 dark:text-slate-400 text-xs">
                 No pending student leave applications to review.
               </div>
             ) : (
               leaveRequests.map((leave) => (
-                <div key={leave._id} className="p-3 bg-amber-50/50 border border-amber-200 rounded-xl space-y-2">
+                <div key={leave._id} className="p-3 bg-amber-50/50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl space-y-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-bold text-xs text-gray-900">{leave.studentId?.fullName}</p>
-                      <p className="text-[10px] text-gray-500">
+                      <p className="font-bold text-xs text-gray-900 dark:text-slate-100">{leave.studentId?.fullName}</p>
+                      <p className="text-[10px] text-gray-500 dark:text-slate-400">
                         {leave.classId?.name} ({leave.sectionId}) · Roll: {leave.studentId?.rollNumber || 'N/A'}
                       </p>
                     </div>
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full">
+                    <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 text-[10px] font-bold rounded-full">
                       {leave.category}
                     </span>
                   </div>
 
-                  <p className="text-xs text-gray-700 bg-white p-2 rounded-lg border border-amber-100 italic">
+                  <p className="text-xs text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-900 p-2 rounded-lg border border-amber-100 dark:border-amber-900 italic">
                     "{leave.reason}"
                   </p>
 
-                  <div className="flex justify-between items-center text-[10px] text-gray-500">
+                  <div className="flex justify-between items-center text-[10px] text-gray-500 dark:text-slate-400">
                     <span>
                       {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                     </span>

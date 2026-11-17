@@ -18,24 +18,24 @@ export default function StepFeeConcession({
 }) {
   return (
                 <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 text-gray-800">
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800 text-gray-800 dark:text-slate-100">
                     <div className="flex items-center gap-2">
-                      <CircleDollarSign className="w-4 h-4 text-emerald-600" />
-                      <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700">Fee Schedule & Concession Setup</h3>
+                      <CircleDollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">Fee Schedule & Concession Setup</h3>
                     </div>
-                    <span className="text-xs font-semibold text-gray-500">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-slate-400">
                       Class: <strong>{currentModalClass?.name}</strong>
                     </span>
                   </div>
 
                   {/* 1. Fee Structures Selection List */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-gray-200 space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                        <p className="text-xs font-bold text-gray-800 dark:text-slate-100 uppercase tracking-wide">
                           Applicable Fee Heads
                         </p>
-                        <p className="text-[11px] text-gray-500">Select active fees for this grade level</p>
+                        <p className="text-[11px] text-gray-500 dark:text-slate-400">Select active fees for this grade level</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -49,7 +49,7 @@ export default function StepFeeConcession({
                               }
                             }))
                           }}
-                          className="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold"
+                          className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 font-bold"
                         >
                           Select All
                         </button>
@@ -65,7 +65,7 @@ export default function StepFeeConcession({
                               }
                             }))
                           }}
-                          className="text-[11px] text-gray-500 hover:text-gray-700 font-medium"
+                          className="text-[11px] text-gray-500 dark:text-slate-400 hover:text-gray-700 font-medium"
                         >
                           Clear All
                         </button>
@@ -73,7 +73,7 @@ export default function StepFeeConcession({
                     </div>
 
                     {loadingFeeStructures ? (
-                      <div className="py-6 text-center text-xs text-gray-500 animate-pulse">
+                      <div className="py-6 text-center text-xs text-gray-500 dark:text-slate-400 animate-pulse">
                         Loading class fee structures…
                       </div>
                     ) : classFeeStructures.length > 0 ? (
@@ -97,22 +97,22 @@ export default function StepFeeConcession({
                               }}
                               className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${
                                 isSelected
-                                  ? 'bg-emerald-50/60 border-emerald-300 shadow-xs ring-1 ring-emerald-400'
-                                  : 'bg-white border-gray-200 hover:bg-gray-50 opacity-75'
+                                  ? 'bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-300 shadow-xs ring-1 ring-emerald-400'
+                                  : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800/50 opacity-75'
                               }`}
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
-                                  isSelected ? 'bg-emerald-700 border-emerald-600 text-white' : 'border-gray-300 bg-white'
+                                  isSelected ? 'bg-emerald-700 border-emerald-600 text-white' : 'border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900'
                                 }`}>
                                   {isSelected && <Check className="w-3.5 h-3.5" />}
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="text-xs font-bold text-gray-900 truncate">{structure.title || structure.feeType}</p>
-                                  <p className="text-[10px] text-gray-500">Due: {structure.dueDate ? formatDate(structure.dueDate) : '—'}</p>
+                                  <p className="text-xs font-bold text-gray-900 dark:text-slate-100 truncate">{structure.title || structure.feeType}</p>
+                                  <p className="text-[10px] text-gray-500 dark:text-slate-400">Due: {structure.dueDate ? formatDate(structure.dueDate) : '—'}</p>
                                 </div>
                               </div>
-                              <span className="font-bold text-xs text-emerald-800 ml-2 whitespace-nowrap">
+                              <span className="font-bold text-xs text-emerald-800 dark:text-emerald-200 ml-2 whitespace-nowrap">
                                 {formatPKR(structure.amount)}
                               </span>
                             </div>
@@ -120,24 +120,24 @@ export default function StepFeeConcession({
                         })}
                       </div>
                     ) : (
-                      <div className="p-4 bg-white rounded-xl border border-dashed border-gray-300 text-center text-xs text-gray-500">
+                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-300 dark:border-slate-600 text-center text-xs text-gray-500 dark:text-slate-400">
                         No active fee structures found for {currentModalClass?.name || 'this class'}. Fees can be assigned later.
                       </div>
                     )}
                   </div>
 
                   {/* 2. Scholarship & Concession Card */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-gray-200 space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                      <span className="text-xs font-bold text-gray-800 dark:text-slate-100 uppercase tracking-wide">
                         Scholarship & Concession Waiver
                       </span>
-                      <span className="text-[10px] text-gray-500">Optional discount category</span>
+                      <span className="text-[10px] text-gray-500 dark:text-slate-400">Optional discount category</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-1">
                           Concession Category
                         </label>
                         <select aria-label="Concession Category"
@@ -154,7 +154,7 @@ export default function StepFeeConcession({
                             }))
                             clearFieldError('discountValue')
                           }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white font-medium"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white dark:bg-slate-900 font-medium"
                         >
                           <option value="None">None (Standard Tuition)</option>
                           <option value="Need-Based Scholarship">Need-Based Scholarship</option>
@@ -170,11 +170,11 @@ export default function StepFeeConcession({
                       {newStudent.feeSetup?.concessionType !== 'None' && (
                         <>
                           <div>
-                            <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-1">
                               Discount Mode & Value
                             </label>
                             <div className="flex gap-1.5">
-                              <div className="flex bg-white rounded-xl border border-gray-300 p-0.5">
+                              <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-gray-300 dark:border-slate-600 p-0.5">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -187,7 +187,7 @@ export default function StepFeeConcession({
                                   className={`px-2 py-1 rounded-lg text-xs font-bold transition-all ${
                                     newStudent.feeSetup?.discountType === 'percentage'
                                       ? 'bg-indigo-600 text-white'
-                                      : 'text-gray-600 hover:text-gray-900'
+                                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900'
                                   }`}
                                 >
                                   %
@@ -204,7 +204,7 @@ export default function StepFeeConcession({
                                   className={`px-2 py-1 rounded-lg text-xs font-bold transition-all ${
                                     newStudent.feeSetup?.discountType === 'fixed'
                                       ? 'bg-indigo-600 text-white'
-                                      : 'text-gray-600 hover:text-gray-900'
+                                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900'
                                   }`}
                                 >
                                   PKR
@@ -224,18 +224,18 @@ export default function StepFeeConcession({
                                   clearFieldError('discountValue')
                                 }}
                                 placeholder={newStudent.feeSetup?.discountType === 'percentage' ? 'e.g. 25' : 'e.g. 2000'}
-                                className={`flex-1 px-3 py-2 border rounded-xl text-xs outline-none bg-white font-bold ${
-                                  formErrors.discountValue ? 'border-red-500' : 'border-gray-300 focus:ring-2 focus:ring-indigo-600/20'
+                                className={`flex-1 px-3 py-2 border rounded-xl text-xs outline-none bg-white dark:bg-slate-900 font-bold ${
+                                  formErrors.discountValue ? 'border-red-500' : 'border-gray-300 dark:border-slate-600 focus:ring-2 focus:ring-indigo-600/20'
                                 }`}
                               />
                             </div>
                             {formErrors.discountValue && (
-                              <p className="text-[10px] text-red-600 mt-1 font-semibold">{formErrors.discountValue}</p>
+                              <p className="text-[10px] text-red-600 dark:text-red-400 mt-1 font-semibold">{formErrors.discountValue}</p>
                             )}
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-1">
                               Approval Remarks / Reason
                             </label>
                             <input aria-label="Approval Remarks / Reason"
@@ -246,7 +246,7 @@ export default function StepFeeConcession({
                                 feeSetup: { ...prev.feeSetup, concessionReason: e.target.value }
                               }))}
                               placeholder="e.g. Approved on merit rank #1"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white dark:bg-slate-900"
                             />
                           </div>
                         </>
@@ -260,14 +260,14 @@ export default function StepFeeConcession({
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">Gross Total</p>
                         <p className="text-base font-bold mt-0.5">{formatPKR(grossFeeTotal)}</p>
-                        <p className="text-[10px] text-gray-500">{selectedFeeStructures.length} fee item(s)</p>
+                        <p className="text-[10px] text-gray-500 dark:text-slate-400">{selectedFeeStructures.length} fee item(s)</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-300">Concession</p>
                         <p className="text-base font-bold text-emerald-400 mt-0.5">
                           {calculatedDiscount > 0 ? `- ${formatPKR(calculatedDiscount)}` : 'PKR 0'}
                         </p>
-                        <p className="text-[10px] text-gray-500 truncate">{newStudent.feeSetup?.concessionType || 'None'}</p>
+                        <p className="text-[10px] text-gray-500 dark:text-slate-400 truncate">{newStudent.feeSetup?.concessionType || 'None'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-300">Net Payable</p>
@@ -278,8 +278,8 @@ export default function StepFeeConcession({
                   </div>
 
                   {/* 4. Payment Collection / Challan Status Option */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-gray-200 space-y-3">
-                    <label className="block text-xs font-bold text-gray-800 uppercase tracking-wide">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 space-y-3">
+                    <label className="block text-xs font-bold text-gray-800 dark:text-slate-100 uppercase tracking-wide">
                       Payment Collection & Voucher Issuance
                     </label>
 
@@ -291,15 +291,15 @@ export default function StepFeeConcession({
                         }))}
                         className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
                           newStudent.feeSetup?.initialPaymentStatus === 'Pending'
-                            ? 'bg-amber-50/70 border-amber-400 shadow-sm ring-2 ring-amber-400/30'
-                            : 'bg-white border-gray-200 hover:bg-gray-50 opacity-80'
+                            ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-400 shadow-sm ring-2 ring-amber-400/30'
+                            : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800/50 opacity-80'
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <Receipt className="w-4 h-4 text-amber-600" />
-                          <span className="text-xs font-bold text-gray-900">Mark as Pending (Issue Challan)</span>
+                          <Receipt className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                          <span className="text-xs font-bold text-gray-900 dark:text-slate-100">Mark as Pending (Issue Challan)</span>
                         </div>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-gray-500 dark:text-slate-400">
                           Issues 3-copy student bank fee voucher for counter or bank collection.
                         </p>
                       </div>
@@ -311,15 +311,15 @@ export default function StepFeeConcession({
                         }))}
                         className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
                           newStudent.feeSetup?.initialPaymentStatus === 'Paid'
-                            ? 'bg-emerald-50/70 border-emerald-400 shadow-sm ring-2 ring-emerald-400/30'
-                            : 'bg-white border-gray-200 hover:bg-gray-50 opacity-80'
+                            ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-400 shadow-sm ring-2 ring-emerald-400/30'
+                            : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800/50 opacity-80'
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <Wallet className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs font-bold text-gray-900">Collect Upfront (Mark as Paid)</span>
+                          <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          <span className="text-xs font-bold text-gray-900 dark:text-slate-100">Collect Upfront (Mark as Paid)</span>
                         </div>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-gray-500 dark:text-slate-400">
                           Record immediate payment at registration desk & generate official receipt.
                         </p>
                       </div>
@@ -328,7 +328,7 @@ export default function StepFeeConcession({
                     {newStudent.feeSetup?.initialPaymentStatus === 'Paid' && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 animate-in fade-in duration-150">
                         <div>
-                          <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                          <label className="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-1">
                             Payment Mode <span className="text-red-500">*</span>
                           </label>
                           <select aria-label="Payment Mode"
@@ -337,7 +337,7 @@ export default function StepFeeConcession({
                               ...prev,
                               feeSetup: { ...prev.feeSetup, paymentMode: e.target.value }
                             }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white font-medium"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white dark:bg-slate-900 font-medium"
                           >
                             <option value="Cash">Cash (Counter Collection)</option>
                             <option value="Bank Transfer">Bank Transfer / Deposit</option>
@@ -348,7 +348,7 @@ export default function StepFeeConcession({
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                          <label className="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-1">
                             Reference / Remarks
                           </label>
                           <input aria-label="Reference / Remarks"
@@ -359,7 +359,7 @@ export default function StepFeeConcession({
                               feeSetup: { ...prev.feeSetup, paymentRemarks: e.target.value }
                             }))}
                             placeholder="e.g. Counter deposit or Bank txn #8942"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-600/20 bg-white dark:bg-slate-900"
                           />
                         </div>
                       </div>

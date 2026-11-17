@@ -382,7 +382,7 @@ export default function StudentRegistrationModal({
     <>
       {open && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-3xl w-full border border-gray-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full border border-gray-200 dark:border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
 
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-950 p-5 text-white flex items-center justify-between relative flex-shrink-0">
@@ -400,14 +400,14 @@ export default function StudentRegistrationModal({
                   resetForm()
                   onClose()
                 }}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-white/10 dark:bg-slate-900/10 hover:bg-white/20 text-indigo-200 hover:text-white flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Wizard Step Progress Tracker */}
-            <div className="bg-slate-50 border-b border-gray-200 px-4 py-3 flex-shrink-0">
+            <div className="bg-slate-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 px-4 py-3 flex-shrink-0">
               <div className="grid grid-cols-5 gap-2">
                 {WIZARD_STEPS.map((s) => {
                   const Icon = s.icon
@@ -429,26 +429,26 @@ export default function StudentRegistrationModal({
                         isCurrent
                           ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-600/20'
                           : isCompleted
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
-                          : 'bg-white text-gray-500 border border-gray-200 cursor-not-allowed opacity-75'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                          : 'bg-white dark:bg-slate-900 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 cursor-not-allowed opacity-75'
                       }`}
                     >
                       <div
                         className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                           isCurrent
-                            ? 'bg-white text-indigo-700'
+                            ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300'
                             : isCompleted
                             ? 'bg-emerald-700 text-white'
-                            : 'bg-gray-100 text-gray-500'
+                            : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
                         }`}
                       >
                         {isCompleted ? <Check className="w-4 h-4 stroke-[3]" /> : s.id}
                       </div>
                       <div className="hidden sm:block min-w-0">
-                        <p className={`text-[11px] font-bold leading-tight truncate ${isCurrent ? 'text-white' : 'text-gray-800'}`}>
+                        <p className={`text-[11px] font-bold leading-tight truncate ${isCurrent ? 'text-white' : 'text-gray-800 dark:text-slate-100'}`}>
                           {s.label}
                         </p>
-                        <p className={`text-[9px] truncate ${isCurrent ? 'text-indigo-200' : 'text-gray-500'}`}>
+                        <p className={`text-[9px] truncate ${isCurrent ? 'text-indigo-200' : 'text-gray-500 dark:text-slate-400'}`}>
                           {s.sub}
                         </p>
                       </div>
@@ -520,13 +520,13 @@ export default function StudentRegistrationModal({
             </div>
 
             {/* Modal Footer / Navigation Controls */}
-            <div className="p-4 bg-slate-50 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
               <div>
                 {currentStep > 1 ? (
                   <button
                     type="button"
                     onClick={handlePrevStep}
-                    className="px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                    className="px-4 py-2 border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4" /> Previous Step
                   </button>
@@ -537,7 +537,7 @@ export default function StudentRegistrationModal({
                       resetForm()
                       onClose()
                     }}
-                    className="px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-600 text-xs font-semibold rounded-xl transition-colors"
+                    className="px-4 py-2 border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 text-xs font-semibold rounded-xl transition-colors"
                   >
                     Cancel
                   </button>

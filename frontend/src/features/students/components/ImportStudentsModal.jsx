@@ -158,11 +158,11 @@ export default function ImportStudentsModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full border border-gray-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full border border-gray-200 dark:border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-indigo-950 p-5 text-white flex items-center justify-between relative flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white shadow-md">
+            <div className="w-10 h-10 rounded-2xl bg-white/10 dark:bg-slate-900/10 border border-white/20 flex items-center justify-center text-white shadow-md">
               <FileSpreadsheet className="w-5 h-5 text-emerald-300" />
             </div>
             <div>
@@ -174,7 +174,7 @@ export default function ImportStudentsModal({
           </div>
           <button aria-label="Close"
             onClick={handleModalClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-white/10 dark:bg-slate-900/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -183,14 +183,14 @@ export default function ImportStudentsModal({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-5 flex-1">
           {/* Step 1: Template Download Banner */}
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50/60 border border-emerald-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-gradient-to-br from-emerald-50 dark:from-emerald-950/40 to-teal-50/60 dark:to-teal-950/40 border border-emerald-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700 flex-shrink-0">
+              <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 flex-shrink-0">
                 <FileCheck className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-gray-900">Standard Import Template</h4>
-                <p className="text-xs text-gray-600 mt-0.5">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-slate-100">Standard Import Template</h4>
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
                   Includes formatted columns, field guidelines, and sample records.
                 </p>
               </div>
@@ -199,10 +199,10 @@ export default function ImportStudentsModal({
               type="button"
               onClick={handleDownloadTemplate}
               disabled={downloadingTemplate}
-              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-white hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-xs flex-shrink-0 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-white dark:bg-slate-900 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-300 hover:text-white border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-xs flex-shrink-0 disabled:opacity-50"
             >
               {downloadingTemplate ? (
-                <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-600 dark:text-emerald-400" />
               ) : (
                 <Download className="w-4 h-4" />
               )}
@@ -213,57 +213,57 @@ export default function ImportStudentsModal({
           {/* Results View or Upload Zone */}
           {importResult ? (
             <div className="space-y-4">
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-emerald-950">
+              <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-5 text-emerald-950 dark:text-emerald-100">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   <h3 className="text-base font-bold">Import Summary</h3>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-white/80 p-3 rounded-xl border border-emerald-100">
-                    <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <div className="bg-white/80 dark:bg-slate-900/80 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900">
+                    <span className="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                       Total Evaluated
                     </span>
-                    <p className="text-xl font-extrabold text-gray-900">{importResult.totalRows}</p>
+                    <p className="text-xl font-extrabold text-gray-900 dark:text-slate-100">{importResult.totalRows}</p>
                   </div>
-                  <div className="bg-white/80 p-3 rounded-xl border border-emerald-100">
-                    <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">
+                  <div className="bg-white/80 dark:bg-slate-900/80 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900">
+                    <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
                       Newly Created
                     </span>
-                    <p className="text-xl font-extrabold text-emerald-700">
+                    <p className="text-xl font-extrabold text-emerald-700 dark:text-emerald-300">
                       +{importResult.createdCount}
                     </p>
                   </div>
-                  <div className="bg-white/80 p-3 rounded-xl border border-emerald-100">
-                    <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">
+                  <div className="bg-white/80 dark:bg-slate-900/80 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900">
+                    <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                       Updated Records
                     </span>
-                    <p className="text-xl font-extrabold text-indigo-700">
+                    <p className="text-xl font-extrabold text-indigo-700 dark:text-indigo-300">
                       {importResult.updatedCount}
                     </p>
                   </div>
                 </div>
 
-                <p className="text-xs text-emerald-800 mt-3 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-xs text-emerald-800 dark:text-emerald-200 mt-3 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                   Students directory has been refreshed with new enrollments and updates.
                 </p>
               </div>
 
               {/* Display Row Errors if Any */}
               {importResult.errors && importResult.errors.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-                  <div className="flex items-center gap-2 text-amber-800 font-bold text-xs mb-2">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200 font-bold text-xs mb-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     Some rows could not be imported ({importResult.errors.length}):
                   </div>
                   <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
                     {importResult.errors.map((err, idx) => (
                       <div
                         key={idx}
-                        className="text-xs text-amber-900 bg-white/70 p-2 rounded-lg border border-amber-100 flex items-start gap-2"
+                        className="text-xs text-amber-900 dark:text-amber-100 bg-white/70 dark:bg-slate-900/70 p-2 rounded-lg border border-amber-100 dark:border-amber-900 flex items-start gap-2"
                       >
-                        <span className="font-semibold text-amber-700">Row {err.row}:</span>
+                        <span className="font-semibold text-amber-700 dark:text-amber-300">Row {err.row}:</span>
                         <span>{err.error}</span>
                       </div>
                     ))}
@@ -281,10 +281,10 @@ export default function ImportStudentsModal({
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
                   dragOver
-                    ? 'border-emerald-500 bg-emerald-50/70 scale-[0.99]'
+                    ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 scale-[0.99]'
                     : file
-                    ? 'border-emerald-400 bg-emerald-50/20'
-                    : 'border-gray-300 hover:border-emerald-400 hover:bg-slate-50'
+                    ? 'border-emerald-400 bg-emerald-50/20 dark:bg-emerald-950/40'
+                    : 'border-gray-300 dark:border-slate-600 hover:border-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <input
@@ -295,35 +295,35 @@ export default function ImportStudentsModal({
                   className="hidden"
                 />
 
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3 shadow-xs">
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-3 shadow-xs">
                   {file ? (
-                    <FileSpreadsheet className="w-7 h-7 text-emerald-600" />
+                    <FileSpreadsheet className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <UploadCloud className="w-7 h-7 text-emerald-600" />
+                    <UploadCloud className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                   )}
                 </div>
 
                 {file ? (
                   <div>
-                    <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full mb-1">
+                    <span className="inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 text-xs font-bold rounded-full mb-1">
                       Ready to Upload
                     </span>
-                    <h4 className="text-sm font-bold text-gray-900 truncate max-w-sm mx-auto">
+                    <h4 className="text-sm font-bold text-gray-900 dark:text-slate-100 truncate max-w-sm mx-auto">
                       {file.name}
                     </h4>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                       {(file.size / 1024).toFixed(1)} KB • Click or drop another file to replace
                     </p>
                   </div>
                 ) : (
                   <div>
-                    <h4 className="text-sm font-bold text-gray-900">
+                    <h4 className="text-sm font-bold text-gray-900 dark:text-slate-100">
                       Drop student Excel spreadsheet here
                     </h4>
-                    <p className="text-xs text-gray-500 mt-1">
-                      or <span className="text-emerald-700 font-semibold underline">browse file</span> from your computer
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                      or <span className="text-emerald-700 dark:text-emerald-300 font-semibold underline">browse file</span> from your computer
                     </p>
-                    <p className="text-[11px] text-gray-500 mt-2">
+                    <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-2">
                       Supports .xlsx and .csv up to 10MB
                     </p>
                   </div>
@@ -331,38 +331,38 @@ export default function ImportStudentsModal({
               </div>
 
               {/* Supported Columns Guide */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-2">
-                  <Info className="w-3.5 h-3.5 text-slate-500" />
+              <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">
+                  <Info className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                   Supported Excel Columns & Aliases:
                 </div>
                 <div className="flex flex-wrap gap-1.5 text-[11px]">
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-semibold rounded-md">
+                  <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 font-semibold rounded-md">
                     Full Name *
                   </span>
-                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 font-semibold rounded-md">
+                  <span className="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-200 font-semibold rounded-md">
                     Class / Grade *
                   </span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">Section</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">Gender</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">Section</span>
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">Gender</span>
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">
                     Date of Birth
                   </span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">Father Name</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">Father Name</span>
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">
                     Guardian Phone
                   </span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">
                     Guardian CNIC
                   </span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">Address</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">Blood Group</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">B-Form</span>
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">Address</span>
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">Blood Group</span>
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">B-Form</span>
+                  <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">
                     Student ID (Update mode)
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-2">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
                   * Tip: Leave <strong>Student ID</strong> blank to automatically enroll new students with system-generated IDs and student portal credentials. Provide an existing Student ID to update an active record.
                 </p>
               </div>
@@ -371,13 +371,13 @@ export default function ImportStudentsModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-slate-50 p-4 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
+        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
           {importResult ? (
             <div className="w-full flex items-center justify-between">
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl text-xs font-semibold transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold transition-colors"
               >
                 Import Another File
               </button>
@@ -395,7 +395,7 @@ export default function ImportStudentsModal({
                 type="button"
                 onClick={handleModalClose}
                 disabled={uploading}
-                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50"
+                className="px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

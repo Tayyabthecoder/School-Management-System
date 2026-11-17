@@ -70,14 +70,14 @@ export default function StaffAttendanceRegister({ staff = [] }) {
   const markedCount = activeStaff.filter((s) => statusByStaff[s._id]).length
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-      <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden mb-6">
+      <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="font-bold text-gray-900 flex items-center gap-2">
+          <h3 className="font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
             <CalendarCheck className="w-4 h-4 text-indigo-500" />
             Staff Attendance Register
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
             {markedCount} of {activeStaff.length} marked. Each choice saves immediately; absences and half days reduce payroll.
           </p>
         </div>
@@ -86,21 +86,21 @@ export default function StaffAttendanceRegister({ staff = [] }) {
           value={date}
           max={todayLocal()}
           onChange={(e) => setDate(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
           aria-label="Attendance date"
         />
       </div>
       {loading ? (
         <div className="p-6"><SkeletonTable rows={4} /></div>
       ) : activeStaff.length === 0 ? (
-        <div className="py-10 text-center text-sm text-gray-500">No active staff members</div>
+        <div className="py-10 text-center text-sm text-gray-500 dark:text-slate-400">No active staff members</div>
       ) : (
-        <div className="divide-y divide-gray-100 max-h-[420px] overflow-y-auto">
+        <div className="divide-y divide-gray-100 dark:divide-slate-800 max-h-[420px] overflow-y-auto">
           {activeStaff.map((s) => (
             <div key={s._id} className="px-5 py-3 flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="font-semibold text-gray-800 text-sm">{s.fullName}</p>
-                <p className="text-xs text-gray-500">{s.staffId} · {s.designation}</p>
+                <p className="font-semibold text-gray-800 dark:text-slate-100 text-sm">{s.fullName}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{s.staffId} · {s.designation}</p>
               </div>
               <div className="flex flex-wrap gap-1.5" role="group" aria-label={`Attendance for ${s.fullName}`}>
                 {STAFF_STATUSES.map((status) => {
@@ -113,7 +113,7 @@ export default function StaffAttendanceRegister({ staff = [] }) {
                       aria-pressed={selected}
                       onClick={() => !selected && mark(s, status)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors disabled:opacity-60 ${
-                        selected ? STATUS_STYLES[status] : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-400'
+                        selected ? STATUS_STYLES[status] : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:border-indigo-400'
                       }`}
                     >
                       {status}

@@ -13,10 +13,10 @@ export default function GuardianAttendanceTab({
 }) {
   return (
           <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm">
               <div>
-                <h3 className="font-bold text-gray-900 text-sm">Attendance & Absence Management</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Track daily attendance and submit digital leave applications</p>
+                <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm">Attendance & Absence Management</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Track daily attendance and submit digital leave applications</p>
               </div>
               <button
                 onClick={() => setShowLeaveModal(true)}
@@ -28,50 +28,50 @@ export default function GuardianAttendanceTab({
 
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                <span className="text-xs text-gray-500 font-semibold uppercase">Total Sessions</span>
-                <div className="text-2xl font-black text-gray-900 mt-1">{attSummary.totalDays || 0}</div>
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Total Sessions</span>
+                <div className="text-2xl font-black text-gray-900 dark:text-slate-100 mt-1">{attSummary.totalDays || 0}</div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                <span className="text-xs text-gray-500 font-semibold uppercase">Present Days</span>
-                <div className="text-2xl font-black text-emerald-700 mt-1">{attSummary.presentDays || 0}</div>
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Present Days</span>
+                <div className="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-1">{attSummary.presentDays || 0}</div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                <span className="text-xs text-gray-500 font-semibold uppercase">Attendance Rate</span>
-                <div className={`text-2xl font-black mt-1 ${isLowAttendance ? 'text-amber-700' : 'text-emerald-700'}`}>
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm text-center">
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-semibold uppercase">Attendance Rate</span>
+                <div className={`text-2xl font-black mt-1 ${isLowAttendance ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300'}`}>
                   {attSummary.attendancePercentage || '100%'}
                 </div>
               </div>
             </div>
 
             {/* Leave Requests Status List */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
-              <h4 className="font-bold text-gray-900 text-xs uppercase tracking-wider">Submitted Leave Applications</h4>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-5 space-y-3">
+              <h4 className="font-bold text-gray-900 dark:text-slate-100 text-xs uppercase tracking-wider">Submitted Leave Applications</h4>
               {leaveRequests.length === 0 ? (
-                <p className="text-xs text-gray-500">No leave requests submitted yet.</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">No leave requests submitted yet.</p>
               ) : (
                 <div className="space-y-2">
                   {leaveRequests.map((leave) => {
-                    let statusBg = 'bg-amber-100 text-amber-800'
-                    if (leave.status === 'Approved') statusBg = 'bg-green-100 text-green-800'
-                    if (leave.status === 'Rejected') statusBg = 'bg-red-100 text-red-800'
+                    let statusBg = 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200'
+                    if (leave.status === 'Approved') statusBg = 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200'
+                    if (leave.status === 'Rejected') statusBg = 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200'
 
                     return (
-                      <div key={leave._id} className="p-3 bg-gray-50 border border-gray-200 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                      <div key={leave._id} className="p-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-gray-900">{leave.category} Leave</span>
+                            <span className="font-bold text-gray-900 dark:text-slate-100">{leave.category} Leave</span>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBg}`}>
                               {leave.status}
                             </span>
                           </div>
-                          <p className="text-gray-500 text-[11px] mt-0.5">
+                          <p className="text-gray-500 dark:text-slate-400 text-[11px] mt-0.5">
                             {formatDate(leave.startDate)} → {formatDate(leave.endDate)} · Reason: <em>"{leave.reason}"</em>
                           </p>
                         </div>
 
                         {leave.reviewRemarks && (
-                          <span className="text-[10px] text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">
+                          <span className="text-[10px] text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-2 py-1 rounded border border-gray-200 dark:border-slate-700">
                             Note: {leave.reviewRemarks}
                           </span>
                         )}
@@ -83,25 +83,25 @@ export default function GuardianAttendanceTab({
             </div>
 
             {/* Daily Records List */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-gray-100 font-bold text-xs text-gray-700">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-gray-100 dark:border-slate-800 font-bold text-xs text-gray-700 dark:text-slate-300">
                 Daily Attendance Timeline
               </div>
               {attHistory.length === 0 ? (
-                <div className="p-8 text-center text-gray-500 text-xs">No attendance recorded yet.</div>
+                <div className="p-8 text-center text-gray-500 dark:text-slate-400 text-xs">No attendance recorded yet.</div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-slate-800">
                   {attHistory.map((rec, i) => {
-                    let statusBg = 'bg-emerald-100 text-emerald-800'
-                    if (rec.status === 'Absent') statusBg = 'bg-red-100 text-red-800'
-                    if (rec.status === 'Late') statusBg = 'bg-amber-100 text-amber-800'
-                    if (rec.status === 'Excused') statusBg = 'bg-blue-100 text-blue-800'
+                    let statusBg = 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200'
+                    if (rec.status === 'Absent') statusBg = 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200'
+                    if (rec.status === 'Late') statusBg = 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200'
+                    if (rec.status === 'Excused') statusBg = 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200'
 
                     return (
-                      <div key={rec.date ? String(rec.date) : i} className="p-3.5 flex items-center justify-between text-xs hover:bg-gray-50">
+                      <div key={rec.date ? String(rec.date) : i} className="p-3.5 flex items-center justify-between text-xs hover:bg-gray-50 dark:hover:bg-slate-800/50">
                         <div>
-                          <span className="font-bold text-gray-800">{formatDate(rec.date)}</span>
-                          {rec.remarks && <p className="text-[11px] text-gray-500 mt-0.5">{rec.remarks}</p>}
+                          <span className="font-bold text-gray-800 dark:text-slate-100">{formatDate(rec.date)}</span>
+                          {rec.remarks && <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">{rec.remarks}</p>}
                         </div>
                         <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${statusBg}`}>
                           {rec.status}

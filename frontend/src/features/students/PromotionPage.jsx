@@ -139,14 +139,14 @@ export default function PromotionPage() {
       />
 
       {executionResult && (
-        <div className="p-6 bg-green-50 border border-green-200 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-green-500 text-white rounded-xl flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-green-900">{executionResult.message}</h2>
-              <p className="text-sm text-green-700 mt-0.5">
+              <h2 className="text-lg font-bold text-green-900 dark:text-green-100">{executionResult.message}</h2>
+              <p className="text-sm text-green-700 dark:text-green-300 mt-0.5">
                 Students have been enrolled into their new classes successfully.
               </p>
             </div>
@@ -155,15 +155,15 @@ export default function PromotionPage() {
       )}
 
       {/* Step 1: Mapping Configuration */}
-      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
-        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm space-y-5">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold">
+            <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center font-bold">
               1
             </div>
             <div>
-              <h2 className="font-bold text-gray-900">Promotion Rules & Class Progression Map</h2>
-              <p className="text-xs text-gray-500">Configure target classes and the qualifying Final Term examination.</p>
+              <h2 className="font-bold text-gray-900 dark:text-slate-100">Promotion Rules & Class Progression Map</h2>
+              <p className="text-xs text-gray-500 dark:text-slate-400">Configure target classes and the qualifying Final Term examination.</p>
             </div>
           </div>
 
@@ -172,7 +172,7 @@ export default function PromotionPage() {
               aria-label="Final exam term"
               value={finalTermName}
               onChange={(e) => setFinalTermName(e.target.value)}
-              className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500"
             >
               <option value="Final Term">Term: Final Term</option>
               <option value="Annual Exam">Term: Annual Exam</option>
@@ -181,7 +181,7 @@ export default function PromotionPage() {
 
             <button
               onClick={handleSaveConfig}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-colors"
+              className="px-4 py-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 text-gray-800 dark:text-slate-100 text-xs font-semibold rounded-xl transition-colors"
             >
               Save Map
             </button>
@@ -189,20 +189,20 @@ export default function PromotionPage() {
         </div>
 
         {loadingConfig ? (
-          <div className="text-center py-6 text-sm text-gray-500">Loading promotion rules...</div>
+          <div className="text-center py-6 text-sm text-gray-500 dark:text-slate-400">Loading promotion rules...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {mappings.map((m, idx) => {
               const fromName = m.fromClassId?.name || classes.find(c => c._id === m.fromClassId)?.name || 'Class'
               return (
-                <div key={m.fromClassId?._id || m.fromClassId || idx} className="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between gap-3 text-sm">
-                  <span className="font-bold text-gray-800">{fromName}</span>
-                  <span className="text-gray-500 font-bold">➔</span>
+                <div key={m.fromClassId?._id || m.fromClassId || idx} className="p-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between gap-3 text-sm">
+                  <span className="font-bold text-gray-800 dark:text-slate-100">{fromName}</span>
+                  <span className="text-gray-500 dark:text-slate-400 font-bold">➔</span>
                   <select
                     aria-label={`Promote ${fromName} students to`}
                     value={m.toClassId?._id || m.toClassId || ''}
                     onChange={(e) => updateMappingTo(idx, e.target.value)}
-                    className="px-2.5 py-1 bg-white border border-gray-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-indigo-500"
+                    className="px-2.5 py-1 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="">Select Target Class</option>
                     {classes.map(c => (
@@ -229,15 +229,15 @@ export default function PromotionPage() {
 
       {/* Step 2: Preview Results & Overrides */}
       {previewData && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden space-y-4">
-          <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden space-y-4">
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold">
+              <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center font-bold">
                 2
               </div>
               <div>
-                <h2 className="font-bold text-gray-900">Promotion Eligibility Preview</h2>
-                <p className="text-xs text-gray-500">Review results evaluated against Exam pass marks. Modify decisions with overrides.</p>
+                <h2 className="font-bold text-gray-900 dark:text-slate-100">Promotion Eligibility Preview</h2>
+                <p className="text-xs text-gray-500 dark:text-slate-400">Review results evaluated against Exam pass marks. Modify decisions with overrides.</p>
               </div>
             </div>
 
@@ -256,37 +256,37 @@ export default function PromotionPage() {
             <button
               onClick={() => setActiveTab('promote')}
               className={`p-4 rounded-xl border text-left transition-all ${
-                activeTab === 'promote' ? 'bg-green-50 border-green-300 ring-2 ring-green-500' : 'bg-gray-50 border-gray-200'
+                activeTab === 'promote' ? 'bg-green-50 dark:bg-green-950/40 border-green-300 ring-2 ring-green-500' : 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700'
               }`}
             >
-              <div className="flex items-center gap-2 text-green-700 font-semibold text-xs uppercase">
+              <div className="flex items-center gap-2 text-green-700 dark:text-green-300 font-semibold text-xs uppercase">
                 <CheckCircle2 className="w-4 h-4" /> Passed & Promoted
               </div>
-              <div className="text-2xl font-extrabold text-green-900 mt-1">{previewData.summary.promoteCount}</div>
+              <div className="text-2xl font-extrabold text-green-900 dark:text-green-100 mt-1">{previewData.summary.promoteCount}</div>
             </button>
 
             <button
               onClick={() => setActiveTab('retain')}
               className={`p-4 rounded-xl border text-left transition-all ${
-                activeTab === 'retain' ? 'bg-red-50 border-red-300 ring-2 ring-red-500' : 'bg-gray-50 border-gray-200'
+                activeTab === 'retain' ? 'bg-red-50 dark:bg-red-950/40 border-red-300 ring-2 ring-red-500' : 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700'
               }`}
             >
-              <div className="flex items-center gap-2 text-red-700 font-semibold text-xs uppercase">
+              <div className="flex items-center gap-2 text-red-700 dark:text-red-300 font-semibold text-xs uppercase">
                 <XCircle className="w-4 h-4" /> Retained (Failed)
               </div>
-              <div className="text-2xl font-extrabold text-red-900 mt-1">{previewData.summary.retainCount}</div>
+              <div className="text-2xl font-extrabold text-red-900 dark:text-red-100 mt-1">{previewData.summary.retainCount}</div>
             </button>
 
             <button
               onClick={() => setActiveTab('unresolved')}
               className={`p-4 rounded-xl border text-left transition-all ${
-                activeTab === 'unresolved' ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-500' : 'bg-gray-50 border-gray-200'
+                activeTab === 'unresolved' ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 ring-2 ring-amber-500' : 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700'
               }`}
             >
-              <div className="flex items-center gap-2 text-amber-700 font-semibold text-xs uppercase">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-semibold text-xs uppercase">
                 <AlertTriangle className="w-4 h-4" /> Unresolved (Missing Grades)
               </div>
-              <div className="text-2xl font-extrabold text-amber-900 mt-1">{previewData.summary.unresolvedCount}</div>
+              <div className="text-2xl font-extrabold text-amber-900 dark:text-amber-100 mt-1">{previewData.summary.unresolvedCount}</div>
             </button>
           </div>
 
@@ -294,7 +294,7 @@ export default function PromotionPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50/75 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-200">
+                <tr className="bg-gray-50/75 dark:bg-slate-800/40 text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-gray-200 dark:border-slate-700">
                   <th className="p-4">Roll No</th>
                   <th className="p-4">Student Name</th>
                   <th className="p-4">Current Class</th>
@@ -304,10 +304,10 @@ export default function PromotionPage() {
                   <th className="p-4">Override Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-sm">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-sm">
                 {(previewData[activeTab] || []).length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-gray-500">
+                    <td colSpan="7" className="p-8 text-center text-gray-500 dark:text-slate-400">
                       No students in the {activeTab} group.
                     </td>
                   </tr>
@@ -315,19 +315,19 @@ export default function PromotionPage() {
                   previewData[activeTab].map((st) => {
                     const currentDecision = overrides[st.studentId] || st.decision
                     return (
-                      <tr key={st.studentId} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="p-4 font-mono text-xs font-bold text-gray-700">{st.rollNo}</td>
-                        <td className="p-4 font-semibold text-gray-900">{st.fullName}</td>
-                        <td className="p-4 text-gray-600">{st.currentClass}</td>
-                        <td className="p-4 font-semibold text-indigo-600">{st.targetClass}</td>
-                        <td className="p-4 text-xs text-gray-500">{st.reason}</td>
+                      <tr key={st.studentId} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="p-4 font-mono text-xs font-bold text-gray-700 dark:text-slate-300">{st.rollNo}</td>
+                        <td className="p-4 font-semibold text-gray-900 dark:text-slate-100">{st.fullName}</td>
+                        <td className="p-4 text-gray-600 dark:text-slate-400">{st.currentClass}</td>
+                        <td className="p-4 font-semibold text-indigo-600 dark:text-indigo-400">{st.targetClass}</td>
+                        <td className="p-4 text-xs text-gray-500 dark:text-slate-400">{st.reason}</td>
                         <td className="p-4">
                           {currentDecision === 'promote' ? (
-                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
                               Promote
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
                               Retain
                             </span>
                           )}
@@ -337,7 +337,7 @@ export default function PromotionPage() {
                             aria-label={`Promotion decision for ${st.fullName || st.studentId}`}
                             value={currentDecision}
                             onChange={(e) => handleOverrideChange(st.studentId, e.target.value)}
-                            className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500"
+                            className="px-2.5 py-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500"
                           >
                             <option value="promote">Set to Promote</option>
                             <option value="retain">Set to Retain</option>

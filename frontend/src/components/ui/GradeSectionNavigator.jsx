@@ -97,7 +97,7 @@ export default function GradeSectionNavigator({
 
         {/* Section Pills */}
         <div className="inline-flex items-center gap-1.5 p-1 bg-slate-100/80 dark:bg-slate-800/60 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
-          <span className="text-2xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-500 px-2">
+          <span className="text-2xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 px-2">
             Section
           </span>
           {sections.map((sec) => {

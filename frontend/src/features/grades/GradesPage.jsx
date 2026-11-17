@@ -122,19 +122,19 @@ export default function GradesPage() {
 
       {/* Breadcrumb Trail */}
       {view !== 'grades' && (
-        <nav aria-label="Grades drill-down path" className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <nav aria-label="Grades drill-down path" className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 mb-6">
           {crumb.map((c, i) => (
             <React.Fragment key={`${i}-${c.label}`}>
               {i > 0 && <ChevronRight className="w-4 h-4 text-gray-300" />}
               {c.onClick ? (
                 <button
                   onClick={c.onClick}
-                  className="text-indigo-600 hover:text-indigo-800 font-medium"
+                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 font-medium"
                 >
                   {c.label}
                 </button>
               ) : (
-                <span className="text-gray-800 font-semibold">{c.label}</span>
+                <span className="text-gray-800 dark:text-slate-100 font-semibold">{c.label}</span>
               )}
             </React.Fragment>
           ))}
@@ -145,7 +145,7 @@ export default function GradesPage() {
       {view === 'grades' && (
         <>
           <div className="flex justify-between items-center mb-5">
-            <p className="text-sm text-gray-500">Select a grade to enter exam marks</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Select a grade to enter exam marks</p>
             <button
               onClick={() => setShowExamModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow-sm"
@@ -187,8 +187,8 @@ export default function GradesPage() {
       {view === 'sections' && selectedGrade && (
         <>
           <div className="mb-5">
-            <h2 className="text-xl font-bold text-gray-900">{selectedGrade.name}</h2>
-            <p className="text-sm text-gray-500 mt-1">Select a section to enter exam marks</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">{selectedGrade.name}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Select a section to enter exam marks</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {getSectionsForGrade(selectedGrade).map((section) => {
@@ -201,13 +201,13 @@ export default function GradesPage() {
                 <button
                   key={section}
                   onClick={() => handleSelectSection(section)}
-                  className="bg-white border-2 border-indigo-200 hover:border-indigo-500 hover:bg-indigo-50 rounded-2xl p-6 text-left transition-all duration-200 hover:shadow-md group"
+                  className="bg-white dark:bg-slate-900 border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-500 hover:bg-indigo-50 rounded-2xl p-6 text-left transition-all duration-200 hover:shadow-md group"
                 >
-                  <div className="w-12 h-12 bg-indigo-100 group-hover:bg-indigo-200 rounded-xl flex items-center justify-center mb-3 transition-colors">
-                    <span className="text-2xl font-black text-indigo-600">{section}</span>
+                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 group-hover:bg-indigo-200 rounded-xl flex items-center justify-center mb-3 transition-colors">
+                    <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{section}</span>
                   </div>
-                  <p className="font-bold text-gray-800">Section {section}</p>
-                  <p className="text-xs text-gray-500 mt-1">{count} Students</p>
+                  <p className="font-bold text-gray-800 dark:text-slate-100">Section {section}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{count} Students</p>
                 </button>
               )
             })}
@@ -220,22 +220,22 @@ export default function GradesPage() {
         <>
           <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">
                 {selectedGrade.name} — Section {selectedSection}
               </h2>
-              <p className="text-sm text-gray-500 mt-1">{students.length} students enrolled</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{students.length} students enrolled</p>
             </div>
             <div className="flex items-center gap-3">
               {/* Exam Selector */}
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Exam</label>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">Exam</label>
                 <select aria-label="Exam"
                   value={selectedExam?._id || ''}
                   onChange={(e) => {
                     const exam = exams.find((x) => x._id === e.target.value) || null
                     setSelectedExam(exam)
                   }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">— Select Exam —</option>
                   {exams.map((ex) => (
@@ -248,7 +248,7 @@ export default function GradesPage() {
               <div className="mt-4">
                 <button
                   onClick={() => setShowExamModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 border border-indigo-300 text-indigo-700 hover:bg-indigo-50 font-semibold text-sm rounded-lg"
+                  className="flex items-center gap-2 px-4 py-2 border border-indigo-300 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 font-semibold text-sm rounded-lg"
                 >
                   <FileText className="w-4 h-4" />
                   New Exam

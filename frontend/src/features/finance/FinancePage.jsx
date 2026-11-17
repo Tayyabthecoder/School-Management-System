@@ -42,6 +42,10 @@ import FeeGradePicker from './components/FeeGradePicker'
 import FeeSearchResults from './components/FeeSearchResults'
 import FeeSearchBar from './components/FeeSearchBar'
 import MonthlyChallanControlCard from './components/MonthlyChallanControlCard'
+import { useFeeSearchColumns } from './hooks/useFeeSearchColumns'
+import { useChallanActions } from './hooks/useChallanActions'
+import { useFeeActions } from './hooks/useFeeActions'
+import { useFinanceData } from './hooks/useFinanceData'
 
 
 export default function FinancePage() {
@@ -91,42 +95,7 @@ export default function FinancePage() {
   })
   const [forceRegenerate, setForceRegenerate] = useState(false)
 
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      const [clsRes, stuRes, feesRes, statsRes, cronRes] = await Promise.all([
-        loadClasses(),
-        cachedGet('/students', { params: { limit: 1000 } }),
-        cachedGet('/finance/student-fees', { params: { limit: 1000 } }),
-        cachedGet('/reports/dashboard-stats').catch(() => ({ data: { data: {} } })),
-        cachedGet('/finance/monthly-challans/status').catch(() => ({ data: { data: null } })),
-      ])
-      if (clsRes.data?.success && clsRes.data.data.length > 0) {
-        setClasses(clsRes.data.data)
-      } else {
-        setClasses(FALLBACK_GRADES)
-      }
-      if (stuRes.data?.success) setStudents(stuRes.data.data)
-      if (feesRes.data?.success) setStudentFees(feesRes.data.data)
-      if (statsRes.data?.success) {
-        setOverdueStats({
-          count: statsRes.data.data?.overdueCount || 0,
-          total: statsRes.data.data?.overdueTotal || 0,
-        })
-      }
-      if (cronRes.data?.success) {
-        setCronStatus(cronRes.data.data)
-      }
-    } catch (err) {
-      setClasses(FALLBACK_GRADES)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
+  const { fetchData } = useFinanceData({ setClasses, students, setStudents, setStudentFees, setLoading, setOverdueStats, setCronStatus })
 
   const displayClasses = classes && classes.length > 0 ? classes : FALLBACK_GRADES
 
@@ -166,189 +135,9 @@ export default function FinancePage() {
   }
 
   // Payment Modal Triggers
-  const handleOpenPayment = (feeRecord) => {
-    setSelectedFeeRecord(feeRecord)
-    setPaymentAmount(feeRecord.outstandingAmount || feeRecord.netAmount)
-    setShowPaymentModal(true)
-  }
-
-  const handleRecordPayment = async (e) => {
-    e.preventDefault()
-    if (!selectedFeeRecord) return
-    setSubmittingPayment(true)
-
-    try {
-      const res = await api.post('/finance/payments', {
-        studentFeeId: selectedFeeRecord._id,
-        amountPaid: Number(paymentAmount),
-        paymentMode,
-      })
-
-      if (res.data?.success) {
-        setShowPaymentModal(false)
-        fetchData()
-        toast.success(`Payment recorded successfully! Receipt #: ${res.data.data.payment.receiptNo}`)
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.error?.message || 'Payment recording failed')
-    } finally {
-      setSubmittingPayment(false)
-    }
-  }
-
-  // Concession Modal Triggers
-  const handleOpenConcessionModal = (feeRecord) => {
-    setConcessionFeeRecord(feeRecord)
-    setConcessionType(
-      feeRecord.concessionType && feeRecord.concessionType !== 'None'
-        ? feeRecord.concessionType
-        : 'Sibling Discount'
-    )
-    setDiscountAmount(feeRecord.discount || 0)
-    setConcessionReason(feeRecord.concessionReason || '')
-    setShowConcessionModal(true)
-  }
-
-  const handleApplyPresetPercentage = (pct) => {
-    if (!concessionFeeRecord) return
-    const calculated = Math.round((concessionFeeRecord.amountDue * pct) / 100)
-    setDiscountAmount(calculated)
-  }
-
-  const handleApplyConcession = async (e) => {
-    e.preventDefault()
-    if (!concessionFeeRecord) return
-    setSubmittingConcession(true)
-
-    try {
-      const res = await api.post('/finance/concession', {
-        studentFeeId: concessionFeeRecord._id,
-        discountAmount: Number(discountAmount),
-        concessionType,
-        concessionReason,
-      })
-
-      if (res.data?.success) {
-        setShowConcessionModal(false)
-        await fetchData()
-        toast.success(`Fee concession applied successfully! New net amount: PKR ${formatPKR(res.data.data.netAmount)}`)
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.error?.message || err.response?.data?.message || 'Failed to apply fee concession')
-    } finally {
-      setSubmittingConcession(false)
-    }
-  }
-
+  const { handleOpenPayment, handleRecordPayment, handleOpenConcessionModal, handleApplyPresetPercentage, handleApplyConcession } = useFeeActions({ toast, fetchData, setShowPaymentModal, selectedFeeRecord, setSelectedFeeRecord, paymentAmount, setPaymentAmount, paymentMode, setSubmittingPayment, setShowConcessionModal, concessionFeeRecord, setConcessionFeeRecord, concessionType, setConcessionType, discountAmount, setDiscountAmount, concessionReason, setConcessionReason, setSubmittingConcession })
   // Challan Download Trigger
-  const handleDownloadChallan = async (feeRecord) => {
-    setDownloadingChallanId(feeRecord._id)
-    try {
-      const res = await api.get(`/finance/challan/${feeRecord._id}`, {
-        responseType: 'blob',
-      })
-      const blob = new Blob([res.data], { type: 'application/pdf' })
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      const studentCode = feeRecord.studentId?.studentId || 'STU'
-      const challanSuffix = feeRecord._id.slice(-6).toUpperCase()
-      link.setAttribute('download', `Fee_Challan_${studentCode}_${challanSuffix}.pdf`)
-      document.body.appendChild(link)
-      link.click()
-      link.parentNode.removeChild(link)
-      window.URL.revokeObjectURL(url)
-
-      // Refresh data so Due Date column reflects the new 10-day post-download due date immediately
-      await fetchData()
-    } catch (err) {
-      toast.error(err.response?.data?.error?.message || 'Failed to download Fee Challan PDF')
-    } finally {
-      setDownloadingChallanId(null)
-    }
-  }
-
-  // Bulk Print / Download Section Challans
-  const [bulkPrinting, setBulkPrinting] = useState(false)
-  const [bulkProgress, setBulkProgress] = useState(null)
-
-  const handleBulkPrintChallans = async () => {
-    if (!activeFeeLedger || activeFeeLedger.length === 0) {
-      toast.warning('No students found in this section to generate challans.')
-      return
-    }
-
-    setBulkPrinting(true)
-    let count = 0
-    try {
-      for (const feeRecord of activeFeeLedger) {
-        setBulkProgress(`Downloading ${count + 1} of ${activeFeeLedger.length}...`)
-        const res = await api.get(`/finance/challan/${feeRecord._id}`, {
-          responseType: 'blob',
-        })
-        const blob = new Blob([res.data], { type: 'application/pdf' })
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        const studentCode = feeRecord.studentId?.studentId || 'STU'
-        const challanSuffix = feeRecord._id.slice(-6).toUpperCase()
-        link.setAttribute('download', `Fee_Challan_${studentCode}_${challanSuffix}.pdf`)
-        document.body.appendChild(link)
-        link.click()
-        link.parentNode.removeChild(link)
-        window.URL.revokeObjectURL(url)
-        count++
-        await new Promise((r) => setTimeout(r, 150))
-      }
-
-      // Refresh data after bulk downloads
-      await fetchData()
-      toast.success(`Successfully downloaded ${count} fee challans!`)
-    } catch (err) {
-      logError('Bulk challan error', err)
-      toast.error('Failed while downloading bulk challans')
-    } finally {
-      setBulkPrinting(false)
-      setBulkProgress(null)
-    }
-  }
-
-  const handleTriggerMonthlyGeneration = async (e) => {
-    e.preventDefault()
-    setGeneratingChallans(true)
-    try {
-      const res = await api.post('/finance/monthly-challans/generate', {
-        targetDate: generationTargetDate,
-        force: forceRegenerate,
-      })
-      if (res.data?.success) {
-        setShowGenerateModal(false)
-        await fetchData()
-        toast.success(
-          `Monthly challans generated for ${res.data.data.month} ${res.data.data.year}: ${res.data.data.generatedCount} generated, ${res.data.data.skippedCount} skipped.`
-        )
-      }
-    } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        err.response?.data?.error?.message ||
-        'Failed to generate monthly challans'
-      )
-    } finally {
-      setGeneratingChallans(false)
-    }
-  }
-
-  const activeFeeLedger = studentFees.filter((f) => {
-    if (!selectedGrade || !selectedSection || !f.studentId) return false
-    const matchesClass =
-      f.studentId.classId &&
-      (f.studentId.classId === selectedGrade._id ||
-        f.studentId.classId._id === selectedGrade._id ||
-        f.studentId.classId?.name === selectedGrade.name)
-    const matchesSection = f.studentId.sectionId === selectedSection
-    return matchesClass && matchesSection
-  })
+  const { handleDownloadChallan, handleBulkPrintChallans, handleTriggerMonthlyGeneration, activeFeeLedger, bulkPrinting, bulkProgress } = useChallanActions({ toast, fetchData, students, studentFees, selectedGrade, selectedSection, setDownloadingChallanId, setShowGenerateModal, setGeneratingChallans, generationTargetDate, forceRegenerate })
 
   const columns = buildFeeLedgerColumns({
     onDownloadChallan: handleDownloadChallan,
@@ -419,183 +208,7 @@ export default function FinancePage() {
     })
   }, [studentFees, searchQuery, statusFilter])
 
-  const searchColumns = [
-    {
-      header: 'Student & Roll ID',
-      cell: (row) => (
-        <div>
-          <div className="font-semibold text-slate-900 dark:text-slate-100">
-            {row.studentId ? row.studentId.fullName : 'N/A'}
-          </div>
-          <div className="text-xs text-indigo-600 dark:text-indigo-400 font-mono font-medium">
-            {row.studentId ? row.studentId.studentId : 'N/A'}
-          </div>
-          {row.studentId?.guardian?.name && (
-            <div className="text-[11px] text-slate-500 truncate max-w-[150px]">
-              G: {row.studentId.guardian.name}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: 'Grade & Section',
-      cell: (row) => {
-        const clsName = row.studentId?.classId?.name || 'Class'
-        const secId = row.studentId?.sectionId || 'A'
-        return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-            {clsName} · Sec {secId}
-          </span>
-        )
-      },
-    },
-    {
-      header: 'Challan Voucher #',
-      cell: (row) => {
-        const activeDue = row.effectiveDueDate || row.dueDate || row.createdAt
-        const challanYear = activeDue ? new Date(activeDue).getFullYear() : new Date().getFullYear()
-        const suffix = row._id ? row._id.slice(-6).toUpperCase() : '------'
-        const challanCode = `CHL-${challanYear}-${suffix}`
-        return (
-          <div>
-            <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-              {challanCode}
-            </span>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-[140px]">
-              {row.feeStructureId?.title || 'Tuition Fee'}
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      header: 'Base Fee',
-      cell: (row) => (
-        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-          {formatPKR(row.amountDue)}
-        </span>
-      ),
-    },
-    {
-      header: 'Concession',
-      cell: (row) => {
-        if (row.discount > 0) {
-          return (
-            <div className="space-y-0.5">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                <Tag className="w-3 h-3" /> -{formatPKR(row.discount)}
-              </span>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400 italic">
-                {row.concessionType !== 'None' ? row.concessionType : 'Institutional'}
-              </div>
-            </div>
-          )
-        }
-        return <span className="text-xs text-slate-500">None</span>
-      },
-    },
-    {
-      header: 'Net Payable',
-      cell: (row) => (
-        <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">
-          {formatPKR(row.netAmount)}
-        </span>
-      ),
-    },
-    {
-      header: 'Paid',
-      cell: (row) => (
-        <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
-          {formatPKR(row.amountPaid)}
-        </span>
-      ),
-    },
-    {
-      header: 'Outstanding',
-      cell: (row) => (
-        <span className="font-bold text-rose-700 dark:text-rose-400 text-xs">
-          {formatPKR(row.outstandingAmount)}
-        </span>
-      ),
-    },
-    {
-      header: 'Due Date',
-      cell: (row) => {
-        const isDownloaded = Boolean(row.challanDownloadedAt)
-        const activeDue = row.effectiveDueDate || row.dueDate
-        const due = activeDue ? new Date(activeDue).toLocaleDateString('en-GB') : 'N/A'
-        return (
-          <div>
-            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              {due}
-            </span>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-              {isDownloaded ? '10d post-download' : '10d on download'}
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      header: 'Status',
-      cell: (row) => (
-        <Badge
-          variant={
-            row.status === 'Paid'
-              ? 'success'
-              : row.status === 'Partial'
-              ? 'warning'
-              : 'danger'
-          }
-        >
-          {row.status}
-        </Badge>
-      ),
-    },
-    {
-      header: 'Actions',
-      cell: (row) => (
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button
-            onClick={() => handleDownloadChallan(row)}
-            disabled={downloadingChallanId === row._id}
-            title="Download Bank Fee Challan Voucher (Printable PDF)"
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
-          >
-            <Download className="w-3 h-3 text-amber-700 dark:text-amber-400" />
-            {downloadingChallanId === row._id ? 'Generating...' : 'Challan'}
-          </button>
-
-          <button
-            onClick={() => handleOpenConcessionModal(row)}
-            title="Apply scholarship or discount concession"
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-semibold shadow-xs transition-colors"
-          >
-            <Percent className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
-            Concession
-          </button>
-
-          {row.outstandingAmount > 0 && (
-            <button
-              onClick={() => handleOpenPayment(row)}
-              className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors"
-            >
-              Record Payment
-            </button>
-          )}
-
-          <button
-            onClick={() => handleJumpToLedger(row)}
-            title="Open section fee ledger"
-            className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-semibold transition-colors"
-          >
-            Ledger <ChevronRight className="w-3 h-3" />
-          </button>
-        </div>
-      ),
-    },
-  ]
+  const { searchColumns } = useFeeSearchColumns({ handleOpenPayment, handleOpenConcessionModal, handleDownloadChallan, handleJumpToLedger, downloadingChallanId })
 
   const getSectionsForGrade = (grade) => {
     if (!grade) return ['A', 'B']
@@ -633,23 +246,23 @@ export default function FinancePage() {
       />
 
       {showOverdueBanner && overdueStats.count > 0 && (
-        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-rose-50 to-red-50 border border-red-200 shadow-sm flex items-center justify-between">
+        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-rose-50 dark:from-rose-950/40 to-red-50 dark:to-red-950/40 border border-red-200 dark:border-red-800 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-100 rounded-lg text-red-700">
+            <div className="p-2 bg-red-100 dark:bg-red-900/40 rounded-lg text-red-700 dark:text-red-300">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-gray-900 dark:text-slate-100">
                 Overdue Fee Notice: {overdueStats.count} Student{overdueStats.count > 1 ? 's' : ''} have unpaid fees past deadline
               </p>
-              <p className="text-xs text-red-700">
+              <p className="text-xs text-red-700 dark:text-red-300">
                 Total outstanding overdue amount across all classes: <span className="font-bold">{formatPKR(overdueStats.total)}</span>
               </p>
             </div>
           </div>
           <button
             onClick={() => setShowOverdueBanner(false)}
-            className="text-gray-500 hover:text-gray-600 text-xs font-semibold px-2 py-1 rounded"
+            className="text-gray-500 dark:text-slate-400 hover:text-gray-600 text-xs font-semibold px-2 py-1 rounded"
           >
             ✕ Dismiss
           </button>

@@ -144,7 +144,7 @@ export default function DataTable({
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 p-0.5"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-600 p-0.5"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -194,7 +194,7 @@ export default function DataTable({
                         type="checkbox"
                         checked={isAllSelected}
                         onChange={handleSelectAll}
-                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600/20"
+                        className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-600/20"
                       />
                     </th>
                   )}
@@ -222,7 +222,7 @@ export default function DataTable({
                         <div className="flex items-center gap-1.5">
                           <span>{col.header}</span>
                           {isSortable && (
-                            <span className="text-slate-500">
+                            <span className="text-slate-500 dark:text-slate-400">
                               {isSorted ? (
                                 sortConfig.direction === 'asc' ? (
                                   <ChevronUp className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -258,7 +258,7 @@ export default function DataTable({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleSelectRow(rowId)}
-                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600/20"
+                            className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-600/20"
                           />
                         </td>
                       )}

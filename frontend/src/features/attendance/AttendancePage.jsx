@@ -274,13 +274,13 @@ export default function AttendancePage() {
       />
 
       {/* ── Main Tab Switcher ──────────────────────────────────────── */}
-      <div className="flex border-b border-gray-200 bg-white rounded-2xl px-3 shadow-sm">
+      <div className="flex border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl px-3 shadow-sm">
         <button
           onClick={() => setActiveMainTab('attendance')}
           className={`flex items-center gap-2 py-4 px-4 text-xs font-bold transition-all border-b-2 ${
             activeMainTab === 'attendance'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900'
           }`}
         >
           <Calendar className="w-4 h-4" />
@@ -290,8 +290,8 @@ export default function AttendancePage() {
           onClick={() => setActiveMainTab('leaves')}
           className={`flex items-center gap-2 py-4 px-4 text-xs font-bold transition-all border-b-2 ${
             activeMainTab === 'leaves'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -306,10 +306,10 @@ export default function AttendancePage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-indigo-600" /> Select Academic Grade (1–12) for Attendance
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Select Academic Grade (1–12) for Attendance
                   </h2>
-                  <p className="text-xs text-gray-500">Pick a grade to access its sections and mark student attendance.</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Pick a grade to access its sections and mark student attendance.</p>
                 </div>
                 <Badge variant="indigo">{displayClasses.length} Grades Active</Badge>
               </div>
@@ -327,7 +327,7 @@ export default function AttendancePage() {
                       className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-5 text-white shadow-lg ${theme.shadow} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase">
+                        <span className="px-2.5 py-1 rounded-full bg-white/20 dark:bg-slate-900/20 backdrop-blur-md text-xs font-bold uppercase">
                           Level {cls.level}
                         </span>
                         <Calendar className="w-6 h-6 text-white/90" />
@@ -358,18 +358,18 @@ export default function AttendancePage() {
               <div className="mb-4">
                 <button
                   onClick={() => setNavLevel('grades')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back to All Grades
                 </button>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-6">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mb-6">
                 <div className="flex items-center justify-between mb-6 pb-4 border-b">
                   <div>
-                    <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">GRADE LEVEL {selectedGrade.level}</span>
-                    <h2 className="text-2xl font-extrabold text-gray-900">{selectedGrade.name} - Select Section for Attendance</h2>
-                    <p className="text-xs text-gray-500 mt-1">Select a section roster to record today's attendance status.</p>
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">GRADE LEVEL {selectedGrade.level}</span>
+                    <h2 className="text-2xl font-extrabold text-gray-900 dark:text-slate-100">{selectedGrade.name} - Select Section for Attendance</h2>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Select a section roster to record today's attendance status.</p>
                   </div>
                   <Badge variant="indigo">{sectionsToDisplay.length} Sections</Badge>
                 </div>
@@ -382,25 +382,25 @@ export default function AttendancePage() {
                       <div
                         key={sec}
                         onClick={() => handleSelectSection(sec)}
-                        className="bg-gray-50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                        className="bg-gray-50 dark:bg-slate-800/50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 dark:border-slate-700 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                       >
                         <div className="flex items-center justify-between mb-4">
                           <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl flex items-center justify-center shadow-md shadow-indigo-600/30">
                             {sec}
                           </div>
-                          <span className="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border text-gray-600">
+                          <span className="text-xs font-semibold bg-white dark:bg-slate-900 px-2.5 py-1 rounded-full border text-gray-600 dark:text-slate-400">
                             Section {sec}
                           </span>
                         </div>
 
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">
                           {selectedGrade.name} - Section {sec}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1 mb-4 flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-gray-500" /> {secCount} Enrolled Students
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 mb-4 flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5 text-gray-500 dark:text-slate-400" /> {secCount} Enrolled Students
                         </p>
 
-                        <div className="w-full py-2 bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
+                        <div className="w-full py-2 bg-white dark:bg-slate-900 group-hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 dark:border-indigo-800 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
                           Open Roster <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>

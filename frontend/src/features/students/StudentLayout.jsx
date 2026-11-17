@@ -14,7 +14,7 @@ export default function StudentLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex flex-col font-sans">
       {/* Top Header */}
       <header className="sticky top-0 z-30 bg-indigo-950 text-white shadow-md border-b border-indigo-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -66,7 +66,7 @@ export default function StudentLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+      <footer className="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 py-4 text-center text-xs text-gray-500 dark:text-slate-400">
         School Management System · Student Academic Hub © 2026
       </footer>
     </div>

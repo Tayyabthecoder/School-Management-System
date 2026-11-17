@@ -34,7 +34,7 @@ export default function MonthlyChallanControlCard({
 
             <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0 border-white/10 shrink-0">
               <div className="text-right hidden sm:block">
-                <div className="text-[11px] text-slate-500">Current Cycle Status:</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">Current Cycle Status:</div>
                 <div className="text-xs font-bold text-indigo-200">
                   {cronStatus?.currentMonth || 'Current Month'}: {cronStatus?.currentMonthChallansCount || 0} / {cronStatus?.totalActiveStudents || students.length} Students
                 </div>

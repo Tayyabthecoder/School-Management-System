@@ -93,7 +93,7 @@ export default function AcademicRecordsTab({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-2xs text-slate-500 font-medium italic">
+                      <span className="text-2xs text-slate-500 dark:text-slate-400 font-medium italic">
                         Not assessed yet
                       </span>
                     )}
@@ -103,7 +103,7 @@ export default function AcademicRecordsTab({
             })}
           </div>
         ) : (
-          <div className="p-8 text-center text-sm text-slate-500">
+          <div className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
             No subjects registered for this class. Configure class subjects in the Academic module.
           </div>
         )}
@@ -136,7 +136,7 @@ export default function AcademicRecordsTab({
             size="sm"
             icon={Download}
             onClick={onDownloadReportCard}
-            className="bg-white text-indigo-900 hover:bg-indigo-50 border-white"
+            className="bg-white dark:bg-slate-900 text-indigo-900 dark:text-indigo-100 hover:bg-indigo-50 border-white"
           >
             Export Report Card (.pdf)
           </Button>
@@ -169,7 +169,7 @@ export default function AcademicRecordsTab({
                 </div>
                 <div className="col-span-2 text-center font-bold text-slate-900 dark:text-slate-100 text-sm">
                   {g.marksObtained}{' '}
-                  <span className="text-xs text-slate-500 font-normal">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">
                     / {g.examId?.maxMarks || 100}
                   </span>
                 </div>
@@ -200,7 +200,7 @@ export default function AcademicRecordsTab({
               </div>
             ))
           ) : (
-            <div className="py-12 text-center text-sm text-slate-500">
+            <div className="py-12 text-center text-sm text-slate-500 dark:text-slate-400">
               No exam marks recorded yet for this student.
             </div>
           )}

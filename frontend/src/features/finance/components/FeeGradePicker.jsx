@@ -16,10 +16,10 @@ export default function FeeGradePicker({
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-indigo-600" /> Select Academic Grade (1–12)
+                <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Select Academic Grade (1–12)
                 </h2>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-slate-400">
                   Pick a grade level to review fee ledgers, manage concessions, and print 3-part bank fee challans.
                 </p>
               </div>
@@ -53,7 +53,7 @@ export default function FeeGradePicker({
                     className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-5 text-white shadow-lg ${theme.shadow} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase">
+                      <span className="px-2.5 py-1 rounded-full bg-white/20 dark:bg-slate-900/20 backdrop-blur-md text-xs font-bold uppercase">
                         Level {cls.level}
                       </span>
                       <CircleDollarSign className="w-6 h-6 text-white/90" />

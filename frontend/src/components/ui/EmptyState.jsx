@@ -10,7 +10,7 @@ export default function EmptyState({
 }) {
   return (
     <div className={`text-center py-12 px-4 flex flex-col items-center justify-center ${className}`}>
-      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-4 shadow-xs">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center text-slate-400 dark:text-slate-400 mb-4 shadow-xs">
         <Icon className="w-7 h-7" />
       </div>
       <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 tracking-tight mb-1">

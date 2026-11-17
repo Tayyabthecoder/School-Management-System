@@ -10,17 +10,17 @@ const ICONS = {
 }
 
 const BG = {
-  success: 'bg-green-50 border-green-200',
-  error: 'bg-red-50 border-red-200',
-  warning: 'bg-amber-50 border-amber-200',
-  info: 'bg-indigo-50 border-indigo-200',
+  success: 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800',
+  error: 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800',
+  warning: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800',
+  info: 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800',
 }
 
 const TEXT = {
-  success: 'text-green-800',
-  error: 'text-red-800',
-  warning: 'text-amber-800',
-  info: 'text-indigo-800',
+  success: 'text-green-800 dark:text-green-200',
+  error: 'text-red-800 dark:text-red-200',
+  warning: 'text-amber-800 dark:text-amber-200',
+  info: 'text-indigo-800 dark:text-indigo-200',
 }
 
 function ToastItem({ toast }) {

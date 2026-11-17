@@ -55,7 +55,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Official Email Address *</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400" />
               <input aria-label="Official Email Address"
                 required
                 type="email"
@@ -68,7 +68,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Primary Phone / Mobile</label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400" />
               <input aria-label="Primary Phone / Mobile"
                 value={profile?.phone || ''}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
@@ -87,7 +87,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Website URL</label>
             <div className="relative">
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400" />
               <input aria-label="Website URL"
                 value={profile?.website || ''}
                 onChange={(e) => setProfile({ ...profile, website: e.target.value })}
@@ -98,7 +98,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
           <div className="md:col-span-2">
             <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Campus Physical Address</label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
+              <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500 dark:text-slate-400" />
               <textarea aria-label="Campus Physical Address"
                 rows={2}
                 value={profile?.address || ''}
@@ -122,7 +122,7 @@ export default function SchoolProfileTab({ profile, setProfile, onSave, savingPr
                 type="color"
                 value={profile?.primaryColor || '#3730A3'}
                 onChange={(e) => setProfile({ ...profile, primaryColor: e.target.value })}
-                className="w-10 h-10 p-0.5 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer bg-white"
+                className="w-10 h-10 p-0.5 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer bg-white dark:bg-slate-900"
               />
               <input aria-label="#3730A3"
                 type="text"

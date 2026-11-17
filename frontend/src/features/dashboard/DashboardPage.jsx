@@ -71,10 +71,10 @@ const QUICK_ACTIONS = {
 }
 
 const COLOR_MAP = {
-  indigo: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200',
-  green: 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200',
-  teal: 'bg-teal-50 text-teal-700 hover:bg-teal-100 border-teal-200',
-  amber: 'bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200',
+  indigo: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 border-indigo-200 dark:border-indigo-800',
+  green: 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 hover:bg-green-100 border-green-200 dark:border-green-800',
+  teal: 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 hover:bg-teal-100 border-teal-200 dark:border-teal-800',
+  amber: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 border-amber-200 dark:border-amber-800',
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -303,7 +303,7 @@ export default function DashboardPage() {
 
       {/* ── Quick Actions ───────────────────────────────────────────── */}
       <div className="card-surface p-5 mb-6">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Quick Actions</h2>
+        <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Quick Actions</h2>
         <div className="flex flex-wrap gap-2.5">
           {quickActions.map((action) => {
             const Icon = action.icon
@@ -329,7 +329,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Enrollment by Grade</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5">Active enrolled students across all grades</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Active enrolled students across all grades</p>
             </div>
             <span className="text-[11px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-full font-semibold border border-indigo-100 dark:border-indigo-900">
               Academic Year 2026
@@ -362,10 +362,10 @@ export default function DashboardPage() {
             <>
               <div className="mb-4">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Fee Collection</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Collected vs outstanding</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Collected vs outstanding</p>
               </div>
               {loading ? (
-                <div className="h-52 bg-gray-100 rounded-xl animate-pulse" />
+                <div className="h-52 bg-gray-100 dark:bg-slate-800 rounded-xl animate-pulse" />
               ) : (
                 <>
                   <ChartFrame label="Pie chart: fee collected versus outstanding">
@@ -394,12 +394,12 @@ export default function DashboardPage() {
                   </ChartFrame>
                   <div className="mt-2 space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-500">Collected</span>
-                      <span className="font-bold text-green-700">{formatPKR(stats?.totalCollections)}</span>
+                      <span className="text-gray-500 dark:text-slate-400">Collected</span>
+                      <span className="font-bold text-green-700 dark:text-green-300">{formatPKR(stats?.totalCollections)}</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-500">Outstanding</span>
-                      <span className="font-bold text-amber-700">{formatPKR(stats?.totalOutstandingFees)}</span>
+                      <span className="text-gray-500 dark:text-slate-400">Outstanding</span>
+                      <span className="font-bold text-amber-700 dark:text-amber-300">{formatPKR(stats?.totalOutstandingFees)}</span>
                     </div>
                   </div>
                 </>
@@ -409,20 +409,20 @@ export default function DashboardPage() {
             <>
               <div className="mb-4">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Today's Staff Roster</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Staff presence & leave distribution</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Staff presence & leave distribution</p>
               </div>
               <div className="h-44 flex flex-col justify-center space-y-3">
-                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-emerald-800">Staff Present Today</span>
-                  <span className="text-lg font-bold text-emerald-900">{stats?.staffPresentToday ?? 0}</span>
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-900 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">Staff Present Today</span>
+                  <span className="text-lg font-bold text-emerald-900 dark:text-emerald-100">{stats?.staffPresentToday ?? 0}</span>
                 </div>
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-amber-800">Staff On Leave</span>
-                  <span className="text-lg font-bold text-amber-900">{stats?.staffOnLeaveToday ?? 0}</span>
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-100 dark:border-amber-900 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Staff On Leave</span>
+                  <span className="text-lg font-bold text-amber-900 dark:text-amber-100">{stats?.staffOnLeaveToday ?? 0}</span>
                 </div>
-                <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-rose-800">Pending Leave Requests</span>
-                  <span className="text-lg font-bold text-rose-900">{stats?.pendingLeaveRequests ?? 0}</span>
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-100 dark:border-rose-900 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-rose-800 dark:text-rose-200">Pending Leave Requests</span>
+                  <span className="text-lg font-bold text-rose-900 dark:text-rose-100">{stats?.pendingLeaveRequests ?? 0}</span>
                 </div>
               </div>
             </>
@@ -430,20 +430,20 @@ export default function DashboardPage() {
             <>
               <div className="mb-4">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Academic Status</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Current term & attendance status</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Current term & attendance status</p>
               </div>
               <div className="h-44 flex flex-col justify-center space-y-3">
-                <div className="p-3.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-indigo-800">Active Academic Session</span>
-                  <span className="text-sm font-bold text-indigo-900">{stats?.academicYear ?? 'Not set'}</span>
+                <div className="p-3.5 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-indigo-800 dark:text-indigo-200">Active Academic Session</span>
+                  <span className="text-sm font-bold text-indigo-900 dark:text-indigo-100">{stats?.academicYear ?? 'Not set'}</span>
                 </div>
-                <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-emerald-800">Campus Attendance Rate</span>
-                  <span className="text-sm font-bold text-emerald-900">{formatRate(stats?.attendanceRate)}</span>
+                <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-900 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">Campus Attendance Rate</span>
+                  <span className="text-sm font-bold text-emerald-900 dark:text-emerald-100">{formatRate(stats?.attendanceRate)}</span>
                 </div>
-                <div className="p-3.5 bg-teal-50 rounded-xl border border-teal-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-teal-800">Total Enrolled Students</span>
-                  <span className="text-sm font-bold text-teal-900">{stats?.totalStudents ?? 0}</span>
+                <div className="p-3.5 bg-teal-50 dark:bg-teal-950/40 rounded-xl border border-teal-100 dark:border-teal-900 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-teal-800 dark:text-teal-200">Total Enrolled Students</span>
+                  <span className="text-sm font-bold text-teal-900 dark:text-teal-100">{stats?.totalStudents ?? 0}</span>
                 </div>
               </div>
             </>
@@ -458,7 +458,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 card-surface p-6">
           <div className="mb-4">
             <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Attendance Trend</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5">Daily attendance rate — last 7 days</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daily attendance rate — last 7 days</p>
           </div>
           <ChartFrame label="Line chart: daily attendance rate over the last 7 days">
           <ResponsiveContainer width="100%" height={180}>

@@ -205,7 +205,7 @@ export default function ProfileHeader({
                       type="button"
                       onClick={onOpenChangeSection}
                       aria-label="Change Student Section" title="Change Student Section"
-                      className="p-1 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-lg transition-colors"
+                      className="p-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-lg transition-colors"
                     >
                       <ArrowRightLeft className="w-3.5 h-3.5" />
                     </button>

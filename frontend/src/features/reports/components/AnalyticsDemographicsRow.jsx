@@ -10,10 +10,10 @@ export default function DemographicsRow({
   return (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Gender Breakdown */}
-                  <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                  <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-                        <Users className="w-4 h-4 text-pink-600" />
+                      <h2 className="font-bold text-gray-900 dark:text-slate-100 text-sm flex items-center gap-2">
+                        <Users className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                         Student Gender Ratio ({demographics?.totalEnrolled || 0} Total)
                       </h2>
                     </div>
@@ -41,16 +41,16 @@ export default function DemographicsRow({
                         </ResponsiveContainer>
                         </ChartFrame>
                       ) : (
-                        <p className="text-xs text-gray-500">No demographic data available.</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">No demographic data available.</p>
                       )}
                     </div>
                   </div>
 
                   {/* Age Group Distribution */}
-                  <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                  <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-teal-600" />
+                      <h2 className="font-bold text-gray-900 dark:text-slate-100 text-sm flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                         Age Group Distribution
                       </h2>
                     </div>

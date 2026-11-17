@@ -48,7 +48,7 @@ export default function FeeLedgerTab({
       {/* Financial Summary KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card-surface p-5">
-          <p className="text-2xs font-semibold text-slate-500 uppercase">Total Fees Invoiced</p>
+          <p className="text-2xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Fees Invoiced</p>
           <p className="text-xl font-black text-slate-900 dark:text-slate-100 mt-1">
             {formatPKR(totalFeeDue)}
           </p>
@@ -143,7 +143,7 @@ export default function FeeLedgerTab({
                       {f.concessionType || 'Scholarship'})
                     </span>
                   ) : (
-                    <p className="text-slate-500 mt-0.5">Invoice: {f._id?.slice(-8)}</p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">Invoice: {f._id?.slice(-8)}</p>
                   )}
                 </div>
                 <div className="col-span-2 font-medium text-slate-700 dark:text-slate-300">
@@ -151,7 +151,7 @@ export default function FeeLedgerTab({
                 </div>
                 <div className="col-span-2 text-right">
                   <p className="font-bold text-slate-800 dark:text-slate-200">{formatPKR(f.amountDue)}</p>
-                  <p className="text-2xs text-slate-500">
+                  <p className="text-2xs text-slate-500 dark:text-slate-400">
                     {f.discount > 0 ? `Waiver: -${formatPKR(f.discount)}` : 'Full Rate'}
                   </p>
                 </div>
@@ -159,7 +159,7 @@ export default function FeeLedgerTab({
                   <p className="font-black text-slate-900 dark:text-slate-100">{formatPKR(f.netAmount)}</p>
                   <p
                     className={`text-2xs font-bold ${
-                      f.amountPaid > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'
+                      f.amountPaid > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     Paid: {formatPKR(f.amountPaid)}
@@ -216,7 +216,7 @@ export default function FeeLedgerTab({
               </div>
             ))
           ) : (
-            <div className="py-12 text-center text-sm text-slate-500">
+            <div className="py-12 text-center text-sm text-slate-500 dark:text-slate-400">
               No fee invoices generated yet for this student.
             </div>
           )}

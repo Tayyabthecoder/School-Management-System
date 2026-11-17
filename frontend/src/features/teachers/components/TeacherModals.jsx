@@ -64,7 +64,7 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
   if (!open) return null
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
         <div className="p-6 bg-indigo-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <GraduationCap className="w-6 h-6 text-indigo-300" />
@@ -78,43 +78,43 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Full Name *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Full Name *</label>
               <input aria-label="Full Name"
                 type="text"
                 required
                 value={form.fullName}
                 onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                 placeholder="e.g. Prof. Tariq Mahmood"
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Phone *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Phone *</label>
               <input aria-label="Phone"
                 type="text"
                 required
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="+92 300 1234567"
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Email</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Email</label>
               <input aria-label="Email"
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="tariq@school.edu.pk"
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Designation</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Designation</label>
               <select aria-label="Designation"
                 value={form.designation}
                 onChange={(e) => setForm({ ...form, designation: e.target.value })}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 <option>Senior Teacher</option>
                 <option>Subject Specialist</option>
@@ -124,11 +124,11 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Department</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Department</label>
               <select aria-label="Department"
                 value={form.department}
                 onChange={(e) => setForm({ ...form, department: e.target.value })}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 <option>Academics</option>
                 <option>Science & Math</option>
@@ -139,33 +139,33 @@ export function AddTeacherModal({ open, onClose, onCreated }) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Monthly Salary (PKR)</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Monthly Salary (PKR)</label>
               <input aria-label="Monthly Salary (PKR)"
                 type="number"
                 value={form.salary}
                 onChange={(e) => setForm({ ...form, salary: Number(e.target.value) })}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Qualification</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Qualification</label>
               <input aria-label="Qualification"
                 type="text"
                 value={form.qualification}
                 onChange={(e) => setForm({ ...form, qualification: e.target.value })}
                 placeholder="e.g. M.Phil Physics"
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-800">
+          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-[11px] text-amber-800 dark:text-amber-200">
             <strong>System Notice:</strong> Login credentials will be automatically generated with a random one-time temporary password, shown once after saving. Password rotation is enforced on first login.
           </div>
-          <div className="flex justify-end gap-2.5 pt-2 border-t border-gray-100">
+          <div className="flex justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800/50"
             >
               Cancel
             </button>
@@ -233,7 +233,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
   if (!open || !teacher) return null
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
         <div className="p-6 bg-indigo-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <BookOpen className="w-6 h-6 text-indigo-300" />
@@ -247,12 +247,12 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Target Class *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Target Class *</label>
               <select aria-label="Target Class"
                 required
                 value={form.classId}
                 onChange={(e) => handleClassChange(e.target.value)}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Select Class</option>
                 {classes.map((c) => (
@@ -261,11 +261,11 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Section *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Section *</label>
               <select aria-label="Section"
                 value={form.sectionId}
                 onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 {availableSections.map((s) => (
                   <option key={s} value={s}>Section {s}</option>
@@ -273,12 +273,12 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
               </select>
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Subject to Teach *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Subject to Teach *</label>
               <select aria-label="Subject to Teach"
                 required
                 value={form.subjectId}
                 onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Select Subject</option>
                 {filteredSubjects.map((s) => (
@@ -287,11 +287,11 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Day of Week *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Day of Week *</label>
               <select aria-label="Day of Week"
                 value={form.dayOfWeek}
                 onChange={(e) => setForm({ ...form, dayOfWeek: e.target.value })}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 {DAYS.map((d) => (
                   <option key={d} value={d}>{d}</option>
@@ -299,7 +299,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Period Slot *</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Period Slot *</label>
               <select aria-label="Period Slot"
                 value={form.periodNumber}
                 onChange={(e) => {
@@ -308,7 +308,7 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
                   const [start, end] = slotTime.split(' - ')
                   setForm({ ...form, periodNumber: pNum, startTime: start, endTime: end })
                 }}
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               >
                 {PERIODS.map((p) => (
                   <option key={p} value={p}>Period {p} ({PERIOD_TIMES[p - 1]})</option>
@@ -316,21 +316,21 @@ export function AssignPeriodModal({ open, teacher, classes, subjects, onClose, o
               </select>
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Classroom / Laboratory</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">Classroom / Laboratory</label>
               <input aria-label="Classroom / Laboratory"
                 type="text"
                 value={form.room}
                 onChange={(e) => setForm({ ...form, room: e.target.value })}
                 placeholder="e.g. Physics Lab 2 or Room 14"
-                className="w-full text-xs p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-2.5 pt-2 border-t border-gray-100">
+          <div className="flex justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800/50"
             >
               Cancel
             </button>
@@ -376,7 +376,7 @@ export function TeacherScheduleModal({ open, teacher, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-6 bg-indigo-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-800 flex items-center justify-center font-bold text-lg text-indigo-200">
@@ -396,36 +396,36 @@ export function TeacherScheduleModal({ open, teacher, onClose }) {
           {loading ? (
             <SkeletonTable rows={6} />
           ) : (
-            <div className="border border-gray-200 rounded-xl overflow-x-auto">
+            <div className="border border-gray-200 dark:border-slate-700 rounded-xl overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse min-w-[650px]">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="p-3 font-bold text-gray-700 w-28">Day / Period</th>
+                  <tr className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
+                    <th className="p-3 font-bold text-gray-700 dark:text-slate-300 w-28">Day / Period</th>
                     {PERIODS.map((p) => (
-                      <th key={p} className="p-3 font-bold text-gray-700 text-center">
+                      <th key={p} className="p-3 font-bold text-gray-700 dark:text-slate-300 text-center">
                         P{p}
-                        <span className="block text-[10px] font-normal text-gray-500">{PERIOD_TIMES[p - 1].split(' - ')[0]}</span>
+                        <span className="block text-[10px] font-normal text-gray-500 dark:text-slate-400">{PERIOD_TIMES[p - 1].split(' - ')[0]}</span>
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                   {DAYS.map((day) => (
-                    <tr key={day} className="hover:bg-gray-50/50">
-                      <td className="p-3 font-semibold text-gray-800 bg-gray-50/80">{day}</td>
+                    <tr key={day} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40">
+                      <td className="p-3 font-semibold text-gray-800 dark:text-slate-100 bg-gray-50/80 dark:bg-slate-800/40">{day}</td>
                       {PERIODS.map((p) => {
                         const entry = scheduleMap[`${day}-${p}`]
                         return (
-                          <td key={p} className="p-2 text-center border-l border-gray-100">
+                          <td key={p} className="p-2 text-center border-l border-gray-100 dark:border-slate-800">
                             {entry ? (
-                              <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-left">
-                                <p className="font-bold text-indigo-900 leading-tight">
+                              <div className="p-2 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900 rounded-lg text-left">
+                                <p className="font-bold text-indigo-900 dark:text-indigo-100 leading-tight">
                                   {entry.subjectId?.name || 'Subject'}
                                 </p>
-                                <p className="text-[10px] text-indigo-700 mt-0.5 font-medium">
+                                <p className="text-[10px] text-indigo-700 dark:text-indigo-300 mt-0.5 font-medium">
                                   {entry.classId?.name} ({entry.sectionId})
                                 </p>
-                                <p className="text-[9px] text-gray-500 mt-0.5">{entry.room || 'Classroom'}</p>
+                                <p className="text-[9px] text-gray-500 dark:text-slate-400 mt-0.5">{entry.room || 'Classroom'}</p>
                               </div>
                             ) : (
                               <span className="text-[10px] text-gray-300 font-mono">— Free —</span>

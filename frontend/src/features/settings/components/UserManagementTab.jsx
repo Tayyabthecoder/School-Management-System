@@ -109,7 +109,7 @@ export default function UserManagementTab({
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white text-sm">{u.username}</p>
-                        <p className="text-xs text-gray-500 dark:text-slate-500">ID: {u._id?.slice(-6)}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">ID: {u._id?.slice(-6)}</p>
                       </div>
                     </div>
                     <div className="col-span-3">
@@ -138,7 +138,7 @@ export default function UserManagementTab({
                 )
               })}
               {filteredUsers.length === 0 && (
-                <div className="py-12 text-center text-sm text-gray-500 dark:text-slate-500">No users match criteria</div>
+                <div className="py-12 text-center text-sm text-gray-500 dark:text-slate-400">No users match criteria</div>
               )}
             </div>
           </div>
