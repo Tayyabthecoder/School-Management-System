@@ -74,7 +74,7 @@ export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
       <form onSubmit={handleSave} className="space-y-4">
         <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
           <div>
-            <span className="text-slate-400 font-semibold uppercase text-2xs">
+            <span className="text-slate-500 font-semibold uppercase text-2xs">
               Base Gross Amount
             </span>
             <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
@@ -82,8 +82,8 @@ export function AdjustConcessionModal({ open, feeRecord, onClose, onSuccess }) {
             </p>
           </div>
           <div>
-            <span className="text-slate-400 font-semibold uppercase text-2xs">Already Paid</span>
-            <p className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-0.5">
+            <span className="text-slate-500 font-semibold uppercase text-2xs">Already Paid</span>
+            <p className="font-bold text-emerald-700 dark:text-emerald-400 text-sm mt-0.5">
               {formatPKR(feeRecord.amountPaid)}
             </p>
           </div>
@@ -304,7 +304,7 @@ export function RecordPaymentModal({
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-2 gap-3 p-3 bg-amber-50/60 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800 text-xs">
             <div>
-              <span className="text-slate-400 font-semibold uppercase text-2xs">
+              <span className="text-slate-500 font-semibold uppercase text-2xs">
                 Net Invoice Amount
               </span>
               <p className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
@@ -496,7 +496,7 @@ export function AssignFeeModal({ open, student, onClose, onSuccess }) {
           {loadingStructures ? (
             <p className="text-xs text-slate-500">Loading fee structures…</p>
           ) : structures.length > 0 ? (
-            <select
+            <select aria-label="Fee structure"
               value={selectedStructureId}
               onChange={(e) => {
                 const sId = e.target.value

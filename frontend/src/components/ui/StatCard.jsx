@@ -61,9 +61,9 @@ export default function StatCard({
 }) {
   const colorMap = {
     indigo: 'bg-indigo-50/80 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50',
-    teal: 'bg-teal-50/80 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 border-teal-100 dark:border-teal-900/50',
-    green: 'bg-emerald-50/80 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50',
-    amber: 'bg-amber-50/80 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-900/50',
+    teal: 'bg-teal-50/80 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border-teal-100 dark:border-teal-900/50',
+    green: 'bg-emerald-50/80 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50',
+    amber: 'bg-amber-50/80 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/50',
     rose: 'bg-rose-50/80 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/50',
   }
 
@@ -74,9 +74,9 @@ export default function StatCard({
           <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             {title}
           </p>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight tabular-nums">
+          <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight tabular-nums">
             {value}
-          </h3>
+          </p>
         </div>
         {Icon && (
           <div className={`p-3.5 rounded-2xl border shadow-xs ${colorMap[color] || colorMap.indigo}`}>
@@ -90,8 +90,8 @@ export default function StatCard({
           <span
             className={`inline-flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-md ${
               isPositive
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40'
-                : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800/40'
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40'
+                : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-800/40'
             }`}
           >
             {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}

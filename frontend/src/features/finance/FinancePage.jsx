@@ -35,6 +35,13 @@ import {
 } from './components/FinanceModals'
 import { logError } from '../../lib/logger'
 import { buildFeeLedgerColumns } from './components/feeLedgerColumns'
+import { cachedGet } from '../../lib/cachedGet'
+import FeeLedgerView from './components/FeeLedgerView'
+import FeeSectionPicker from './components/FeeSectionPicker'
+import FeeGradePicker from './components/FeeGradePicker'
+import FeeSearchResults from './components/FeeSearchResults'
+import FeeSearchBar from './components/FeeSearchBar'
+import MonthlyChallanControlCard from './components/MonthlyChallanControlCard'
 
 
 export default function FinancePage() {
@@ -89,10 +96,10 @@ export default function FinancePage() {
     try {
       const [clsRes, stuRes, feesRes, statsRes, cronRes] = await Promise.all([
         loadClasses(),
-        api.get('/students', { params: { limit: 1000 } }),
-        api.get('/finance/student-fees', { params: { limit: 1000 } }),
-        api.get('/reports/dashboard-stats').catch(() => ({ data: { data: {} } })),
-        api.get('/finance/monthly-challans/status').catch(() => ({ data: { data: null } })),
+        cachedGet('/students', { params: { limit: 1000 } }),
+        cachedGet('/finance/student-fees', { params: { limit: 1000 } }),
+        cachedGet('/reports/dashboard-stats').catch(() => ({ data: { data: {} } })),
+        cachedGet('/finance/monthly-challans/status').catch(() => ({ data: { data: null } })),
       ])
       if (clsRes.data?.success && clsRes.data.data.length > 0) {
         setClasses(clsRes.data.data)
@@ -135,8 +142,8 @@ export default function FinancePage() {
     if (selectedGrade?._id) {
       try {
         const [feesRes, stuRes] = await Promise.all([
-          api.get('/finance/student-fees', { params: { classId: selectedGrade._id, sectionId: sec, limit: 1000 } }).catch(() => null),
-          api.get('/students', { params: { classId: selectedGrade._id, sectionId: sec, limit: 1000 } }).catch(() => null),
+          cachedGet('/finance/student-fees', { params: { classId: selectedGrade._id, sectionId: sec, limit: 1000 } }).catch(() => null),
+          cachedGet('/students', { params: { classId: selectedGrade._id, sectionId: sec, limit: 1000 } }).catch(() => null),
         ])
         if (feesRes?.data?.success && Array.isArray(feesRes.data.data)) {
           setStudentFees((prev) => {
@@ -424,7 +431,7 @@ export default function FinancePage() {
             {row.studentId ? row.studentId.studentId : 'N/A'}
           </div>
           {row.studentId?.guardian?.name && (
-            <div className="text-[11px] text-slate-400 truncate max-w-[150px]">
+            <div className="text-[11px] text-slate-500 truncate max-w-[150px]">
               G: {row.studentId.guardian.name}
             </div>
           )}
@@ -485,7 +492,7 @@ export default function FinancePage() {
             </div>
           )
         }
-        return <span className="text-xs text-slate-400">None</span>
+        return <span className="text-xs text-slate-500">None</span>
       },
     },
     {
@@ -619,52 +626,16 @@ export default function FinancePage() {
       />
 
       {/* Automated Monthly Recurring Challan Control Card */}
-      <div className="mb-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-5 text-white shadow-xl border border-indigo-500/30">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center shrink-0 text-indigo-400 shadow-inner">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-bold text-white flex items-center gap-1.5">
-                  Automated Recurring Fee Challan System
-                </h3>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  <CheckCircle2 className="w-3 h-3" /> Auto-Cron Active
-                </span>
-                <span className="text-xs text-indigo-200/80 hidden sm:inline">
-                  • 1st of every month @ 00:00 (Midnight PKT)
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 mt-1">
-                Generates monthly tuition fee challans for all enrolled students across all 13 grades (Play Junior to Grade 12) with due date falling 10 days after challan download, preserving scholarships and sibling discounts.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0 border-white/10 shrink-0">
-            <div className="text-right hidden sm:block">
-              <div className="text-[11px] text-slate-400">Current Cycle Status:</div>
-              <div className="text-xs font-bold text-indigo-200">
-                {cronStatus?.currentMonth || 'Current Month'}: {cronStatus?.currentMonthChallansCount || 0} / {cronStatus?.totalActiveStudents || students.length} Students
-              </div>
-            </div>
-            <button
-              onClick={() => setShowGenerateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all shadow-lg shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98] shrink-0"
-            >
-              <Zap className="w-4 h-4 text-amber-300" />
-              Generate Monthly Challans
-            </button>
-          </div>
-        </div>
-      </div>
+      <MonthlyChallanControlCard
+        students={students}
+        cronStatus={cronStatus}
+        setShowGenerateModal={setShowGenerateModal}
+      />
 
       {showOverdueBanner && overdueStats.count > 0 && (
         <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-rose-50 to-red-50 border border-red-200 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-100 rounded-lg text-red-600">
+            <div className="p-2 bg-red-100 rounded-lg text-red-700">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
@@ -678,7 +649,7 @@ export default function FinancePage() {
           </div>
           <button
             onClick={() => setShowOverdueBanner(false)}
-            className="text-gray-400 hover:text-gray-600 text-xs font-semibold px-2 py-1 rounded"
+            className="text-gray-500 hover:text-gray-600 text-xs font-semibold px-2 py-1 rounded"
           >
             ✕ Dismiss
           </button>
@@ -686,295 +657,64 @@ export default function FinancePage() {
       )}
 
       {/* Global Student & Challan Search Bar */}
-      <div className="mb-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input aria-label="Search any student by name, student ID (e.g. STU-0012), or challan # (e.g. CHL-2026-ABCDEF)..."
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search any student by name, student ID (e.g. STU-0012), or challan # (e.g. CHL-2026-ABCDEF)..."
-              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs md:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 transition-all font-medium"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                title="Clear search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Quick Status Filter Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0 overflow-x-auto">
-            {['All', 'Pending', 'Partial', 'Overdue', 'Paid'].map((st) => (
-              <button
-                key={st}
-                type="button"
-                onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  statusFilter === st
-                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                {st}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Search Active Indicator / Summary */}
-        {searchQuery.trim() && (
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-slate-500 dark:text-slate-400">
-              Found <strong className="text-indigo-600 dark:text-indigo-400">{searchedFees.length}</strong> record{searchedFees.length === 1 ? '' : 's'} matching &ldquo;<span className="text-slate-800 dark:text-slate-200 font-semibold">{searchQuery}</span>&rdquo;
-              {statusFilter !== 'All' && <span> with status <strong>{statusFilter}</strong></span>}
-            </span>
-            <button
-              onClick={() => {
-                setSearchQuery('')
-                setStatusFilter('All')
-              }}
-              className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
-            >
-              Reset Search
-            </button>
-          </div>
-        )}
-      </div>
+      <FeeSearchBar
+        searchedFees={searchedFees}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+      />
 
       {/* Main Content: Search Results OR Navigation Views */}
       {searchQuery.trim().length > 0 ? (
-        <div className="space-y-4">
-          <div className="card-surface p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                  Search Results
-                </h3>
-                <Badge variant="indigo">{searchedFees.length} Found</Badge>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Fee accounts & challan vouchers matching &ldquo;{searchQuery}&rdquo; across all academic grades
-              </p>
-            </div>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition-colors w-fit"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Grade View
-            </button>
-          </div>
-
-          <DataTable
-            columns={searchColumns}
-            data={searchedFees}
-            loading={loading}
-            emptyMessage={`No student fee records or challans found matching "${searchQuery}".`}
-          />
-        </div>
+        <FeeSearchResults
+          columns={columns}
+          searchedFees={searchedFees}
+          searchColumns={searchColumns}
+          loading={loading}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
       ) : (
         <>
           {navLevel === 'grades' && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-600" /> Select Academic Grade (1–12)
-              </h2>
-              <p className="text-xs text-gray-500">
-                Pick a grade level to review fee ledgers, manage concessions, and print 3-part bank fee challans.
-              </p>
-            </div>
-            <Badge variant="indigo">{displayClasses.length} Grades Configured</Badge>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            {displayClasses.map((cls, index) => {
-              const theme = GRADE_THEMES[index % GRADE_THEMES.length]
-              const gradeStudents = students.filter(
-                (s) =>
-                  s.classId &&
-                  (s.classId._id === cls._id ||
-                    s.classId === cls._id ||
-                    s.classId?.name === cls.name)
-              ).length
-              const classSections = getSectionsForGrade(cls)
-              const classFee = studentFees.find(
-                (f) =>
-                  f.studentId?.classId &&
-                  (f.studentId.classId === cls._id ||
-                    f.studentId.classId._id === cls._id ||
-                    f.studentId.classId?.name === cls.name)
-              )
-              const monthlyAmount = classFee?.amountDue || (8000 + (cls.level || 0) * 500)
-
-              return (
-                <div
-                  key={cls._id || cls.name}
-                  onClick={() => handleSelectGrade(cls)}
-                  className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.gradient} p-5 text-white shadow-lg ${theme.shadow} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase">
-                      Level {cls.level}
-                    </span>
-                    <CircleDollarSign className="w-6 h-6 text-white/90" />
-                  </div>
-
-                  <h3 className="text-2xl font-extrabold mb-1">{cls.name}</h3>
-                  <p className="text-xs text-white/80 font-medium mb-4">
-                    Sections: {classSections.join(', ')} • {formatPKR(monthlyAmount)}/mo
-                  </p>
-
-                  <div className="pt-3 border-t border-white/20 flex items-center justify-between text-xs font-semibold">
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5" /> {gradeStudents} Students
-                    </span>
-                    <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      View Fee Ledger <ChevronRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        <FeeGradePicker
+          displayClasses={displayClasses}
+          handleSelectGrade={handleSelectGrade}
+          getSectionsForGrade={getSectionsForGrade}
+          students={students}
+          studentFees={studentFees}
+        />
       )}
 
       {navLevel === 'sections' && selectedGrade && (
-        <div>
-          <div className="mb-4">
-            <button
-              onClick={() => setNavLevel('grades')}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to All Grades
-            </button>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-6">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b">
-              <div>
-                <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
-                  GRADE LEVEL {selectedGrade.level}
-                </span>
-                <h2 className="text-2xl font-extrabold text-gray-900">
-                  {selectedGrade.name} - Select Section
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  Select a section to inspect student accounts, concessions, and download 3-part bank deposit vouchers.
-                </p>
-              </div>
-              <Badge variant="indigo">{sectionsToDisplay.length} Sections</Badge>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {sectionsToDisplay.map((sec) => {
-                const secStudentsCount = students.filter(
-                  (s) =>
-                    s.classId &&
-                    (s.classId._id === selectedGrade._id ||
-                      s.classId === selectedGrade._id ||
-                      s.classId?.name === selectedGrade.name) &&
-                    s.sectionId === sec
-                ).length
-
-                return (
-                  <div
-                    key={sec}
-                    onClick={() => handleSelectSection(sec)}
-                    className="bg-gray-50 hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-gray-200 hover:border-indigo-500 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl flex items-center justify-center shadow-md shadow-indigo-600/30">
-                        {sec}
-                      </div>
-                      <span className="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border text-gray-600">
-                        Section {sec}
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                      {selectedGrade.name} - Section {sec}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1 mb-4 flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5 text-gray-400" /> {secStudentsCount} Enrolled Students
-                    </p>
-
-                    <div className="w-full py-2 bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
-                      Open Fee Ledger <ChevronRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
+        <FeeSectionPicker
+          handleSelectSection={handleSelectSection}
+          sectionsToDisplay={sectionsToDisplay}
+          students={students}
+          setNavLevel={setNavLevel}
+          selectedGrade={selectedGrade}
+        />
       )}
 
       {navLevel === 'fees' && selectedGrade && selectedSection && (
-        <div>
-          <GradeSectionNavigator
-            grades={displayClasses}
-            selectedGrade={selectedGrade}
-            selectedSection={selectedSection}
-            onSelectGrade={(g) => {
-              setSelectedGrade(g)
-              const secs = getSectionsForGrade(g)
-              setSelectedSection(secs.includes(selectedSection) ? selectedSection : (secs[0] || 'A'))
-            }}
-            onSelectSection={(sec) => handleSelectSection(sec)}
-            students={students}
-            rightSlot={
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  icon={Printer}
-                  loading={bulkPrinting}
-                  onClick={handleBulkPrintChallans}
-                >
-                  {bulkPrinting ? (bulkProgress || 'Generating...') : 'Bulk Print Section Challans'}
-                </Button>
-                <button
-                  onClick={() => setNavLevel('grades')}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" /> All Grades
-                </button>
-              </div>
-            }
-          />
-
-          <div className="card-surface p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                {selectedGrade.name} · SECTION {selectedSection}
-              </span>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                Fee Balance & Concession Ledger
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Official printable Bank Fee Challan vouchers (configurable 2-part or 3-part in Settings)
-              </p>
-            </div>
-            <Badge variant="indigo">{activeFeeLedger.length} Accounts Active</Badge>
-          </div>
-
-          <DataTable
-            columns={columns}
-            data={activeFeeLedger}
-            loading={loading}
-            emptyMessage={`No student fee records found for ${selectedGrade.name} - Section ${selectedSection}.`}
-          />
-        </div>
+        <FeeLedgerView
+          displayClasses={displayClasses}
+          handleSelectSection={handleSelectSection}
+          handleBulkPrintChallans={handleBulkPrintChallans}
+          activeFeeLedger={activeFeeLedger}
+          columns={columns}
+          getSectionsForGrade={getSectionsForGrade}
+          students={students}
+          loading={loading}
+          setNavLevel={setNavLevel}
+          selectedGrade={selectedGrade}
+          setSelectedGrade={setSelectedGrade}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+          bulkPrinting={bulkPrinting}
+          bulkProgress={bulkProgress}
+        />
       )}
         </>
       )}

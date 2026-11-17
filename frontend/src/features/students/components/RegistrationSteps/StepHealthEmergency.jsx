@@ -60,7 +60,7 @@ export default function StepHealthEmergency({
                       <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">
                         Alternative Emergency Contact (Optional)
                       </span>
-                      <span className="text-[10px] text-gray-400">Defaults to primary guardian if left blank</span>
+                      <span className="text-[10px] text-gray-500">Defaults to primary guardian if left blank</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

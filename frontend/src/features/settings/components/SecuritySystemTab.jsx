@@ -158,7 +158,7 @@ export default function SecuritySystemTab({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase">Backend API Status</p>
-            <p className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-2">
+            <p className="text-base font-bold text-emerald-700 dark:text-emerald-400 mt-1 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               {systemHealth.status}
             </p>

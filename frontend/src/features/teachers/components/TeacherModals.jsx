@@ -5,6 +5,7 @@ import api from '../../../lib/axios'
 import { announceCredentials } from '../../../lib/credentials'
 import { useToast } from '../../../store/toastStore'
 import { SkeletonTable } from '../../../components/ui/Skeleton'
+import { cachedGet } from '../../../lib/cachedGet'
 
 export const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -355,7 +356,7 @@ export function TeacherScheduleModal({ open, teacher, onClose }) {
   useEffect(() => {
     if (open && teacher) {
       setLoading(true)
-      api.get(`/teachers/${teacher._id}/schedule`)
+      cachedGet(`/teachers/${teacher._id}/schedule`)
         .then((res) => {
           if (res.data?.success) setSchedule(res.data.schedule || [])
         })
@@ -403,7 +404,7 @@ export function TeacherScheduleModal({ open, teacher, onClose }) {
                     {PERIODS.map((p) => (
                       <th key={p} className="p-3 font-bold text-gray-700 text-center">
                         P{p}
-                        <span className="block text-[10px] font-normal text-gray-400">{PERIOD_TIMES[p - 1].split(' - ')[0]}</span>
+                        <span className="block text-[10px] font-normal text-gray-500">{PERIOD_TIMES[p - 1].split(' - ')[0]}</span>
                       </th>
                     ))}
                   </tr>
@@ -424,7 +425,7 @@ export function TeacherScheduleModal({ open, teacher, onClose }) {
                                 <p className="text-[10px] text-indigo-700 mt-0.5 font-medium">
                                   {entry.classId?.name} ({entry.sectionId})
                                 </p>
-                                <p className="text-[9px] text-gray-400 mt-0.5">{entry.room || 'Classroom'}</p>
+                                <p className="text-[9px] text-gray-500 mt-0.5">{entry.room || 'Classroom'}</p>
                               </div>
                             ) : (
                               <span className="text-[10px] text-gray-300 font-mono">— Free —</span>

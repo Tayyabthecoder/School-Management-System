@@ -73,10 +73,10 @@ export default function StudentDocumentsTab({ student, canManage, onDocumentsCha
     <div className="card-surface p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
+          <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
             <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Student Documents
-          </h3>
+          </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Files attached to this student&apos;s record.
           </p>

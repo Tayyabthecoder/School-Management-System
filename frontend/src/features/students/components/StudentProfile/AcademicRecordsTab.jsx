@@ -29,10 +29,10 @@ export default function AcademicRecordsTab({
       <div className="card-surface p-6">
         <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
+            <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Curriculum Subjects ({student?.classId?.name || 'Class'})
-            </h3>
+            </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Standard academic course curriculum enrolled for the current academic session.
             </p>
@@ -93,7 +93,7 @@ export default function AcademicRecordsTab({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-2xs text-slate-400 font-medium italic">
+                      <span className="text-2xs text-slate-500 font-medium italic">
                         Not assessed yet
                       </span>
                     )}
@@ -103,7 +103,7 @@ export default function AcademicRecordsTab({
             })}
           </div>
         ) : (
-          <div className="p-8 text-center text-sm text-slate-400">
+          <div className="p-8 text-center text-sm text-slate-500">
             No subjects registered for this class. Configure class subjects in the Academic module.
           </div>
         )}
@@ -116,10 +116,10 @@ export default function AcademicRecordsTab({
       {/* Performance Summary Banner */}
       <div className="bg-gradient-to-r from-indigo-900 to-indigo-950 rounded-2xl p-6 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h3 className="font-bold text-lg flex items-center gap-2">
+          <h2 className="font-bold text-lg flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-400" />
             Cumulative Academic Performance
-          </h3>
+          </h2>
           <p className="text-xs text-indigo-200 mt-1">
             Exam marks, percentages, and teacher remarks across all published assessment terms.
           </p>
@@ -169,7 +169,7 @@ export default function AcademicRecordsTab({
                 </div>
                 <div className="col-span-2 text-center font-bold text-slate-900 dark:text-slate-100 text-sm">
                   {g.marksObtained}{' '}
-                  <span className="text-xs text-slate-400 font-normal">
+                  <span className="text-xs text-slate-500 font-normal">
                     / {g.examId?.maxMarks || 100}
                   </span>
                 </div>
@@ -200,7 +200,7 @@ export default function AcademicRecordsTab({
               </div>
             ))
           ) : (
-            <div className="py-12 text-center text-sm text-slate-400">
+            <div className="py-12 text-center text-sm text-slate-500">
               No exam marks recorded yet for this student.
             </div>
           )}

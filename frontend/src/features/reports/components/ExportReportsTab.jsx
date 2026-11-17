@@ -29,7 +29,7 @@ function ReportCard({ icon: Icon, color, title, description, actions }) {
     emerald: {
       icon: 'bg-emerald-100 text-emerald-700',
       badge: 'bg-emerald-50 border-emerald-200',
-      btn: 'bg-emerald-600 hover:bg-emerald-700',
+      btn: 'bg-emerald-700 hover:bg-emerald-800',
     },
     indigo: {
       icon: 'bg-indigo-100 text-indigo-700',
@@ -39,7 +39,7 @@ function ReportCard({ icon: Icon, color, title, description, actions }) {
     amber: {
       icon: 'bg-amber-100 text-amber-700',
       badge: 'bg-amber-50 border-amber-200',
-      btn: 'bg-amber-600 hover:bg-amber-700',
+      btn: 'bg-amber-700 hover:bg-amber-800',
     },
     rose: {
       icon: 'bg-rose-100 text-rose-700',
@@ -49,7 +49,7 @@ function ReportCard({ icon: Icon, color, title, description, actions }) {
     teal: {
       icon: 'bg-teal-100 text-teal-700',
       badge: 'bg-teal-50 border-teal-200',
-      btn: 'bg-teal-600 hover:bg-teal-700',
+      btn: 'bg-teal-700 hover:bg-teal-800',
     },
     violet: {
       icon: 'bg-violet-100 text-violet-700',
@@ -59,7 +59,7 @@ function ReportCard({ icon: Icon, color, title, description, actions }) {
     cyan: {
       icon: 'bg-cyan-100 text-cyan-700',
       badge: 'bg-cyan-50 border-cyan-200',
-      btn: 'bg-cyan-600 hover:bg-cyan-700',
+      btn: 'bg-cyan-700 hover:bg-cyan-800',
     },
   }
   const c = COLOR_MAP[color] || COLOR_MAP.indigo

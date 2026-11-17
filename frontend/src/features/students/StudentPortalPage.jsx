@@ -20,6 +20,7 @@ import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton'
 import api from '../../lib/axios'
 import { formatPKR, formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
+import { cachedGet } from '../../lib/cachedGet'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -47,7 +48,7 @@ export default function StudentPortalPage() {
     const loadPortal = async () => {
       setLoading(true)
       try {
-        const res = await api.get('/students/me/portal')
+        const res = await cachedGet('/students/me/portal')
         if (res.data?.success) {
           setData(res.data.data)
         }
@@ -231,9 +232,9 @@ export default function StudentPortalPage() {
           {/* Periods Schedule Cards */}
           {dayTimetable.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-dashed border-gray-200">
-              <Clock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+              <Clock className="w-10 h-10 text-gray-500 mx-auto mb-2" />
               <p className="text-sm font-bold text-gray-700">No classes scheduled on {selectedDay}</p>
-              <p className="text-xs text-gray-400 mt-0.5">Enjoy your free study or recreational period!</p>
+              <p className="text-xs text-gray-500 mt-0.5">Enjoy your free study or recreational period!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -258,7 +259,7 @@ export default function StudentPortalPage() {
                     Teacher: <strong className="text-gray-800">{period.teacherId?.fullName || 'Assigned Faculty'}</strong>
                   </p>
 
-                  <div className="pt-2 border-t border-gray-100 text-xs text-gray-400 flex justify-between">
+                  <div className="pt-2 border-t border-gray-100 text-xs text-gray-500 flex justify-between">
                     <span>Room: <strong className="text-gray-700">{period.room || 'Classroom'}</strong></span>
                     <span className="font-mono text-[10px]">{period.subjectId?.code}</span>
                   </div>
@@ -275,36 +276,36 @@ export default function StudentPortalPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase">Overall Attendance</p>
-              <h3 className={`text-3xl font-extrabold mt-1 ${isLowAttendance ? 'text-amber-600' : 'text-green-600'}`}>
+              <p className={`text-3xl font-extrabold mt-1 ${isLowAttendance ? 'text-amber-700' : 'text-green-700'}`}>
                 {attRate}%
-              </h3>
-              <p className="text-[10px] text-gray-400 mt-1">Minimum target: 75%</p>
+              </p>
+              <p className="text-[10px] text-gray-500 mt-1">Minimum target: 75%</p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase">Total Days</p>
-              <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{attendance.summary?.totalDays ?? 0}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Recorded sessions</p>
+              <p className="text-3xl font-extrabold text-gray-900 mt-1">{attendance.summary?.totalDays ?? 0}</p>
+              <p className="text-[10px] text-gray-500 mt-1">Recorded sessions</p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase">Present Days</p>
-              <h3 className="text-3xl font-extrabold text-green-600 mt-1">{attendance.summary?.presentDays ?? 0}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">On-time attendance</p>
+              <p className="text-3xl font-extrabold text-green-700 mt-1">{attendance.summary?.presentDays ?? 0}</p>
+              <p className="text-[10px] text-gray-500 mt-1">On-time attendance</p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase">Absent Days</p>
-              <h3 className="text-3xl font-extrabold text-red-600 mt-1">{attendance.summary?.absentDays ?? 0}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Unexcused missed days</p>
+              <p className="text-3xl font-extrabold text-red-600 mt-1">{attendance.summary?.absentDays ?? 0}</p>
+              <p className="text-[10px] text-gray-500 mt-1">Unexcused missed days</p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase">Excused / Late</p>
-              <h3 className="text-3xl font-extrabold text-amber-600 mt-1">
+              <p className="text-3xl font-extrabold text-amber-700 mt-1">
                 {(attendance.summary?.excusedDays || 0) + (attendance.summary?.lateDays || 0)}
-              </h3>
-              <p className="text-[10px] text-gray-400 mt-1">Approved leaves & late</p>
+              </p>
+              <p className="text-[10px] text-gray-500 mt-1">Approved leaves & late</p>
             </div>
           </div>
 
@@ -312,11 +313,11 @@ export default function StudentPortalPage() {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-bold text-gray-900 text-sm">Recent Daily Attendance Records</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Showing last 30 recorded days</p>
+              <p className="text-xs text-gray-500 mt-0.5">Showing last 30 recorded days</p>
             </div>
 
             {attendance.history?.length === 0 ? (
-              <div className="p-8 text-center text-gray-400 text-xs">No attendance records logged yet.</div>
+              <div className="p-8 text-center text-gray-500 text-xs">No attendance records logged yet.</div>
             ) : (
               <div className="divide-y divide-gray-100">
                 {attendance.history.map((record, i) => {
@@ -329,11 +330,11 @@ export default function StudentPortalPage() {
                   return (
                     <div key={record.date ? String(record.date) : i} className="p-4 flex items-center justify-between text-xs hover:bg-gray-50">
                       <div className="flex items-center gap-3">
-                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <Calendar className="w-4 h-4 text-gray-500" />
                         <div>
                           <span className="font-bold text-gray-800">{formatDate(record.date)}</span>
                           {record.remarks && (
-                            <p className="text-[11px] text-gray-400 mt-0.5">{record.remarks}</p>
+                            <p className="text-[11px] text-gray-500 mt-0.5">{record.remarks}</p>
                           )}
                         </div>
                       </div>
@@ -356,7 +357,7 @@ export default function StudentPortalPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-bold text-gray-900 text-base">Examination Performance & Marks</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Subject-wise marks and official letter grades</p>
+              <p className="text-xs text-gray-500 mt-0.5">Subject-wise marks and official letter grades</p>
             </div>
             <button
               onClick={handleDownloadReportCard}
@@ -368,7 +369,7 @@ export default function StudentPortalPage() {
           </div>
 
           {grades.length === 0 ? (
-            <div className="text-center py-12 text-gray-400 text-xs">
+            <div className="text-center py-12 text-gray-500 text-xs">
               No examination marks published yet for your current session.
             </div>
           ) : (
@@ -437,10 +438,10 @@ export default function StudentPortalPage() {
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h3 className="font-bold text-gray-900 text-base mb-1">Fee Invoices & Challan Receipts</h3>
-            <p className="text-xs text-gray-400 mb-4">View issued fee challans, payment statuses, and download printable receipts</p>
+            <p className="text-xs text-gray-500 mb-4">View issued fee challans, payment statuses, and download printable receipts</p>
 
             {fees.length === 0 ? (
-              <div className="text-center py-12 text-gray-400 text-xs">
+              <div className="text-center py-12 text-gray-500 text-xs">
                 No fee records issued for your profile.
               </div>
             ) : (

@@ -76,7 +76,7 @@ export default function AttendanceHistoryTab({
       {/* Attendance KPI Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="card-surface p-4 text-center">
-          <p className="text-2xs text-slate-400 font-semibold uppercase">Total Days Logged</p>
+          <p className="text-2xs text-slate-500 font-semibold uppercase">Total Days Logged</p>
           <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">
             {attendanceStats.totalAttended}
           </p>
@@ -120,9 +120,9 @@ export default function AttendanceHistoryTab({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+            <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               Attendance Calendar · {MONTH_NAMES[calMonth.getMonth()]} {calMonth.getFullYear()}
-            </h3>
+            </h2>
           </div>
 
           {/* Month Navigation Controls */}
@@ -154,7 +154,7 @@ export default function AttendanceHistoryTab({
         </div>
 
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+        <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
           {DAYS_OF_WEEK.map((d) => (
             <div key={d} className="py-1">
               {d}
@@ -184,7 +184,7 @@ export default function AttendanceHistoryTab({
                 statusStyles =
                   'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300 font-bold'
                 badge = (
-                  <span className="text-2xs bg-emerald-600 text-white font-black px-1.5 py-0.2 rounded-full">
+                  <span className="text-2xs bg-emerald-700 text-white font-black px-1.5 py-0.2 rounded-full">
                     P
                   </span>
                 )
@@ -200,7 +200,7 @@ export default function AttendanceHistoryTab({
                 statusStyles =
                   'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-300 font-bold'
                 badge = (
-                  <span className="text-2xs bg-amber-600 text-white font-black px-1.5 py-0.2 rounded-full">
+                  <span className="text-2xs bg-amber-700 text-white font-black px-1.5 py-0.2 rounded-full">
                     L
                   </span>
                 )
@@ -215,7 +215,7 @@ export default function AttendanceHistoryTab({
               }
             } else if (isSunday) {
               statusStyles =
-                'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400'
+                'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600'
             }
 
             return (
@@ -312,10 +312,10 @@ export default function AttendanceHistoryTab({
       {/* Paginated Attendance Timeline Log */}
       <div className="card-surface overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-2">
+          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-2">
             <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             Attendance Log History ({flatAttendanceList.length} total entries)
-          </h4>
+          </h3>
           <span className="text-xs text-slate-500 dark:text-slate-400">
             Page {attPage} of {totalAttPages}
           </span>
@@ -339,7 +339,7 @@ export default function AttendanceHistoryTab({
                   <p className="font-bold text-slate-900 dark:text-slate-100">
                     {formatDate(item.date)}
                   </p>
-                  <p className="text-slate-400 text-2xs">
+                  <p className="text-slate-500 text-2xs">
                     {item.date.toLocaleDateString('en-US', { weekday: 'long' })}
                   </p>
                 </div>
@@ -367,7 +367,7 @@ export default function AttendanceHistoryTab({
               </div>
             ))
           ) : (
-            <div className="py-10 text-center text-sm text-slate-400">
+            <div className="py-10 text-center text-sm text-slate-500">
               No attendance history available for this student.
             </div>
           )}

@@ -303,7 +303,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                       {isChecked ? (
                         <CheckSquare className="w-4 h-4 text-indigo-600 shrink-0" />
                       ) : (
-                        <Square className="w-4 h-4 text-gray-400 shrink-0" />
+                        <Square className="w-4 h-4 text-gray-500 shrink-0" />
                       )}
                       <span className="truncate">{f.label}</span>
                     </label>
@@ -432,7 +432,7 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                 <button
                   onClick={() => handleExportCustomReport('excel')}
                   disabled={customExportLoading !== null}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-colors disabled:opacity-60"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-sm transition-colors disabled:opacity-60"
                 >
                   <FileSpreadsheet className="w-4 h-4" />
                   {customExportLoading === 'excel' ? 'Exporting...' : 'Export Excel (.xlsx)'}
@@ -460,11 +460,11 @@ export default function CustomReportBuilderTab({ classesList = [] }) {
                     {previewData.count} Total Records Matched
                   </span>
                 </div>
-                <span className="text-xs text-gray-400">Showing first {previewData.rows.length} rows</span>
+                <span className="text-xs text-gray-500">Showing first {previewData.rows.length} rows</span>
               </div>
 
               {previewData.rows.length === 0 ? (
-                <div className="py-12 text-center text-xs text-gray-400">
+                <div className="py-12 text-center text-xs text-gray-500">
                   No records match your selected criteria.
                 </div>
               ) : (

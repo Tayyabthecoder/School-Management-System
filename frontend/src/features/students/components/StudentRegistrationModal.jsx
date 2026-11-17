@@ -25,6 +25,7 @@ import StepFeeConcession from './RegistrationSteps/StepFeeConcession'
 import StepHealthEmergency from './RegistrationSteps/StepHealthEmergency'
 import RegistrationSuccessDialog from './RegistrationSteps/RegistrationSuccessDialog'
 import { logError } from '../../../lib/logger'
+import { cachedGet } from '../../../lib/cachedGet'
 
 const INITIAL_STUDENT_STATE = {
   // Step 1: Basic Info
@@ -141,7 +142,7 @@ export default function StudentRegistrationModal({
     if (!classId) return
     setLoadingFeeStructures(true)
     try {
-      const res = await api.get('/finance/structures', { params: { classId } })
+      const res = await cachedGet('/finance/structures', { params: { classId } })
       if (res.data?.success) {
         const structures = res.data.data || []
         setClassFeeStructures(structures)
@@ -429,7 +430,7 @@ export default function StudentRegistrationModal({
                           ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-600/20'
                           : isCompleted
                           ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
-                          : 'bg-white text-gray-400 border border-gray-200 cursor-not-allowed opacity-75'
+                          : 'bg-white text-gray-500 border border-gray-200 cursor-not-allowed opacity-75'
                       }`}
                     >
                       <div
@@ -437,7 +438,7 @@ export default function StudentRegistrationModal({
                           isCurrent
                             ? 'bg-white text-indigo-700'
                             : isCompleted
-                            ? 'bg-emerald-600 text-white'
+                            ? 'bg-emerald-700 text-white'
                             : 'bg-gray-100 text-gray-500'
                         }`}
                       >
@@ -447,7 +448,7 @@ export default function StudentRegistrationModal({
                         <p className={`text-[11px] font-bold leading-tight truncate ${isCurrent ? 'text-white' : 'text-gray-800'}`}>
                           {s.label}
                         </p>
-                        <p className={`text-[9px] truncate ${isCurrent ? 'text-indigo-200' : 'text-gray-400'}`}>
+                        <p className={`text-[9px] truncate ${isCurrent ? 'text-indigo-200' : 'text-gray-500'}`}>
                           {s.sub}
                         </p>
                       </div>
@@ -558,7 +559,7 @@ export default function StudentRegistrationModal({
                     type="button"
                     disabled={submitting}
                     onClick={handleCreate}
-                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-200 flex items-center gap-2 transition-all disabled:opacity-60"
+                    className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-200 flex items-center gap-2 transition-all disabled:opacity-60"
                   >
                     {submitting ? (
                       <span>Registering Student…</span>

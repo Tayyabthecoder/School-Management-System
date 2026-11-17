@@ -8,6 +8,7 @@ import { confirmAction } from '../../store/confirmStore'
 import { useToast } from '../../store/toastStore'
 import api from '../../lib/axios'
 import { logError } from '../../lib/logger'
+import { cachedGet } from '../../lib/cachedGet'
 
 export default function PromotionPage() {
   const toast = useToast()
@@ -32,7 +33,7 @@ export default function PromotionPage() {
       try {
         const [clsRes, cfgRes] = await Promise.all([
           loadClasses(),
-          api.get('/students/promotion/config'),
+          cachedGet('/students/promotion/config'),
         ])
         const clsList = clsRes.data?.data || []
         setClasses(clsList)
@@ -144,7 +145,7 @@ export default function PromotionPage() {
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-green-900">{executionResult.message}</h3>
+              <h2 className="text-lg font-bold text-green-900">{executionResult.message}</h2>
               <p className="text-sm text-green-700 mt-0.5">
                 Students have been enrolled into their new classes successfully.
               </p>
@@ -161,13 +162,14 @@ export default function PromotionPage() {
               1
             </div>
             <div>
-              <h3 className="font-bold text-gray-900">Promotion Rules & Class Progression Map</h3>
+              <h2 className="font-bold text-gray-900">Promotion Rules & Class Progression Map</h2>
               <p className="text-xs text-gray-500">Configure target classes and the qualifying Final Term examination.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <select
+              aria-label="Final exam term"
               value={finalTermName}
               onChange={(e) => setFinalTermName(e.target.value)}
               className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500"
@@ -187,7 +189,7 @@ export default function PromotionPage() {
         </div>
 
         {loadingConfig ? (
-          <div className="text-center py-6 text-sm text-gray-400">Loading promotion rules...</div>
+          <div className="text-center py-6 text-sm text-gray-500">Loading promotion rules...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {mappings.map((m, idx) => {
@@ -195,8 +197,9 @@ export default function PromotionPage() {
               return (
                 <div key={m.fromClassId?._id || m.fromClassId || idx} className="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between gap-3 text-sm">
                   <span className="font-bold text-gray-800">{fromName}</span>
-                  <span className="text-gray-400 font-bold">➔</span>
+                  <span className="text-gray-500 font-bold">➔</span>
                   <select
+                    aria-label={`Promote ${fromName} students to`}
                     value={m.toClassId?._id || m.toClassId || ''}
                     onChange={(e) => updateMappingTo(idx, e.target.value)}
                     className="px-2.5 py-1 bg-white border border-gray-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-indigo-500"
@@ -233,7 +236,7 @@ export default function PromotionPage() {
                 2
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Promotion Eligibility Preview</h3>
+                <h2 className="font-bold text-gray-900">Promotion Eligibility Preview</h2>
                 <p className="text-xs text-gray-500">Review results evaluated against Exam pass marks. Modify decisions with overrides.</p>
               </div>
             </div>
@@ -304,7 +307,7 @@ export default function PromotionPage() {
               <tbody className="divide-y divide-gray-100 text-sm">
                 {(previewData[activeTab] || []).length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-gray-400">
+                    <td colSpan="7" className="p-8 text-center text-gray-500">
                       No students in the {activeTab} group.
                     </td>
                   </tr>
@@ -331,6 +334,7 @@ export default function PromotionPage() {
                         </td>
                         <td className="p-4">
                           <select
+                            aria-label={`Promotion decision for ${st.fullName || st.studentId}`}
                             value={currentDecision}
                             onChange={(e) => handleOverrideChange(st.studentId, e.target.value)}
                             className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500"

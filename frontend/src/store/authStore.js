@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { create } from 'zustand'
+import { queryClient } from '../lib/queryClient.js'
 
 const getStoredUser = () => {
   try {
@@ -53,6 +54,7 @@ export const useAuthStore = create((set) => ({
     axios.post('/api/v1/auth/logout', {}, { withCredentials: true }).catch(() => {})
     localStorage.removeItem('sms_user')
     localStorage.removeItem('sms_token')
+    queryClient.clear() // the next person to sign in must not see this user's cached data
     set({ user: null, accessToken: null, isAuthenticated: false, isInitializing: false })
   },
 }))

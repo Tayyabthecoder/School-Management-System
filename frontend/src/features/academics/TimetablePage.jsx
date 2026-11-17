@@ -11,6 +11,7 @@ import api from '../../lib/axios'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 import { logError } from '../../lib/logger'
+import { cachedGet } from '../../lib/cachedGet'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -46,7 +47,7 @@ export default function TimetablePage() {
     try {
       const [clsRes, tchRes] = await Promise.all([
         loadClasses(),
-        api.get('/teachers').catch(() => ({ data: { data: [] } })),
+        cachedGet('/teachers').catch(() => ({ data: { data: [] } })),
       ])
 
       if (clsRes.data?.success && clsRes.data.data.length > 0) {
@@ -74,8 +75,8 @@ export default function TimetablePage() {
     setLoading(true)
     try {
       const [ttRes, subRes] = await Promise.all([
-        api.get('/timetable', { params: { classId: selectedClassId, sectionId: selectedSection } }),
-        api.get('/classes/subjects', { params: { classId: selectedClassId } }),
+        cachedGet('/timetable', { params: { classId: selectedClassId, sectionId: selectedSection } }),
+        cachedGet('/classes/subjects', { params: { classId: selectedClassId } }),
       ])
 
       if (ttRes.data?.success) setTimetableEntries(ttRes.data.data)
@@ -176,9 +177,9 @@ export default function TimetablePage() {
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-indigo-600" />
-            <h3 className="font-bold text-gray-900 text-base">
+            <h2 className="font-bold text-gray-900 text-base">
               {selectedClass?.name || 'Class'} — Section {selectedSection} Schedule
-            </h3>
+            </h2>
           </div>
           <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full">
             {timetableEntries.length} / 48 Periods Scheduled
@@ -222,7 +223,7 @@ export default function TimetablePage() {
                                 {isAdmin && (
                                   <button
                                     onClick={() => handleDeletePeriod(entry._id)}
-                                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-opacity p-0.5"
+                                    className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-600 transition-opacity p-0.5"
                                     title="Clear slot"
                                   >
                                     <Trash2 className="w-3 h-3" />
@@ -232,10 +233,10 @@ export default function TimetablePage() {
                               <p className="text-[11px] text-indigo-700 font-semibold mt-1 truncate">
                                 {entry.teacherId?.fullName || 'Faculty'}
                               </p>
-                              <p className="text-[10px] text-gray-400 mt-0.5">{entry.room || 'Room 101'}</p>
+                              <p className="text-[10px] text-gray-500 mt-0.5">{entry.room || 'Room 101'}</p>
                             </div>
                           ) : (
-                            <div className="w-full h-full min-h-[60px] p-2 bg-gray-50/60 border border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-300 text-[10px] font-mono">
+                            <div className="w-full h-full min-h-[60px] p-2 bg-gray-50/60 border border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-500 text-[10px] font-mono">
                               — Empty —
                             </div>
                           )}

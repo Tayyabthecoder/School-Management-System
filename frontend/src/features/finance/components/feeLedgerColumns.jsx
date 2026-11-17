@@ -52,7 +52,7 @@ export const buildFeeLedgerColumns = ({ onDownloadChallan, onOpenConcession, onO
           </div>
         )
       }
-      return <span className="text-xs text-gray-400">None</span>
+      return <span className="text-xs text-gray-500">None</span>
     },
   },
   {

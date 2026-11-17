@@ -13,6 +13,9 @@ import { formatPKR, formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import StaffAttendanceRegister from './components/StaffAttendanceRegister'
 import { logError } from '../../lib/logger'
+import { cachedGet } from '../../lib/cachedGet'
+import AddStaffModal from './components/AddStaffModal'
+import LeaveRequestsPanel from './components/LeaveRequestsPanel'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -22,211 +25,6 @@ const MONTHS = [
 const CURRENT_MONTH = new Date().getMonth() + 1
 const CURRENT_YEAR = new Date().getFullYear()
 
-// ─── Add Staff Modal ──────────────────────────────────────────────────────────
-function AddStaffModal({ open, onClose, onAdded }) {
-  const toast = useToast()
-  const [form, setForm] = useState({
-    fullName: '', cnic: '', phone: '', email: '',
-    designation: '', department: 'Academics', joiningDate: '', salary: '',
-  })
-  const [saving, setSaving] = useState(false)
-
-  const handle = async (e) => {
-    e.preventDefault()
-    setSaving(true)
-    try {
-      const res = await api.post('/hr/staff', form)
-      if (res.data?.success) {
-        toast.success(`Staff member "${form.fullName}" added successfully!`)
-        announceCredentials(res.data.initialCredentials)
-        onAdded(res.data.data)
-        onClose()
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to add staff')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  if (!open) return null
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">Add New Staff Member</h2>
-        </div>
-        <form onSubmit={handle} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name *</label>
-              <input aria-label="Full Name" required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Full Name" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">CNIC</label>
-              <input aria-label="CNIC" value={form.cnic} onChange={(e) => setForm({ ...form, cnic: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="42101-1234567-1" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Phone *</label>
-              <input aria-label="Phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="+92300…" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Email</label>
-              <input aria-label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="email@school.edu.pk" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Department *</label>
-              <select aria-label="Department" required value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                {['Academics', 'Finance', 'HR', 'Administration', 'IT', 'Operations'].map((d) => (
-                  <option key={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Designation *</label>
-              <input aria-label="Designation" required value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="e.g. Senior Teacher" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Joining Date</label>
-              <input aria-label="Joining Date" type="date" value={form.joiningDate} onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Monthly Salary (PKR) *</label>
-              <input aria-label="Monthly Salary (PKR)" required type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="50000" />
-            </div>
-          </div>
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50">
-              Cancel
-            </button>
-            <button type="submit" disabled={saving}
-              className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg disabled:opacity-60">
-              {saving ? 'Adding…' : 'Add Staff Member'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
-
-// ─── Leave Request Table ──────────────────────────────────────────────────────
-function LeaveRequestsPanel({ onStatusChange }) {
-  const toast = useToast()
-  const [leaves, setLeaves] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('Pending')
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await api.get(`/hr/leave?status=${filter}`)
-      if (res.data?.success) setLeaves(res.data.data)
-    } catch {
-      toast.error('Could not load leave requests')
-    } finally {
-      setLoading(false)
-    }
-  }, [filter])
-
-  useEffect(() => { load() }, [load])
-
-  const handleReview = async (leaveId, status) => {
-    try {
-      await api.put('/hr/leave/review', { leaveId, status })
-      toast.success(`Leave request ${status.toLowerCase()} successfully`)
-      load()
-    } catch {
-      toast.error('Failed to update leave request')
-    }
-  }
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-indigo-500" />
-          Leave Requests
-        </h3>
-        <div className="flex gap-2">
-          {['Pending', 'Approved', 'Rejected'].map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                filter === s
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      </div>
-      {loading ? (
-        <div className="p-6"><SkeletonTable rows={3} /></div>
-      ) : leaves.length === 0 ? (
-        <div className="py-12 text-center text-sm text-gray-400">
-          No {filter.toLowerCase()} leave requests
-        </div>
-      ) : (
-        <div className="divide-y divide-gray-100">
-          {leaves.map((leave) => (
-            <div key={leave._id} className="px-5 py-4 flex items-center justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 text-sm">
-                  {leave.staffId?.fullName || 'Staff Member'}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {leave.leaveType} · {formatDate(leave.fromDate)} — {formatDate(leave.toDate)}
-                </p>
-                {leave.reason && (
-                  <p className="text-xs text-gray-400 mt-0.5 italic">"{leave.reason}"</p>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={
-                  leave.status === 'Approved' ? 'success' :
-                  leave.status === 'Rejected' ? 'danger' : 'warning'
-                }>
-                  {leave.status}
-                </Badge>
-                {leave.status === 'Pending' && (
-                  <>
-                    <button
-                      onClick={() => handleReview(leave._id, 'Approved')}
-                      className="p-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg transition-colors"
-                      title="Approve"
-                    >
-                      <Check className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleReview(leave._id, 'Rejected')}
-                      className="p-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg transition-colors"
-                      title="Reject"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HRPage() {
@@ -249,7 +47,7 @@ export default function HRPage() {
   const unpaidFinalizedCount = payrollRecords.filter((r) => r.status === 'Finalized' && r.paymentStatus !== 'Paid').length
 
   useEffect(() => {
-    api.get('/hr/staff')
+    cachedGet('/hr/staff')
       .then((res) => { if (res.data?.success) setStaff(res.data.data) })
       .catch(() => toast.error('Could not load staff list'))
       .finally(() => setLoading(false))
@@ -258,7 +56,7 @@ export default function HRPage() {
   // Show the payroll already generated for the selected month, so it can be finalized later
   useEffect(() => {
     let cancelled = false
-    api.get(`/hr/payroll?month=${payMonth}&year=${payYear}`)
+    cachedGet(`/hr/payroll?month=${payMonth}&year=${payYear}`)
       .then((res) => { if (!cancelled) setPayrollRecords(res.data?.data || []) })
       .catch(() => { if (!cancelled) setPayrollRecords([]) })
     return () => { cancelled = true }
@@ -392,7 +190,7 @@ export default function HRPage() {
               <button
                 onClick={handleFinalizePayroll}
                 disabled={finalizing}
-                className="px-5 py-2 bg-emerald-500 text-white hover:bg-emerald-600 font-bold text-sm rounded-lg shadow-sm disabled:opacity-60 transition-colors"
+                className="px-5 py-2 bg-emerald-700 text-white hover:bg-emerald-800 font-bold text-sm rounded-lg shadow-sm disabled:opacity-60 transition-colors"
               >
                 {finalizing ? 'Finalizing…' : `Finalize ${draftCount} Draft${draftCount === 1 ? '' : 's'}`}
               </button>
@@ -459,7 +257,7 @@ export default function HRPage() {
             </h2>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input aria-label="Search staff…"
                   type="text"
                   placeholder="Search staff…"
@@ -502,12 +300,12 @@ export default function HRPage() {
                         </div>
                         <div>
                           <p className="font-semibold text-gray-800 text-sm">{s.fullName}</p>
-                          <p className="text-xs text-gray-400">{s.staffId}</p>
+                          <p className="text-xs text-gray-500">{s.staffId}</p>
                         </div>
                       </div>
                       <div className="col-span-3">
                         <p className="text-sm text-gray-700">{s.designation}</p>
-                        <p className="text-xs text-gray-400">{s.department}</p>
+                        <p className="text-xs text-gray-500">{s.department}</p>
                       </div>
                       <div className="col-span-2 text-right font-semibold text-gray-800 text-sm">
                         {formatPKR(s.salary)}
@@ -519,26 +317,26 @@ export default function HRPage() {
                       </div>
                       <div className="col-span-1 text-right">
                         <ChevronDown
-                          className={`w-4 h-4 text-gray-400 transition-transform ${expanded === s._id ? 'rotate-180' : ''}`}
+                          className={`w-4 h-4 text-gray-500 transition-transform ${expanded === s._id ? 'rotate-180' : ''}`}
                         />
                       </div>
                     </div>
                     {expanded === s._id && (
                       <div className="bg-indigo-50/50 px-5 py-4 border-t border-indigo-100 grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-xs text-gray-400 font-semibold">Phone</p>
+                          <p className="text-xs text-gray-500 font-semibold">Phone</p>
                           <p className="text-gray-700 mt-0.5">{s.phone || '—'}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400 font-semibold">Email</p>
+                          <p className="text-xs text-gray-500 font-semibold">Email</p>
                           <p className="text-gray-700 mt-0.5 truncate">{s.email || '—'}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400 font-semibold">Joining Date</p>
+                          <p className="text-xs text-gray-500 font-semibold">Joining Date</p>
                           <p className="text-gray-700 mt-0.5">{formatDate(s.joiningDate)}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400 font-semibold">CNIC</p>
+                          <p className="text-xs text-gray-500 font-semibold">CNIC</p>
                           <p className="text-gray-700 mt-0.5">{s.cnic || '—'}</p>
                         </div>
                       </div>
@@ -546,7 +344,7 @@ export default function HRPage() {
                   </React.Fragment>
                 ))}
                 {filtered.length === 0 && (
-                  <div className="py-12 text-center text-sm text-gray-400">No staff members found</div>
+                  <div className="py-12 text-center text-sm text-gray-500">No staff members found</div>
                 )}
               </div>
             </div>

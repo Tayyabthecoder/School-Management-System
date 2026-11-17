@@ -111,7 +111,7 @@ export default function ChangeSectionModal({
           <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xs font-bold text-slate-400 uppercase tracking-wide">Student</p>
+                <p className="text-2xs font-bold text-slate-500 uppercase tracking-wide">Student</p>
                 <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
                   {student.fullName}
                 </h4>
@@ -159,7 +159,7 @@ export default function ChangeSectionModal({
                       onClick={() => setSelectedSection(sec)}
                       className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 ${
                         isCurrent
-                          ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed opacity-60'
+                          ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-500 cursor-not-allowed opacity-60'
                           : isSelected
                           ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/30 ring-2 ring-indigo-600/30'
                           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'

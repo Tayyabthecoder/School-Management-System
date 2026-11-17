@@ -15,6 +15,7 @@ import ChangeSectionModal from './components/ChangeSectionModal'
 import ImportStudentsModal from './components/ImportStudentsModal'
 import StudentRegistrationModal from './components/StudentRegistrationModal'
 import { logError } from '../../lib/logger'
+import { cachedGet } from '../../lib/cachedGet'
 
 export default function StudentListPage() {
   const toast = useToast()
@@ -42,7 +43,7 @@ export default function StudentListPage() {
   const fetchStudents = async () => {
     setLoading(true)
     try {
-      const res = await api.get('/students', { params: { limit: 1000 } })
+      const res = await cachedGet('/students', { params: { limit: 1000 } })
       if (res.data?.success) {
         setStudents(res.data.data)
       }
@@ -64,7 +65,7 @@ export default function StudentListPage() {
     setSelectedSection(null)
     setNavLevel('sections')
     try {
-      const res = await api.get('/students', { params: { classId: cls._id, limit: 1000 } })
+      const res = await cachedGet('/students', { params: { classId: cls._id, limit: 1000 } })
       if (res.data?.success && Array.isArray(res.data.data)) {
         setStudents((prev) => {
           const map = new Map(prev.map(s => [s._id, s]))
@@ -82,7 +83,7 @@ export default function StudentListPage() {
     setNavLevel('students')
     if (selectedGrade?._id) {
       try {
-        const res = await api.get('/students', { params: { classId: selectedGrade._id, sectionId, limit: 1000 } })
+        const res = await cachedGet('/students', { params: { classId: selectedGrade._id, sectionId, limit: 1000 } })
         if (res.data?.success && Array.isArray(res.data.data)) {
           setStudents((prev) => {
             const map = new Map(prev.map(s => [s._id, s]))
@@ -181,7 +182,7 @@ export default function StudentListPage() {
           <button
             type="button"
             onClick={() => setChangeSectionStudent(row)}
-            className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
+            className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded-lg inline-flex items-center gap-1 text-xs font-semibold transition-colors"
             title="Change Section within Class"
           >
             <ArrowRightLeft className="w-3.5 h-3.5" /> Change Section
@@ -215,7 +216,7 @@ export default function StudentListPage() {
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto flex-1">
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input aria-label="Search student ID or name globally..."
               type="text"
               value={search}
@@ -231,6 +232,7 @@ export default function StudentListPage() {
           </div>
 
           <select
+            aria-label="Filter by class"
             value={tableClassFilter}
             onChange={(e) => {
               setTableClassFilter(e.target.value)
@@ -280,7 +282,7 @@ export default function StudentListPage() {
 
           <button
             onClick={() => setShowImportModal(true)}
-            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors"
+            className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors"
             title="Import student roster from Excel (.xlsx, .xls, .csv)"
           >
             <FileSpreadsheet className="w-4 h-4" /> Import Excel
@@ -397,7 +399,7 @@ export default function StudentListPage() {
                           {selectedGrade.name} - Section {sec}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1 mb-4 flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-gray-400" /> {secCount} Enrolled Students
+                          <Users className="w-3.5 h-3.5 text-gray-500" /> {secCount} Enrolled Students
                         </p>
 
                         <div className="w-full py-2 bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">

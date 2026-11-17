@@ -138,6 +138,7 @@ export default function GradingScaleTab({
               >
                 <div className="col-span-3 pr-4">
                   <input
+                    aria-label={`Grade label, row ${index + 1}`}
                     type="text"
                     required
                     value={item.label}
@@ -147,6 +148,7 @@ export default function GradingScaleTab({
                 </div>
                 <div className="col-span-3 pr-4">
                   <input
+                    aria-label={`Minimum percent for ${item.label || 'row ' + (index + 1)}`}
                     type="number"
                     min={0}
                     max={100}
@@ -157,6 +159,7 @@ export default function GradingScaleTab({
                 </div>
                 <div className="col-span-3 pr-4">
                   <input
+                    aria-label={`Maximum percent for ${item.label || 'row ' + (index + 1)}`}
                     type="number"
                     min={0}
                     max={100}
@@ -174,7 +177,7 @@ export default function GradingScaleTab({
                   <button
                     type="button"
                     onClick={() => handleDeleteItem(index)}
-                    className="text-gray-400 hover:text-rose-600 p-1 transition-colors"
+                    className="text-gray-500 hover:text-rose-600 p-1 transition-colors"
                     title="Remove grade bracket"
                   >
                     <Trash2 className="w-4 h-4" />

@@ -8,6 +8,7 @@ import api from '../../lib/axios'
 import { formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
+import { cachedGet } from '../../lib/cachedGet'
 
 const LEAVE_TYPES = ['Casual', 'Sick', 'Annual', 'Medical', 'Unpaid', 'Maternity', 'Paternity']
 const EMPTY_FORM = { leaveType: 'Casual', fromDate: '', toDate: '', reason: '' }
@@ -27,7 +28,7 @@ export default function MyLeavePage() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await api.get('/hr/leave')
+      const res = await cachedGet('/hr/leave')
       setRequests(res.data?.data || [])
     } catch (err) {
       toast.error(err.response?.data?.error?.message || 'Could not load your leave requests')
@@ -116,7 +117,7 @@ export default function MyLeavePage() {
           {loading ? (
             <div className="p-6"><SkeletonTable rows={3} /></div>
           ) : requests.length === 0 ? (
-            <div className="py-12 text-center text-sm text-gray-400">You have not requested any leave yet.</div>
+            <div className="py-12 text-center text-sm text-gray-500">You have not requested any leave yet.</div>
           ) : (
             <div className="divide-y divide-gray-100">
               {requests.map((r) => (
@@ -126,7 +127,7 @@ export default function MyLeavePage() {
                       {r.leaveType} · {formatDate(r.fromDate)} — {formatDate(r.toDate)}
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">{r.reason}</p>
-                    {r.reviewRemarks && <p className="text-xs text-gray-400 mt-0.5 italic">HR: {r.reviewRemarks}</p>}
+                    {r.reviewRemarks && <p className="text-xs text-gray-500 mt-0.5 italic">HR: {r.reviewRemarks}</p>}
                   </div>
                   <Badge variant={r.status === 'Approved' ? 'success' : r.status === 'Rejected' ? 'danger' : 'warning'}>
                     {r.status}

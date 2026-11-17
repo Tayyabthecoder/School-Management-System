@@ -27,10 +27,10 @@ export default function FeeLedgerTab({
       {/* Header Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
+          <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base flex items-center gap-2">
             <CircleDollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Fee Ledger & Payment Accounts
-          </h3>
+          </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Manage student fee structures, apply scholarships/concessions, and collect payments.
           </p>
@@ -48,7 +48,7 @@ export default function FeeLedgerTab({
       {/* Financial Summary KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card-surface p-5">
-          <p className="text-2xs font-semibold text-slate-400 uppercase">Total Fees Invoiced</p>
+          <p className="text-2xs font-semibold text-slate-500 uppercase">Total Fees Invoiced</p>
           <p className="text-xl font-black text-slate-900 dark:text-slate-100 mt-1">
             {formatPKR(totalFeeDue)}
           </p>
@@ -143,7 +143,7 @@ export default function FeeLedgerTab({
                       {f.concessionType || 'Scholarship'})
                     </span>
                   ) : (
-                    <p className="text-slate-400 mt-0.5">Invoice: {f._id?.slice(-8)}</p>
+                    <p className="text-slate-500 mt-0.5">Invoice: {f._id?.slice(-8)}</p>
                   )}
                 </div>
                 <div className="col-span-2 font-medium text-slate-700 dark:text-slate-300">
@@ -151,7 +151,7 @@ export default function FeeLedgerTab({
                 </div>
                 <div className="col-span-2 text-right">
                   <p className="font-bold text-slate-800 dark:text-slate-200">{formatPKR(f.amountDue)}</p>
-                  <p className="text-2xs text-slate-400">
+                  <p className="text-2xs text-slate-500">
                     {f.discount > 0 ? `Waiver: -${formatPKR(f.discount)}` : 'Full Rate'}
                   </p>
                 </div>
@@ -159,7 +159,7 @@ export default function FeeLedgerTab({
                   <p className="font-black text-slate-900 dark:text-slate-100">{formatPKR(f.netAmount)}</p>
                   <p
                     className={`text-2xs font-bold ${
-                      f.amountPaid > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400'
+                      f.amountPaid > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'
                     }`}
                   >
                     Paid: {formatPKR(f.amountPaid)}
@@ -194,7 +194,7 @@ export default function FeeLedgerTab({
                     <button
                       type="button"
                       onClick={() => onOpenPayment(f)}
-                      className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors"
+                      className="p-1.5 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors"
                       title="Record Payment"
                     >
                       <Wallet className="w-3.5 h-3.5" />
@@ -216,7 +216,7 @@ export default function FeeLedgerTab({
               </div>
             ))
           ) : (
-            <div className="py-12 text-center text-sm text-slate-400">
+            <div className="py-12 text-center text-sm text-slate-500">
               No fee invoices generated yet for this student.
             </div>
           )}

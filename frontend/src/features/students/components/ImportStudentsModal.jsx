@@ -227,7 +227,7 @@ export default function ImportStudentsModal({
                     <p className="text-xl font-extrabold text-gray-900">{importResult.totalRows}</p>
                   </div>
                   <div className="bg-white/80 p-3 rounded-xl border border-emerald-100">
-                    <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">
+                    <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">
                       Newly Created
                     </span>
                     <p className="text-xl font-extrabold text-emerald-700">
@@ -321,9 +321,9 @@ export default function ImportStudentsModal({
                       Drop student Excel spreadsheet here
                     </h4>
                     <p className="text-xs text-gray-500 mt-1">
-                      or <span className="text-emerald-600 font-semibold underline">browse file</span> from your computer
+                      or <span className="text-emerald-700 font-semibold underline">browse file</span> from your computer
                     </p>
-                    <p className="text-[11px] text-gray-400 mt-2">
+                    <p className="text-[11px] text-gray-500 mt-2">
                       Supports .xlsx and .csv up to 10MB
                     </p>
                   </div>
@@ -384,7 +384,7 @@ export default function ImportStudentsModal({
               <button
                 type="button"
                 onClick={handleModalClose}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
               >
                 <Users className="w-4 h-4" /> View Updated Directory
               </button>
@@ -403,7 +403,7 @@ export default function ImportStudentsModal({
                 type="button"
                 onClick={handleUpload}
                 disabled={!file || uploading}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
               >
                 {uploading ? (
                   <>

@@ -22,6 +22,9 @@ import { formatDate, toLocalDateInput } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { GRADE_THEMES, FALLBACK_GRADES } from '../../constants/grades'
 import { logWarn } from '../../lib/logger'
+import { cachedGet } from '../../lib/cachedGet'
+import LeaveRequestsTab from './components/LeaveRequestsTab'
+import AttendanceRegisterCard from './components/AttendanceRegisterCard'
 
 export default function AttendancePage() {
   const toast = useToast()
@@ -51,7 +54,7 @@ export default function AttendancePage() {
       try {
         const [clsRes, stuRes] = await Promise.all([
           loadClasses(),
-          api.get('/students', { params: { limit: 1000 } }),
+          cachedGet('/students', { params: { limit: 1000 } }),
         ])
         if (clsRes.data?.success && clsRes.data.data.length > 0) {
           setClasses(clsRes.data.data)
@@ -72,7 +75,7 @@ export default function AttendancePage() {
   const loadLeaveRequests = async () => {
     setLeavesLoading(true)
     try {
-      const res = await api.get('/teachers/leave-requests', {
+      const res = await cachedGet('/teachers/leave-requests', {
         params: { status: leaveFilter !== 'ALL' ? leaveFilter : undefined },
       })
       if (res.data?.success) {
@@ -125,7 +128,7 @@ export default function AttendancePage() {
     try {
       // Dynamic section roster fetch ensures full class list even in large institutions (2,000+ students)
       const [stuRes, attRes] = await Promise.all([
-        api.get('/students', {
+        cachedGet('/students', {
           params: {
             classId: grade._id,
             sectionId: section,
@@ -133,7 +136,7 @@ export default function AttendancePage() {
             status: 'Active',
           },
         }).catch(() => null),
-        api.get('/attendance/student', {
+        cachedGet('/attendance/student', {
           params: {
             classId: grade._id,
             sectionId: section,
@@ -394,7 +397,7 @@ export default function AttendancePage() {
                           {selectedGrade.name} - Section {sec}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1 mb-4 flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-gray-400" /> {secCount} Enrolled Students
+                          <Users className="w-3.5 h-3.5 text-gray-500" /> {secCount} Enrolled Students
                         </p>
 
                         <div className="w-full py-2 bg-white group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white font-semibold text-xs rounded-lg text-center border border-indigo-200 group-hover:border-indigo-600 transition-all flex items-center justify-center gap-1">
@@ -436,140 +439,22 @@ export default function AttendancePage() {
                 }
               />
 
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-                  <div>
-                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                      {selectedGrade.name} · SECTION {selectedSection}
-                    </span>
-                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 mt-0.5">
-                      Student Attendance Checklist
-                    </h2>
-                    {/* Live Metric Breakdown */}
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        Present: {statusCounts.Present}
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200/80 dark:border-rose-800">
-                        <span className="w-2 h-2 rounded-full bg-rose-500" />
-                        Absent: {statusCounts.Absent}
-                      </span>
-                      {statusCounts.Late > 0 && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800">
-                          <span className="w-2 h-2 rounded-full bg-amber-500" />
-                          Late: {statusCounts.Late}
-                        </span>
-                      )}
-                      {statusCounts.Excused > 0 && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800">
-                          <span className="w-2 h-2 rounded-full bg-blue-500" />
-                          Excused: {statusCounts.Excused}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <input
-                      type="date"
-                      value={attendanceDate}
-                      onChange={(e) => handleDateChange(e.target.value)}
-                      className="px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      icon={CheckCheck}
-                      onClick={handleMarkAllPresent}
-                      className="text-emerald-700 hover:text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100/80 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800"
-                    >
-                      All Present
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      icon={XSquare}
-                      onClick={handleMarkAllAbsent}
-                      className="text-rose-700 hover:text-rose-800 bg-rose-50/70 hover:bg-rose-100/80 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800"
-                    >
-                      All Absent
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      icon={RotateCcw}
-                      onClick={handleInvertAttendance}
-                      title="Invert Present / Absent status for all"
-                    >
-                      Invert
-                    </Button>
-                  </div>
-                </div>
-
-                {activeRoster.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 text-xs">
-                    No students enrolled in this section.
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100 mt-4">
-                    {activeRoster.map((student, idx) => {
-                      const curStatus = attendance[student._id] || 'Present'
-                      return (
-                        <div
-                          key={student._id}
-                          className="py-3 flex items-center justify-between gap-4 text-xs"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 rounded-full bg-gray-100 font-bold text-gray-600 flex items-center justify-center text-[10px]">
-                              {idx + 1}
-                            </span>
-                            <div>
-                              <p className="font-bold text-gray-900">{student.fullName}</p>
-                              <p className="text-[10px] text-gray-400 font-mono">ID: {student.studentId} · Roll: {student.rollNumber || 'N/A'}</p>
-                            </div>
-                          </div>
-
-                          <div className="flex gap-1.5">
-                            {['Present', 'Absent', 'Late', 'Excused'].map((st) => {
-                              const isActive = curStatus === st
-                              let btnColor = 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                              if (isActive) {
-                                if (st === 'Present') btnColor = 'bg-green-600 text-white font-bold shadow-sm'
-                                if (st === 'Absent') btnColor = 'bg-red-600 text-white font-bold shadow-sm'
-                                if (st === 'Late') btnColor = 'bg-amber-600 text-white font-bold shadow-sm'
-                                if (st === 'Excused') btnColor = 'bg-blue-600 text-white font-bold shadow-sm'
-                              }
-
-                              return (
-                                <button
-                                  key={st}
-                                  type="button"
-                                  onClick={() => handleStatusChange(student._id, st)}
-                                  className={`px-3 py-1 rounded-lg text-xs transition-colors ${btnColor}`}
-                                >
-                                  {st}
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-
-                <div className="pt-6 mt-4 border-t border-gray-100 flex justify-end">
-                  <button
-                    onClick={handleSubmitAttendance}
-                    disabled={submitting || activeRoster.length === 0}
-                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md transition-colors disabled:opacity-60 flex items-center gap-2"
-                  >
-                    <Check className="w-4 h-4" />
-                    {submitting ? 'Saving…' : `Save Attendance (${activeRoster.length} Students)`}
-                  </button>
-                </div>
-              </div>
+              <AttendanceRegisterCard
+                handleDateChange={handleDateChange}
+                handleMarkAllPresent={handleMarkAllPresent}
+                handleMarkAllAbsent={handleMarkAllAbsent}
+                handleInvertAttendance={handleInvertAttendance}
+                handleStatusChange={handleStatusChange}
+                handleSubmitAttendance={handleSubmitAttendance}
+                activeRoster={activeRoster}
+                statusCounts={statusCounts}
+                students={students}
+                selectedGrade={selectedGrade}
+                selectedSection={selectedSection}
+                attendanceDate={attendanceDate}
+                attendance={attendance}
+                submitting={submitting}
+              />
             </div>
           )}
         </>
@@ -577,88 +462,14 @@ export default function AttendancePage() {
 
       {/* ── TAB 2: Student Leave Applications ──────────────────────── */}
       {activeMainTab === 'leaves' && (
-        <div className="space-y-4">
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h3 className="font-bold text-gray-900 text-sm">Parent Leave Applications</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Review and approve digital absence requests submitted by guardians</p>
-            </div>
-
-            <select
-              value={leaveFilter}
-              onChange={(e) => setLeaveFilter(e.target.value)}
-              className="px-3 py-1.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700"
-            >
-              <option value="ALL">All Applications</option>
-              <option value="Pending">Pending Only</option>
-              <option value="Approved">Approved Only</option>
-              <option value="Rejected">Rejected Only</option>
-            </select>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            {leavesLoading ? (
-              <div className="p-8 text-center text-xs text-gray-400">Loading leave requests…</div>
-            ) : leaveRequests.length === 0 ? (
-              <div className="p-12 text-center text-xs text-gray-400">
-                No student leave requests matching your filter.
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {leaveRequests.map((leave) => {
-                  let statusBg = 'bg-amber-100 text-amber-800'
-                  if (leave.status === 'Approved') statusBg = 'bg-green-100 text-green-800'
-                  if (leave.status === 'Rejected') statusBg = 'bg-red-100 text-red-800'
-
-                  return (
-                    <div key={leave._id} className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-gray-900 text-sm">{leave.studentId?.fullName}</span>
-                          <span className="text-[10px] text-gray-400">({leave.classId?.name} - {leave.sectionId})</span>
-                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${statusBg}`}>
-                            {leave.status}
-                          </span>
-                        </div>
-                        <p className="text-gray-600">
-                          <strong>{leave.category} Leave:</strong> {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                        </p>
-                        <p className="text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100 italic">
-                          "{leave.reason}"
-                        </p>
-                      </div>
-
-                      {leave.status === 'Pending' ? (
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            disabled={reviewingId === leave._id}
-                            onClick={() => handleReviewLeave(leave._id, 'Approved')}
-                            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-sm"
-                          >
-                            <Check className="w-3.5 h-3.5" /> Approve
-                          </button>
-                          <button
-                            type="button"
-                            disabled={reviewingId === leave._id}
-                            onClick={() => handleReviewLeave(leave._id, 'Rejected')}
-                            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-sm"
-                          >
-                            <XCircle className="w-3.5 h-3.5" /> Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100">
-                          Reviewed
-                        </span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </div>
+        <LeaveRequestsTab
+          handleReviewLeave={handleReviewLeave}
+          leaveRequests={leaveRequests}
+          leavesLoading={leavesLoading}
+          leaveFilter={leaveFilter}
+          setLeaveFilter={setLeaveFilter}
+          reviewingId={reviewingId}
+        />
       )}
     </div>
   )

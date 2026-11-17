@@ -66,7 +66,7 @@ export default function StudentLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-400">
+      <footer className="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
         School Management System · Student Academic Hub © 2026
       </footer>
     </div>

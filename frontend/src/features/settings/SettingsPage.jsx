@@ -28,6 +28,7 @@ import GradingScaleTab from './components/GradingScaleTab'
 import ChallanBuilderTab from './components/ChallanBuilderTab'
 import UserManagementTab from './components/UserManagementTab'
 import SecuritySystemTab from './components/SecuritySystemTab'
+import { cachedGet } from '../../lib/cachedGet'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const TABS = [
@@ -265,7 +266,7 @@ export default function SettingsPage() {
   const fetchAcademicYears = useCallback(async () => {
     setLoadingAY(true)
     try {
-      const res = await api.get('/classes/academic-years')
+      const res = await cachedGet('/classes/academic-years')
       if (res.data?.success) setAcademicYears(res.data.data)
     } catch (err) {
       // Never show a made-up session: an empty list with an error is honest.
@@ -279,7 +280,7 @@ export default function SettingsPage() {
   // Fetch Challan Settings
   const fetchChallanSettings = useCallback(async () => {
     try {
-      const res = await api.get('/finance/challan-settings')
+      const res = await cachedGet('/finance/challan-settings')
       if (res.data?.success && res.data.data) {
         const merged = mergeChallanConfig(res.data.data)
         setChallanConfig(merged)
@@ -298,7 +299,7 @@ export default function SettingsPage() {
     }
     setLoadingUsers(true)
     try {
-      const res = await api.get('/users?limit=100')
+      const res = await cachedGet('/users?limit=100')
       if (res.data?.success) setUsers(res.data.data)
     } catch {
       toast.error('Could not load user accounts (admin privileges required)')
@@ -310,7 +311,7 @@ export default function SettingsPage() {
   // Check System Health
   const checkHealth = useCallback(async () => {
     try {
-      const res = await api.get('/health')
+      const res = await cachedGet('/health')
       setSystemHealth({
         status: res.data?.status === 'ok' ? 'Online & Healthy' : 'Degraded',
         timestamp: res.data?.timestamp || new Date().toISOString(),
@@ -324,7 +325,7 @@ export default function SettingsPage() {
   // Fetch School Settings from backend
   const fetchSchoolSettings = useCallback(async () => {
     try {
-      const res = await api.get('/settings')
+      const res = await cachedGet('/settings')
       if (res.data?.success && res.data.data) {
         const s = res.data.data
         setProfile(prev => ({

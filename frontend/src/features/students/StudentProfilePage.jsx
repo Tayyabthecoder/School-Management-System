@@ -13,6 +13,7 @@ import { formatDate } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
 import { logError } from '../../lib/logger'
+import { cachedGet } from '../../lib/cachedGet'
 
 // Which profile sections each staff role may load (mirrors the backend route RBAC), so the
 // page doesn't fire requests that are guaranteed to fail with 403 and spam error toasts.
@@ -158,11 +159,11 @@ export default function StudentProfilePage() {
     setLoading(true)
     try {
       const [stRes, feeRes, grdRes, attRes] = await Promise.allSettled([
-        api.get(`/students/${id}`),
-        access.fees ? api.get('/finance/student-fees', { params: { studentId: id } }) : skipped,
-        access.grades ? api.get(`/grades/student/${id}`) : skipped,
+        cachedGet(`/students/${id}`),
+        access.fees ? cachedGet('/finance/student-fees', { params: { studentId: id } }) : skipped,
+        access.grades ? cachedGet(`/grades/student/${id}`) : skipped,
         // GET /attendance does not exist; student attendance lives at /attendance/student.
-        access.attendance ? api.get('/attendance/student', { params: { studentId: id } }) : skipped,
+        access.attendance ? cachedGet('/attendance/student', { params: { studentId: id } }) : skipped,
       ])
 
       if (stRes.status === 'fulfilled' && stRes.value.data?.success) {
@@ -390,9 +391,9 @@ export default function StudentProfilePage() {
     return (
       <div className="card-surface p-12 text-center border-rose-200 dark:border-rose-800">
         <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-3" />
-        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
           Student Record Not Found
-        </h3>
+        </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           The requested student ID could not be located in the database.
         </p>

@@ -1,8 +1,9 @@
 import axios from 'axios'
-import { navigateTo } from './navigation'
-import { useAuthStore } from '../store/authStore'
-import { useToastStore } from '../store/toastStore'
-import { createSingleFlight } from './singleFlight'
+import { navigateTo } from './navigation.js'
+import { useAuthStore } from '../store/authStore.js'
+import { useToastStore } from '../store/toastStore.js'
+import { createSingleFlight } from './singleFlight.js'
+import { queryClient } from './queryClient.js'
 
 const api = axios.create({
   baseURL: '/api/v1',
@@ -33,7 +34,12 @@ export const refreshAccessToken = createSingleFlight(async () => {
 
 // Handle 401 & Concurrent Token Refresh Queue
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // A successful write may change anything a cached GET returned (see lib/cachedGet.js).
+    const method = String(response.config?.method || 'get').toLowerCase()
+    if (method !== 'get') queryClient.removeQueries({ queryKey: ['api'] })
+    return response
+  },
   async (error) => {
     const originalRequest = error.config
 

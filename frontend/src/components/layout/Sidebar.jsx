@@ -68,7 +68,7 @@ export default function Sidebar() {
   return (
     <aside
       className={`fixed top-0 left-0 z-40 h-screen bg-slate-950 text-slate-300 border-r border-slate-800/80 transition-all duration-300 ${
-        isSidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full lg:translate-x-0'
+        isSidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full max-lg:invisible lg:translate-x-0'
       } flex flex-col font-sans select-none`}
     >
       {/* Institution Brand Header */}
@@ -92,7 +92,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation Sections */}
-      <nav className="flex-1 py-4 px-3 overflow-y-auto space-y-5">
+      <nav aria-label="Main navigation" className="flex-1 py-4 px-3 overflow-y-auto space-y-5">
         {NAV_SECTIONS.map((section, sIndex) => {
           const visibleItems = section.items.filter((item) => item.roles.includes(userRole))
           if (visibleItems.length === 0) return null
@@ -138,7 +138,7 @@ export default function Sidebar() {
           {isSidebarOpen && (
             <div className="flex-1 overflow-hidden leading-tight">
               <p className="text-xs font-semibold text-slate-200 truncate capitalize">{user?.username}</p>
-              <p className="text-[10px] text-slate-500 truncate capitalize">{userRole.replace('_', ' ')}</p>
+              <p className="text-[10px] text-slate-400 truncate capitalize">{userRole.replace('_', ' ')}</p>
             </div>
           )}
         </div>

@@ -8,6 +8,7 @@ import api from '../../lib/axios'
 import { useAuthStore } from '../../store/authStore'
 import { logError } from '../../lib/logger'
 import { useClasses } from '../../hooks/useClasses'
+import { cachedGet } from '../../lib/cachedGet'
 
 export default function ReportCardPage() {
   const { user } = useAuthStore()
@@ -34,7 +35,7 @@ export default function ReportCardPage() {
   // Load students for selected class
   useEffect(() => {
     if (!isStudent && selectedClassId) {
-      api.get(`/students?classId=${selectedClassId}&limit=200`)
+      cachedGet(`/students?classId=${selectedClassId}&limit=200`)
         .then(res => {
           const stList = res.data?.data || []
           setStudents(stList)
@@ -55,7 +56,7 @@ export default function ReportCardPage() {
     if (!studentToFetch) return
 
     setLoading(true)
-    api.get(`/report-cards/${studentToFetch}?termName=${encodeURIComponent(termName)}`)
+    cachedGet(`/report-cards/${studentToFetch}?termName=${encodeURIComponent(termName)}`)
       .then(res => {
         if (res.data?.success) {
           setReportData(res.data.data)
@@ -238,28 +239,28 @@ export default function ReportCardPage() {
           {/* Quick Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-400 uppercase">Total Marks</span>
+              <span className="text-xs font-semibold text-gray-500 uppercase">Total Marks</span>
               <div className="text-xl font-bold text-gray-900 mt-1">
                 {reportData.summary.totalMarksObtained} <span className="text-xs font-normal text-gray-500">/ {reportData.summary.totalMaxMarks}</span>
               </div>
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-400 uppercase">Passed Subjects</span>
-              <div className="text-xl font-bold text-green-600 mt-1">
+              <span className="text-xs font-semibold text-gray-500 uppercase">Passed Subjects</span>
+              <div className="text-xl font-bold text-green-700 mt-1">
                 {reportData.summary.passedSubjects} <span className="text-xs font-normal text-gray-500">/ {reportData.summary.totalSubjects}</span>
               </div>
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-400 uppercase">Failed Subjects</span>
+              <span className="text-xs font-semibold text-gray-500 uppercase">Failed Subjects</span>
               <div className={`text-xl font-bold mt-1 ${reportData.summary.failedSubjects > 0 ? 'text-red-600' : 'text-gray-900'}`}>
                 {reportData.summary.failedSubjects}
               </div>
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-xs font-semibold text-gray-400 uppercase">Attendance Rate</span>
+              <span className="text-xs font-semibold text-gray-500 uppercase">Attendance Rate</span>
               <div className="text-xl font-bold text-indigo-600 mt-1">
                 {reportData.attendancePercentage}
               </div>

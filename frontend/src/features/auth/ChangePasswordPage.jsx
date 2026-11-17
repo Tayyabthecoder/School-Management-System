@@ -94,7 +94,7 @@ export default function ChangePasswordPage() {
                 placeholder="Enter current password"
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all pl-10"
               />
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5" />
             </div>
           </div>
 
@@ -111,7 +111,7 @@ export default function ChangePasswordPage() {
                 placeholder="At least 6 characters"
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all pl-10"
               />
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5" />
             </div>
           </div>
 
@@ -128,7 +128,7 @@ export default function ChangePasswordPage() {
                 placeholder="Re-enter new password"
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all pl-10"
               />
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5" />
             </div>
           </div>
 

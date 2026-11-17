@@ -24,222 +24,9 @@ import api from '../../lib/axios'
 import { formatDate, toLocalDateInput } from '../../lib/formatters'
 import { useToast } from '../../store/toastStore'
 import { useAuthStore } from '../../store/authStore'
+import { cachedGet } from '../../lib/cachedGet'
+import QuickPeriodAttendanceModal from './components/QuickPeriodAttendanceModal'
 
-// ─── Fast Period Attendance Modal ─────────────────────────────────────────────
-function QuickPeriodAttendanceModal({ open, period, onClose, onAttendanceMarked }) {
-  const toast = useToast()
-  const [students, setStudents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [records, setRecords] = useState({}) // { studentId: 'Present' | 'Absent' | 'Late' | 'Excused' }
-
-  useEffect(() => {
-    if (!open || !period?.class?._id) return
-
-    const loadRoster = async () => {
-      setLoading(true)
-      try {
-        const res = await api.get('/students', {
-          params: {
-            classId: period.class._id,
-            sectionId: period.sectionId,
-            limit: 100,
-          },
-        })
-        const studentList = res.data?.data || []
-        setStudents(studentList)
-
-        // Initialize all to Present by default
-        const initRecs = {}
-        studentList.forEach(s => {
-          initRecs[s._id] = 'Present'
-        })
-        setRecords(initRecs)
-      } catch (err) {
-        toast.error('Failed to load class student roster')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadRoster()
-  }, [open, period, toast])
-
-  const setAllStatus = (status) => {
-    const updated = {}
-    students.forEach(s => {
-      updated[s._id] = status
-    })
-    setRecords(updated)
-  }
-
-  const toggleStudentStatus = (studentId, status) => {
-    setRecords(prev => ({ ...prev, [studentId]: status }))
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
-    try {
-      const payload = {
-        classId: period.class._id,
-        sectionId: period.sectionId,
-        date: toLocalDateInput(),
-        periodNumber: period.periodNumber || 1,
-        records: students.map(s => ({
-          studentId: s._id,
-          status: records[s._id] || 'Present',
-        })),
-      }
-
-      const res = await api.post('/attendance/student', payload)
-      if (res.data?.success) {
-        toast.success(`Attendance recorded for ${period.class.name} (${period.sectionId}) — Period ${period.periodNumber}!`)
-        onAttendanceMarked()
-        onClose()
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to submit attendance')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  if (!open || !period) return null
-
-  const presentCount = Object.values(records).filter(s => s === 'Present').length
-  const absentCount = Object.values(records).filter(s => s === 'Absent').length
-  const lateCount = Object.values(records).filter(s => s === 'Late').length
-
-  return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 flex flex-col max-h-[90vh]">
-        {/* Modal Header */}
-        <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 p-6 text-white flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 bg-indigo-600 text-white font-bold text-xs rounded-full uppercase">
-                Period {period.periodNumber}
-              </span>
-              <span className="text-xs text-indigo-200">
-                {period.startTime} – {period.endTime}
-              </span>
-            </div>
-            <h3 className="text-lg font-bold mt-1">
-              Take Attendance: {period.class?.name} ({period.sectionId})
-            </h3>
-            <p className="text-xs text-indigo-200 mt-0.5">
-              Subject: {period.subject?.name} · Room: {period.room || 'Classroom'}
-            </p>
-          </div>
-          <button onClick={onClose} className="text-indigo-200 hover:text-white text-lg">✕</button>
-        </div>
-
-        {/* Action Controls */}
-        <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setAllStatus('Present')}
-              className="px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-lg font-bold"
-            >
-              ✓ All Present
-            </button>
-            <button
-              type="button"
-              onClick={() => setAllStatus('Absent')}
-              className="px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-bold"
-            >
-              ✕ All Absent
-            </button>
-          </div>
-
-          <div className="flex gap-3 text-gray-600 font-semibold">
-            <span className="text-green-700">Present: {presentCount}</span>
-            <span className="text-red-600">Absent: {absentCount}</span>
-            <span className="text-amber-600">Late: {lateCount}</span>
-          </div>
-        </div>
-
-        {/* Student Roster List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {loading ? (
-            <SkeletonTable rows={5} />
-          ) : students.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-xs">
-              No students enrolled in this class and section.
-            </div>
-          ) : (
-            students.map((student, idx) => {
-              const curStatus = records[student._id] || 'Present'
-              return (
-                <div
-                  key={student._id}
-                  className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-200 transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-700 text-xs font-bold flex items-center justify-center">
-                      {idx + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="font-bold text-gray-900 text-xs truncate">{student.fullName}</p>
-                      <p className="text-[10px] text-gray-400 font-mono">ID: {student.studentId} · Roll: {student.rollNumber || 'N/A'}</p>
-                    </div>
-                  </div>
-
-                  {/* Status Buttons */}
-                  <div className="flex gap-1.5">
-                    {['Present', 'Absent', 'Late', 'Excused'].map((st) => {
-                      const isActive = curStatus === st
-                      let btnColor = 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      if (isActive) {
-                        if (st === 'Present') btnColor = 'bg-green-600 text-white font-bold shadow-sm'
-                        if (st === 'Absent') btnColor = 'bg-red-600 text-white font-bold shadow-sm'
-                        if (st === 'Late') btnColor = 'bg-amber-600 text-white font-bold shadow-sm'
-                        if (st === 'Excused') btnColor = 'bg-blue-600 text-white font-bold shadow-sm'
-                      }
-
-                      return (
-                        <button
-                          key={st}
-                          type="button"
-                          onClick={() => toggleStudentStatus(student._id, st)}
-                          className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${btnColor}`}
-                        >
-                          {st}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })
-          )}
-        </div>
-
-        {/* Modal Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting || students.length === 0}
-            className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
-          >
-            <Check className="w-4 h-4" />
-            {submitting ? 'Saving Attendance…' : `Save Period Attendance (${students.length} Students)`}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // ─── Main Teacher Workspace Page ──────────────────────────────────────────────
 export default function TeacherWorkspacePage() {
@@ -257,8 +44,8 @@ export default function TeacherWorkspacePage() {
     setLoading(true)
     try {
       const [wsRes, leavesRes] = await Promise.allSettled([
-        api.get('/teachers/me/workspace'),
-        api.get('/teachers/leave-requests', { params: { status: 'Pending' } }),
+        cachedGet('/teachers/me/workspace'),
+        cachedGet('/teachers/leave-requests', { params: { status: 'Pending' } }),
       ])
 
       if (wsRes.status === 'fulfilled' && wsRes.value.data?.success) {
@@ -321,41 +108,41 @@ export default function TeacherWorkspacePage() {
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold uppercase">Today's Periods</p>
-                <h3 className="text-2xl font-extrabold text-gray-900 mt-0.5">{today?.totalPeriodsToday ?? 0}</h3>
+                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{today?.totalPeriodsToday ?? 0}</p>
                 <p className="text-[11px] text-indigo-600 font-medium">{today?.dayName} Schedule</p>
               </div>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
+              <div className="p-3 bg-teal-50 text-teal-700 rounded-xl">
                 <Building className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold uppercase">Assigned Classes</p>
-                <h3 className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.totalAssignedClasses ?? 0}</h3>
-                <p className="text-[11px] text-teal-600 font-medium">Distinct Class Sections</p>
+                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.totalAssignedClasses ?? 0}</p>
+                <p className="text-[11px] text-teal-700 font-medium">Distinct Class Sections</p>
               </div>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-green-50 text-green-600 rounded-xl">
+              <div className="p-3 bg-green-50 text-green-700 rounded-xl">
                 <Users className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold uppercase">Total Students</p>
-                <h3 className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.totalStudents ?? 0}</h3>
-                <p className="text-[11px] text-green-600 font-medium">Across Assigned Sections</p>
+                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.totalStudents ?? 0}</p>
+                <p className="text-[11px] text-green-700 font-medium">Across Assigned Sections</p>
               </div>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
+              <div className="p-3 bg-amber-50 text-amber-700 rounded-xl">
                 <FileText className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold uppercase">Pending Leaves</p>
-                <h3 className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.pendingLeaveRequests ?? 0}</h3>
-                <p className="text-[11px] text-amber-600 font-medium">Parent Absence Notes</p>
+                <p className="text-2xl font-extrabold text-gray-900 mt-0.5">{workload?.pendingLeaveRequests ?? 0}</p>
+                <p className="text-[11px] text-amber-700 font-medium">Parent Absence Notes</p>
               </div>
             </div>
           </>
@@ -369,7 +156,7 @@ export default function TeacherWorkspacePage() {
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
               <Clock className="w-5 h-5 text-indigo-600" /> Today's Teaching Periods ({today?.dayName})
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">Click any period to record or review classroom attendance.</p>
+            <p className="text-xs text-gray-500 mt-0.5">Click any period to record or review classroom attendance.</p>
           </div>
           <span className="text-xs font-semibold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full">
             Session 2026
@@ -380,9 +167,9 @@ export default function TeacherWorkspacePage() {
           <SkeletonTable rows={4} />
         ) : !today?.periods || today.periods.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-            <BookOpen className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+            <BookOpen className="w-10 h-10 text-gray-500 mx-auto mb-2" />
             <p className="text-sm font-semibold text-gray-700">No scheduled periods for {today?.dayName || 'today'}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Enjoy your free day or prepare lesson plans!</p>
+            <p className="text-xs text-gray-500 mt-0.5">Enjoy your free day or prepare lesson plans!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -410,7 +197,7 @@ export default function TeacherWorkspacePage() {
                         <span className="w-2 h-2 rounded-full bg-indigo-600" /> Active Now
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400 font-medium">
+                      <span className="text-xs text-gray-500 font-medium">
                         {period.startTime} – {period.endTime}
                       </span>
                     )}
@@ -455,7 +242,7 @@ export default function TeacherWorkspacePage() {
 
           <div className="space-y-3">
             {assignedClasses.length === 0 ? (
-              <p className="text-xs text-gray-400">No classes assigned to this faculty profile.</p>
+              <p className="text-xs text-gray-500">No classes assigned to this faculty profile.</p>
             ) : (
               assignedClasses.map((cls, idx) => (
                 <div
@@ -499,7 +286,7 @@ export default function TeacherWorkspacePage() {
 
           <div className="space-y-3">
             {leaveRequests.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-xs">
+              <div className="text-center py-8 text-gray-500 text-xs">
                 No pending student leave applications to review.
               </div>
             ) : (

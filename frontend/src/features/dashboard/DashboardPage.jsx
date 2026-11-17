@@ -16,6 +16,7 @@ import { formatPKR } from '../../lib/formatters'
 import { useAuthStore } from '../../store/authStore'
 import { connectSSE, disconnectSSE } from '../../lib/sseClient'
 import { logError } from '../../lib/logger'
+import ChartFrame from '../../components/ui/ChartFrame'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const PIE_COLORS = ['#10b981', '#f59e0b']
@@ -302,7 +303,7 @@ export default function DashboardPage() {
 
       {/* ── Quick Actions ───────────────────────────────────────────── */}
       <div className="card-surface p-5 mb-6">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Actions</h2>
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Quick Actions</h2>
         <div className="flex flex-wrap gap-2.5">
           {quickActions.map((action) => {
             const Icon = action.icon
@@ -328,7 +329,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Enrollment by Grade</h2>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Active enrolled students across all grades</p>
+              <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5">Active enrolled students across all grades</p>
             </div>
             <span className="text-[11px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-full font-semibold border border-indigo-100 dark:border-indigo-900">
               Academic Year 2026
@@ -337,6 +338,7 @@ export default function DashboardPage() {
           {loading ? (
             <div className="h-52 bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse" />
           ) : (
+            <ChartFrame label="Bar chart: enrolled students by grade">
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={gradeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
@@ -350,6 +352,7 @@ export default function DashboardPage() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            </ChartFrame>
           )}
         </div>
 
@@ -359,12 +362,13 @@ export default function DashboardPage() {
             <>
               <div className="mb-4">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Fee Collection</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Collected vs outstanding</p>
+                <p className="text-xs text-gray-500 mt-0.5">Collected vs outstanding</p>
               </div>
               {loading ? (
                 <div className="h-52 bg-gray-100 rounded-xl animate-pulse" />
               ) : (
                 <>
+                  <ChartFrame label="Pie chart: fee collected versus outstanding">
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart>
                       <Pie
@@ -387,6 +391,7 @@ export default function DashboardPage() {
                       <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
                     </PieChart>
                   </ResponsiveContainer>
+                  </ChartFrame>
                   <div className="mt-2 space-y-1.5">
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-500">Collected</span>
@@ -404,7 +409,7 @@ export default function DashboardPage() {
             <>
               <div className="mb-4">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Today's Staff Roster</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Staff presence & leave distribution</p>
+                <p className="text-xs text-gray-500 mt-0.5">Staff presence & leave distribution</p>
               </div>
               <div className="h-44 flex flex-col justify-center space-y-3">
                 <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between">
@@ -425,7 +430,7 @@ export default function DashboardPage() {
             <>
               <div className="mb-4">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Academic Status</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Current term & attendance status</p>
+                <p className="text-xs text-gray-500 mt-0.5">Current term & attendance status</p>
               </div>
               <div className="h-44 flex flex-col justify-center space-y-3">
                 <div className="p-3.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between">
@@ -453,8 +458,9 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 card-surface p-6">
           <div className="mb-4">
             <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Attendance Trend</h2>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Daily attendance rate — last 7 days</p>
+            <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5">Daily attendance rate — last 7 days</p>
           </div>
+          <ChartFrame label="Line chart: daily attendance rate over the last 7 days">
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={attendanceTrend} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
@@ -473,6 +479,7 @@ export default function DashboardPage() {
               />
             </LineChart>
           </ResponsiveContainer>
+          </ChartFrame>
         </div>
 
         {/* Institutional Notices */}
@@ -486,15 +493,15 @@ export default function DashboardPage() {
             <div className="p-3 bg-indigo-50/60 dark:bg-indigo-950/30 rounded-xl border border-indigo-100 dark:border-indigo-900/40">
               <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">ACADEMICS</p>
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5">Midterm Examinations Schedule</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Exams start next Monday across Grade 9 & 10.</p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">Exams start next Monday across Grade 9 & 10.</p>
             </div>
             <div className="p-3 bg-teal-50/60 dark:bg-teal-950/30 rounded-xl border border-teal-100 dark:border-teal-900/40">
-              <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider">FINANCE</p>
+              <p className="text-[10px] font-bold text-teal-700 dark:text-teal-400 uppercase tracking-wider">FINANCE</p>
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5">Monthly Fee Clearance Deadline</p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Ensure all pending dues are recorded by the 10th.</p>
             </div>
             <div className="p-3 bg-amber-50/60 dark:bg-amber-950/30 rounded-xl border border-amber-100 dark:border-amber-900/40">
-              <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">ATTENDANCE</p>
+              <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">ATTENDANCE</p>
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5">Attendance Compliance Notice</p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Maintain minimum 75% monthly attendance requirement.</p>
             </div>

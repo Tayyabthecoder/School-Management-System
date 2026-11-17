@@ -68,7 +68,7 @@ export default function RegistrationSuccessDialog({
                       `/finance/receipt/${registrationSuccessData.paymentId}`,
                       `Receipt_${registrationSuccessData.receiptNo || 'Payment'}.pdf`
                     )}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-200 flex items-center justify-center gap-2 transition-all"
+                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-200 flex items-center justify-center gap-2 transition-all"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download Payment Receipt (.pdf)</span>

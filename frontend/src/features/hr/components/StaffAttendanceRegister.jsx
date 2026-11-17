@@ -3,12 +3,13 @@ import { CalendarCheck } from 'lucide-react'
 import { SkeletonTable } from '../../../components/ui/Skeleton'
 import api from '../../../lib/axios'
 import { useToast } from '../../../store/toastStore'
+import { cachedGet } from '../../../lib/cachedGet'
 
 // Must match backend STAFF_ATTENDANCE_STATUSES (LOW-13). 'Leave' is the legacy spelling of 'On Leave'.
 export const STAFF_STATUSES = ['Present', 'Late', 'Half Day', 'Absent', 'On Leave']
 
 const STATUS_STYLES = {
-  Present: 'bg-emerald-600 text-white border-emerald-600',
+  Present: 'bg-emerald-700 text-white border-emerald-600',
   Late: 'bg-amber-500 text-white border-amber-500',
   'Half Day': 'bg-sky-600 text-white border-sky-600',
   Absent: 'bg-rose-600 text-white border-rose-600',
@@ -36,7 +37,7 @@ export default function StaffAttendanceRegister({ staff = [] }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await api.get(`/attendance/staff?date=${date}`)
+      const res = await cachedGet(`/attendance/staff?date=${date}`)
       const map = {}
       for (const rec of res.data?.data || []) {
         const id = rec.staffId?._id || rec.staffId
@@ -92,14 +93,14 @@ export default function StaffAttendanceRegister({ staff = [] }) {
       {loading ? (
         <div className="p-6"><SkeletonTable rows={4} /></div>
       ) : activeStaff.length === 0 ? (
-        <div className="py-10 text-center text-sm text-gray-400">No active staff members</div>
+        <div className="py-10 text-center text-sm text-gray-500">No active staff members</div>
       ) : (
         <div className="divide-y divide-gray-100 max-h-[420px] overflow-y-auto">
           {activeStaff.map((s) => (
             <div key={s._id} className="px-5 py-3 flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-semibold text-gray-800 text-sm">{s.fullName}</p>
-                <p className="text-xs text-gray-400">{s.staffId} · {s.designation}</p>
+                <p className="text-xs text-gray-500">{s.staffId} · {s.designation}</p>
               </div>
               <div className="flex flex-wrap gap-1.5" role="group" aria-label={`Attendance for ${s.fullName}`}>
                 {STAFF_STATUSES.map((status) => {

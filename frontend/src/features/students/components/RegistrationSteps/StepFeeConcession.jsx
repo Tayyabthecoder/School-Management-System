@@ -103,7 +103,7 @@ export default function StepFeeConcession({
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
-                                  isSelected ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-gray-300 bg-white'
+                                  isSelected ? 'bg-emerald-700 border-emerald-600 text-white' : 'border-gray-300 bg-white'
                                 }`}>
                                   {isSelected && <Check className="w-3.5 h-3.5" />}
                                 </div>
@@ -132,7 +132,7 @@ export default function StepFeeConcession({
                       <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
                         Scholarship & Concession Waiver
                       </span>
-                      <span className="text-[10px] text-gray-400">Optional discount category</span>
+                      <span className="text-[10px] text-gray-500">Optional discount category</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -260,14 +260,14 @@ export default function StepFeeConcession({
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">Gross Total</p>
                         <p className="text-base font-bold mt-0.5">{formatPKR(grossFeeTotal)}</p>
-                        <p className="text-[10px] text-gray-400">{selectedFeeStructures.length} fee item(s)</p>
+                        <p className="text-[10px] text-gray-500">{selectedFeeStructures.length} fee item(s)</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-300">Concession</p>
                         <p className="text-base font-bold text-emerald-400 mt-0.5">
                           {calculatedDiscount > 0 ? `- ${formatPKR(calculatedDiscount)}` : 'PKR 0'}
                         </p>
-                        <p className="text-[10px] text-gray-400 truncate">{newStudent.feeSetup?.concessionType || 'None'}</p>
+                        <p className="text-[10px] text-gray-500 truncate">{newStudent.feeSetup?.concessionType || 'None'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-300">Net Payable</p>

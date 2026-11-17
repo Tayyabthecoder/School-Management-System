@@ -39,7 +39,7 @@ export default function Header() {
       <div className="flex-1 max-w-md mx-4 hidden md:block">
         <button
           onClick={openCommandPalette}
-          className="w-full flex items-center justify-between px-3.5 py-1.5 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/60 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700 text-slate-400 dark:text-slate-400 rounded-xl text-xs font-medium transition-all shadow-xs"
+          className="w-full flex items-center justify-between px-3.5 py-1.5 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/60 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-medium transition-all shadow-xs"
         >
           <div className="flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-slate-400" />
@@ -87,7 +87,7 @@ export default function Header() {
           </div>
           <div className="hidden lg:block text-left leading-none">
             <div className="text-xs font-bold text-slate-800 dark:text-slate-200 capitalize">{user?.username}</div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 capitalize mt-0.5">
+            <div className="text-[10px] text-slate-600 dark:text-slate-400 capitalize mt-0.5">
               {userRole.replace('_', ' ')}
             </div>
           </div>

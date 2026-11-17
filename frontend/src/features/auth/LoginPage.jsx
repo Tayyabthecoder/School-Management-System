@@ -72,14 +72,14 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-950 flex items-center justify-center p-4 font-sans">
         <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10 border border-indigo-100 text-center">
-          <div className="inline-flex p-4 bg-amber-100 rounded-2xl text-amber-600 mb-5 shadow">
+          <div className="inline-flex p-4 bg-amber-100 rounded-2xl text-amber-700 mb-5 shadow">
             <CalendarX className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-2">
             System Unavailable Today
           </h1>
           <p className="text-base font-semibold text-indigo-700 mb-1">
-            Today is <span className="text-amber-600 font-bold">{dayInfo.today}</span>
+            Today is <span className="text-amber-700 font-bold">{dayInfo.today}</span>
           </p>
           <p className="text-sm text-gray-500 mb-6">
             The School Management System is only operational on scheduled school days.
@@ -132,7 +132,7 @@ export default function LoginPage() {
           )}
           <p className="text-xs text-gray-500 mt-1">Authenticate to access your role-based academic workspace</p>
           {showAdminBypass && (
-            <p className="text-xs text-amber-600 font-semibold mt-1">
+            <p className="text-xs text-amber-700 font-semibold mt-1">
               * Admin Override Mode active for {dayInfo?.today}
             </p>
           )}
@@ -151,7 +151,7 @@ export default function LoginPage() {
               Username
             </label>
             <div className="relative">
-              <User className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <User className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
               <input aria-label="e.g. admin"
                 type="text"
                 required
@@ -168,7 +168,7 @@ export default function LoginPage() {
               Password
             </label>
             <div className="relative">
-              <Lock className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Lock className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
               <input aria-label="••••••••"
                 type="password"
                 required

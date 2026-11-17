@@ -235,7 +235,7 @@ export default function ProfileHeader({
               </span>
             </div>
             <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-800 text-center">
-              <p className="text-2xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+              <p className="text-2xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
                 Attendance
               </p>
               <p className="text-lg font-black text-emerald-900 dark:text-emerald-200 mt-0.5">
@@ -250,7 +250,7 @@ export default function ProfileHeader({
               </span>
             </div>
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-100 dark:border-amber-800 text-center">
-              <p className="text-2xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+              <p className="text-2xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">
                 Fee Status
               </p>
               <p className="text-sm font-black text-amber-900 dark:text-amber-200 mt-1">

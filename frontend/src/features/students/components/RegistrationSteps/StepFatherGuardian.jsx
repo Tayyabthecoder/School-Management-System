@@ -15,7 +15,7 @@ export default function StepFatherGuardian({
                       <Shield className="w-4 h-4 text-indigo-600" />
                       <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700">Father & Guardian Profile</h3>
                     </div>
-                    <span className="text-[11px] font-semibold text-gray-400">Father record always archived</span>
+                    <span className="text-[11px] font-semibold text-gray-500">Father record always archived</span>
                   </div>
 
                   {/* Father's Full Name & Status Toggle Box */}
@@ -59,7 +59,7 @@ export default function StepFatherGuardian({
                           }}
                           className={`py-2.5 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                             newStudent.fatherStatus === 'Alive'
-                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200'
+                              ? 'bg-emerald-700 text-white border-emerald-600 shadow-md shadow-emerald-200'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                           }`}
                         >
@@ -76,7 +76,7 @@ export default function StepFatherGuardian({
                           }}
                           className={`py-2.5 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                             newStudent.fatherStatus === 'Deceased'
-                              ? 'bg-amber-600 text-white border-amber-600 shadow-md shadow-amber-200'
+                              ? 'bg-amber-700 text-white border-amber-600 shadow-md shadow-amber-200'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                           }`}
                         >
