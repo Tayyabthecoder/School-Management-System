@@ -152,7 +152,8 @@ export default function LoginPage() {
             </label>
             <div className="relative">
               <User className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
-              <input aria-label="e.g. admin"
+              <input aria-label="Username"
+                autoComplete="username"
                 type="text"
                 required
                 value={username}
@@ -169,7 +170,8 @@ export default function LoginPage() {
             </label>
             <div className="relative">
               <Lock className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
-              <input aria-label="••••••••"
+              <input aria-label="Password"
+                autoComplete="current-password"
                 type="password"
                 required
                 value={password}

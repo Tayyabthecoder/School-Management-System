@@ -1,9 +1,10 @@
 import { test, describe, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 
-// The auth store reads localStorage while it loads; Node has none, so give it an in-memory one first.
+// The auth store reads localStorage while it loads; plain Node has none, so give it an in-memory one first
+// (under Vitest's jsdom there already is one).
 const memory = new Map()
-globalThis.localStorage = {
+if (typeof localStorage === 'undefined') globalThis.localStorage = {
   getItem: (k) => (memory.has(k) ? memory.get(k) : null),
   setItem: (k, v) => memory.set(k, String(v)),
   removeItem: (k) => memory.delete(k),

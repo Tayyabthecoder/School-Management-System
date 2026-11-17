@@ -14,6 +14,7 @@ const SIZE_CLASSES = {
 
 // Open modals, innermost last: only the top one reacts to Escape/Tab.
 const openModalStack = []
+let savedBodyOverflow = ''
 
 export default function Modal({
   isOpen,
@@ -37,6 +38,10 @@ export default function Modal({
   useEffect(() => {
     if (!isModalOpen) return
 
+    // The first modal to open remembers the page's scroll setting; the last one to close restores it.
+    // (Each modal used to remember the value it found, so with two stacked modals closing outer-first
+    // the inner one "restored" the already-locked value and the page stayed unscrollable for good.)
+    if (openModalStack.length === 0) savedBodyOverflow = document.body.style.overflow
     openModalStack.push(titleId)
     const previouslyFocused = document.activeElement
 
@@ -65,7 +70,6 @@ export default function Modal({
     }
 
     // Lock body scroll
-    const originalOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
     window.addEventListener('keydown', handleKeyDown)
@@ -82,8 +86,8 @@ export default function Modal({
       clearTimeout(timer)
       const at = openModalStack.lastIndexOf(titleId)
       if (at !== -1) openModalStack.splice(at, 1)
-      // Only the outermost modal owns the scroll lock; restore focus to what opened the dialog.
-      document.body.style.overflow = openModalStack.length === 0 ? originalOverflow : 'hidden'
+      // Only when the last modal has closed is the page scrollable again; restore focus to what opened the dialog.
+      document.body.style.overflow = openModalStack.length === 0 ? savedBodyOverflow : 'hidden'
       window.removeEventListener('keydown', handleKeyDown)
       if (previouslyFocused && typeof previouslyFocused.focus === 'function') previouslyFocused.focus()
     }

@@ -13,7 +13,7 @@ const VARIANTS = {
   danger:
     'bg-rose-600 hover:bg-rose-700 text-white shadow-xs focus-visible:ring-rose-500 border border-transparent',
   'danger-outline':
-    'bg-transparent hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 focus-visible:ring-rose-400',
+    'bg-transparent hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 focus-visible:ring-rose-400',
   success:
     'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs focus-visible:ring-emerald-500 border border-transparent',
 }

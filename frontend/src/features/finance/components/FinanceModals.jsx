@@ -52,8 +52,8 @@ export function RecordPaymentModal({
               </span>
             </div>
             <div className="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-1 font-bold">
-              <span className="text-rose-600 dark:text-rose-400">Outstanding Balance:</span>
-              <span className="text-rose-600 dark:text-rose-400">
+              <span className="text-rose-700 dark:text-rose-400">Outstanding Balance:</span>
+              <span className="text-rose-700 dark:text-rose-400">
                 {formatPKR(selectedFeeRecord.outstandingAmount)}
               </span>
             </div>

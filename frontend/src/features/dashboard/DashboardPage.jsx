@@ -371,7 +371,7 @@ export default function DashboardPage() {
                   <ChartFrame label="Pie chart: fee collected versus outstanding">
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart>
-                      <Pie
+                      <Pie rootTabIndex={-1}
                         data={feeChartData}
                         cx="50%"
                         cy="50%"

@@ -22,7 +22,7 @@ export default function DemographicsRow({
                         <ChartFrame label="Pie chart: student gender ratio">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
-                            <Pie
+                            <Pie rootTabIndex={-1}
                               data={demographics.gender}
                               innerRadius={50}
                               outerRadius={80}

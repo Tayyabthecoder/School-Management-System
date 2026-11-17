@@ -55,7 +55,7 @@ export default function AnalyticsReviewDrawer({
                         <span className="inline-block px-2.5 py-1 rounded-full text-xs font-extrabold bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-200 border border-rose-300">
                           {s.currentAverage}% Avg
                         </span>
-                        <p className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold mt-1">Requires Review</p>
+                        <p className="text-[10px] text-rose-700 dark:text-rose-400 font-semibold mt-1">Requires Review</p>
                       </div>
                     </div>
                   ))

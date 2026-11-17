@@ -143,6 +143,8 @@ export default function DataTable({
               />
               {searchTerm && (
                 <button
+                  type="button"
+                  aria-label="Clear search"
                   onClick={() => setSearchTerm('')}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-600 p-0.5"
                 >

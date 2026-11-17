@@ -13,9 +13,9 @@ export default function EmptyState({
       <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center text-slate-400 dark:text-slate-400 mb-4 shadow-xs">
         <Icon className="w-7 h-7" />
       </div>
-      <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 tracking-tight mb-1">
+      <p className="text-base font-semibold text-slate-900 dark:text-slate-100 tracking-tight mb-1">
         {title}
-      </h3>
+      </p>
       <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-5 leading-relaxed">
         {description}
       </p>

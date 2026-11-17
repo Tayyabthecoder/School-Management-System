@@ -178,7 +178,7 @@ export default function AcademicRecordsTab({
                     className={
                       g.percentage >= 50
                         ? 'text-slate-800 dark:text-slate-200'
-                        : 'text-rose-600 dark:text-rose-400'
+                        : 'text-rose-700 dark:text-rose-400'
                     }
                   >
                     {g.percentage}%

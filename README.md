@@ -2,7 +2,7 @@
 
 [![Node.js Version](https://img.shields.io/badge/Node.js-20.x_LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![React Version](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
@@ -167,7 +167,7 @@ When seeded using `npm run db:seed`, the database is populated with sample datas
 ## 💻 Technology Stack
 
 ### Frontend
-- **Framework:** [React 18](https://react.dev/) + [Vite 5](https://vitejs.dev/)
+- **Framework:** [React 18](https://react.dev/) + [Vite 8](https://vitejs.dev/)
 - **Routing:** [React Router v6](https://reactrouter.com/) (Protected & Role-based routes)
 - **Styling:** [Tailwind CSS 3](https://tailwindcss.com/) + PostCSS + Autoprefixer
 - **State & Server Cache:** [Zustand](https://github.com/pmndrs/zustand) & [TanStack React Query v5](https://tanstack.com/query/latest)
@@ -490,7 +490,7 @@ npm run test:coverage
 npm run test:integration
 ```
 
-The `*.integration.test.js` suites run the real API against MongoDB. Each suite creates its own throwaway database (`sms_jest_*`), loads the demo seed into it and drops it afterwards, so your development database is never touched. They use `mongodb://127.0.0.1:27017` by default; set `TEST_MONGODB_URI` to point elsewhere. CI starts MongoDB as a service. `npm run test:coverage` fails if coverage drops below the thresholds in `jest.config.js` (84% statements, 86% lines, 80% functions, 62% branches).
+The `*.integration.test.js` suites run the real API against MongoDB. Each suite creates its own throwaway database (`sms_jest_*`), loads the demo seed into it and drops it afterwards, so your development database is never touched. They use `mongodb://127.0.0.1:27017` by default; set `TEST_MONGODB_URI` to point elsewhere. CI starts MongoDB as a service. `npm run test:coverage` fails if coverage drops below the thresholds in `jest.config.js`.
 
 ### Test Coverage Highlights:
 - **Authentication & RBAC:** Verification of role barriers, forbidden actions, and expired token rejection.
@@ -498,19 +498,24 @@ The `*.integration.test.js` suites run the real API against MongoDB. Each suite 
 - **Finance Engine:** Challan calculations, discount applications, and payment reconciliations.
 - **Promotion & Roster:** Section transitions and student record updates.
 
+The `jest.config.js` gate is 88% statements, 90% lines, 88% functions and 68% branches.
+
 For the frontend:
 ```bash
 cd frontend
 
-# Run ESLint validation
-npm run lint
+npm run lint            # ESLint 9 (flat config in eslint.config.js)
+npm test                # Vitest: logic tests and component/router tests (Testing Library + jsdom)
+npm run test:coverage   # the same, plus the coverage gate in vitest.config.js
+npm run build           # production bundle (Vite 8)
 
-# Run the unit tests
-npm test
-
-# Verify the production bundle build
+# End-to-end smoke suite: the built frontend against a real API and MongoDB (reset and seeded each run)
 npm run build
+npm run test:e2e
 ```
+
+- **Component and router tests** cover the shared UI (modal, table, dialogs, toasts, navigation), the route guards and the full route table (which role may open which page, 60 role/page combinations), the stores, hooks and the SSE client. Coverage of that code is measured and gated at 90% statements and lines, 80% branches.
+- **End-to-end tests** (Playwright, driving your installed Chrome or Edge, no browser download) sign in as each role, walk the sidebar, record a payment, check keyboard shortcuts and run an **axe-core accessibility scan on every main screen in light and dark mode**. They need MongoDB on `mongodb://127.0.0.1:27017` (override with `E2E_MONGO_URI`) and use their own database, `sms_e2e`, on ports 5100 and 4173. Set `E2E_BROWSER=msedge` to use Edge. CI runs them in a separate job.
 
 ---
 

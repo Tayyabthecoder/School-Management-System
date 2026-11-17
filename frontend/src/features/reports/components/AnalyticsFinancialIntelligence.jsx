@@ -63,7 +63,7 @@ export default function AnalyticsFinancialIntelligence({
                                 </div>
                                 <div className="flex justify-between text-xs">
                                   <span className="text-gray-500 dark:text-slate-400">Concessions / Aid:</span>
-                                  <span className="font-medium text-rose-600 dark:text-rose-400">-{formatPKR(m.concessions)}</span>
+                                  <span className="font-medium text-rose-700 dark:text-rose-400">-{formatPKR(m.concessions)}</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
                                   <span className="text-gray-500 dark:text-slate-400">Projected Inflow:</span>

@@ -7,8 +7,9 @@ import { fileURLToPath } from 'node:url'
 const SRC = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src')
 const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true })
   .flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]))
-const jsx = walk(SRC).filter((f) => f.endsWith('.jsx'))
+// Tests and test helpers are not product code: they may use <ChartFrame>, <select> etc. as fixtures.
 const rel = (f) => path.relative(SRC, f).split(path.sep).join('/')
+const jsx = walk(SRC).filter((f) => f.endsWith('.jsx') && !rel(f).endsWith('.test.jsx') && !rel(f).startsWith('test/'))
 
 describe('accessibility guards (things a live axe scan found once)', () => {
   test('every chart is wrapped in <ChartFrame> so it has a text alternative', () => {

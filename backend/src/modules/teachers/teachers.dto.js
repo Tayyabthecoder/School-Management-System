@@ -1,5 +1,13 @@
 const { z } = require('zod')
 
+// z.coerce turns a missing field into NaN / Invalid Date before the error callback runs, so a
+// "... is required" message never appeared (callers saw "expected number, received NaN"). These keep a
+// missing value as undefined so the required message is the one that is reported.
+const requiredNumber = (label) => z.preprocess(
+  (v) => (v === undefined || v === null || v === '' ? undefined : Number(v)),
+  z.number({ error: (issue) => (issue.input === undefined ? `${label} is required` : `${label} must be a number`) }),
+)
+
 const createTeacherSchema = z.object({
   body: z.object({
     fullName: z.string({ error: (issue) => (issue.input === undefined ? 'Full name is required' : undefined) }).trim().min(2, 'Full name must be at least 2 characters').max(100),
@@ -23,7 +31,7 @@ const assignTeacherPeriodSchema = z.object({
     dayOfWeek: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {
       error: () => 'dayOfWeek must be a valid weekday',
     }),
-    periodNumber: z.coerce.number({ error: (issue) => (issue.input === undefined ? 'periodNumber is required' : undefined) }).int().min(1).max(12),
+    periodNumber: requiredNumber('periodNumber').pipe(z.number().int().min(1).max(12)),
     startTime: z.string().trim().optional(),
     endTime: z.string().trim().optional(),
     room: z.string().trim().optional(),

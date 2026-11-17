@@ -64,7 +64,7 @@ export default function StatCard({
     teal: 'bg-teal-50/80 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border-teal-100 dark:border-teal-900/50',
     green: 'bg-emerald-50/80 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50',
     amber: 'bg-amber-50/80 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/50',
-    rose: 'bg-rose-50/80 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/50',
+    rose: 'bg-rose-50/80 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-900/50',
   }
 
   return (

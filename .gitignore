@@ -55,3 +55,8 @@ PROJECT_REPORT.md
 
 # Database/upload backups (contain student data)
 backup/
+
+# Playwright output
+playwright-report/
+test-results/
+frontend/e2e/.auth/

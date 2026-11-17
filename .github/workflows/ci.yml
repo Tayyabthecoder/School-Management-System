@@ -76,9 +76,11 @@ jobs:
         working-directory: ./frontend
         run: npm run lint
 
-      - name: Unit Tests
+      # Vitest runs the logic tests and the component/router tests together and enforces the
+      # coverage floor in vitest.config.js (shared UI, route guards, stores, hooks and lib).
+      - name: Unit and component tests with coverage gate
         working-directory: ./frontend
-        run: npm test
+        run: npm run test:coverage
 
       - name: Build Frontend Application
         working-directory: ./frontend
@@ -96,6 +98,63 @@ jobs:
         working-directory: ./frontend
         run: npm audit --omit=dev --audit-level=high
 
+  e2e:
+    name: End-to-end (Playwright, Chrome)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    # The real built frontend against the real API and a MongoDB that the suite resets and seeds.
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      E2E_MONGO_URI: mongodb://127.0.0.1:27017
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build the frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      # The runner image ships Google Chrome, which the suite drives (no browser download).
+      - name: Run end-to-end tests
+        working-directory: ./frontend
+        run: npm run test:e2e
+
+      - name: Keep the report when something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7
+
   docker:
     name: Docker Build & Image Scan
     runs-on: ubuntu-latest
@@ -108,20 +167,37 @@ jobs:
       - name: Build frontend image
         run: docker build -t sms-frontend:ci frontend
 
-      # Informational for now (exit-code 0): surfaces fixable HIGH/CRITICAL findings in the
-      # base images and dependencies without blocking merges. Set exit-code to 1 to enforce.
-      - name: Scan backend image
+      # CRITICAL findings that have a fix block the merge. HIGH ones are listed but do not block
+      # (they are usually base-image packages the project cannot patch itself; Dependabot proposes
+      # the new base-image digest). Raise the second pair to exit-code '1' to enforce HIGH too.
+      - name: Scan backend image (CRITICAL blocks)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: sms-backend:ci
-          severity: HIGH,CRITICAL
+          severity: CRITICAL
           ignore-unfixed: true
-          exit-code: '0'
+          exit-code: '1'
 
-      - name: Scan frontend image
+      - name: Scan frontend image (CRITICAL blocks)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: sms-frontend:ci
-          severity: HIGH,CRITICAL
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: List HIGH findings in the backend image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: sms-backend:ci
+          severity: HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+
+      - name: List HIGH findings in the frontend image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: sms-frontend:ci
+          severity: HIGH
           ignore-unfixed: true
           exit-code: '0'

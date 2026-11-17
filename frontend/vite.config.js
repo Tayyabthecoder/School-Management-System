@@ -29,7 +29,8 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        // The end-to-end suite runs its own API on another port (see playwright.config.js).
+        target: process.env.API_PROXY_TARGET || 'http://localhost:5000',
         changeOrigin: true,
       },
     },
@@ -38,10 +39,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom', 'zustand', 'axios'],
-          charts: ['recharts'],
-          icons: ['lucide-react'],
+        // Vite 8 (Rolldown) wants a function here; the groups are the same as before.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined
+          if (/node_modules\/(recharts|recharts-scale|react-smooth|victory-vendor|d3-[^/]+|internmap|decimal\.js-light)\//.test(id)) return 'charts'
+          if (/node_modules\/lucide-react\//.test(id)) return 'icons'
+          if (/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler|zustand|axios)\//.test(id)) return 'vendor'
+          return undefined
         },
       },
     },

@@ -59,7 +59,7 @@ export default function PersonalMedicalView({ student, calculateAge, onStartEdit
                 </div>
                 <div>
                   <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-2xs">Blood Group</p>
-                  <p className="font-bold text-rose-600 dark:text-rose-400 text-sm mt-0.5">
+                  <p className="font-bold text-rose-700 dark:text-rose-400 text-sm mt-0.5">
                     {student.bloodGroup || (
                       <span className="text-slate-500 dark:text-slate-400 font-normal italic">—</span>
                     )}
