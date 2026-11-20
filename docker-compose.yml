@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7.0@sha256:9896df581dfd0718b7abe112f4c37598d0986c54060e4ec1384997e6503c8c71
+    image: mongo:9.0@sha256:b0c835c26e5997413e985000f1013c275377cd9607761c1784d486f6dd620b7f
     container_name: sms-mongodb
     restart: unless-stopped
     # No host port is published: only the backend (same Docker network) talks to MongoDB.
