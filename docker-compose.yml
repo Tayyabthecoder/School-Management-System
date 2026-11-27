@@ -94,7 +94,7 @@ services:
   # and set CLAMAV_HOST=clamav in .env. Needs about 1.5 GB of RAM and downloads its signatures on
   # first start (a few minutes); until it is ready, uploads are refused rather than left unscanned.
   clamav:
-    image: clamav/clamav:stable@sha256:7054e3f34308c384ea43cd786ea17abf899bd44af40af9f1b099853d7a5c214e
+    image: clamav/clamav:stable@sha256:64e30c0bf976198024deb3dc6d5cfe2485fb969c0f73549ba0fdb364b9469614
     container_name: sms-clamav
     restart: unless-stopped
     profiles: ['antivirus']
